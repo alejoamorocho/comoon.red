@@ -1,41 +1,60 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import ProfileCompleteBadge from '../../components/ProfileCompleteBadge';
 import { Storefront, MapPin } from '@phosphor-icons/react';
+import { isEntrepreneurProfileComplete } from '../../utils/profileCompletion';
 
-// Dummy Data
-const entrepreneurs = [
+// Dummy Data with profile completeness info
+const entrepreneursData = [
   {
     id: "1",
-    store_name: "Café Renacer",
-    bio: "Somos una cooperativa de jóvenes caficultores comprometidos con la paz y la calidad.",
+    store_name: "Cafe Renacer",
+    bio: "Somos una cooperativa de jovenes caficultores comprometidos con la paz y la calidad. Cultivamos con amor en las montanas de Antioquia.",
     location: "Andes, Antioquia",
     photoUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=400&q=80",
-    category: "Alimentos"
+    category: "Alimentos",
+    activeProductsCount: 3
   },
   {
     id: "2",
-    store_name: "Artesanías Ancestrales",
-    bio: "Tejidos tradicionales Wayuu que cuentan historias y sostienen familias enteras.",
+    store_name: "Artesanias Ancestrales",
+    bio: "Tejidos tradicionales Wayuu que cuentan historias y sostienen familias enteras en La Guajira colombiana.",
     location: "Uribia, La Guajira",
     photoUrl: "https://images.unsplash.com/photo-1606758689335-3c8dd315d487?auto=format&fit=crop&w=400&q=80",
-    category: "Arte y Moda"
+    category: "Arte y Moda",
+    activeProductsCount: 5
   },
   {
     id: "3",
     store_name: "BeeHappy",
-    bio: "Apicultura sostenible en zonas de reserva forestal, protegiendo polinizadores.",
+    bio: "Apicultura sostenible.",
     location: "Mocoa, Putumayo",
     photoUrl: "https://images.unsplash.com/photo-1587049359681-36765827054d?auto=format&fit=crop&w=400&q=80",
-    category: "Alimentos"
+    category: "Alimentos",
+    activeProductsCount: 0
   }
 ];
+
+// Sort by profile completeness (complete profiles first)
+const entrepreneurs = entrepreneursData
+  .map(ent => ({
+    ...ent,
+    isComplete: isEntrepreneurProfileComplete({
+      store_name: ent.store_name,
+      bio: ent.bio,
+      photo_url: ent.photoUrl,
+      location: ent.location,
+      activeProductsCount: ent.activeProductsCount
+    })
+  }))
+  .sort((a, b) => (b.isComplete ? 1 : 0) - (a.isComplete ? 1 : 0));
 ---
 
 <Layout title="Emprendedores">
   <div class="py-12 px-4">
     <div class="text-center mb-16">
-      <h1 class="text-4xl font-bold mb-4 text-dracula-cyan flex items-center justify-center gap-3">
-        <Storefront weight="duotone" /> Emprendedores con Propósito
+      <h1 class="text-4xl font-bold mb-4 text-entrepreneur flex items-center justify-center gap-3">
+        <Storefront weight="duotone" /> Emprendedores con Proposito
       </h1>
       <p class="text-lg text-dracula-fg/70 max-w-2xl mx-auto">
         Conoce a los creadores detrás de los productos. Cada emprendimiento aquí tiene una historia de resiliencia y compromiso social.
@@ -44,20 +63,25 @@ const entrepreneurs = [
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
       {entrepreneurs.map(ent => (
-        <a href={`/entrepreneurs/${ent.id}`} class="glass block rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-300 group">
+        <a href={`/entrepreneurs/${ent.id}`} class="glass block rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-300 group relative">
+          {ent.isComplete && (
+            <div class="absolute top-2 left-2 z-10">
+              <ProfileCompleteBadge client:visible isComplete={true} size="sm" />
+            </div>
+          )}
           <div class="h-48 overflow-hidden relative">
             <img src={ent.photoUrl} alt={ent.store_name} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-            <div class="absolute top-4 right-4 bg-dracula-bg/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-dracula-cyan border border-dracula-cyan/30">
+            <div class="absolute top-4 right-4 bg-dracula-bg/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-entrepreneur border border-entrepreneur/30">
               {ent.category}
             </div>
           </div>
           <div class="p-6">
-            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-dracula-cyan transition-colors">{ent.store_name}</h3>
-            <div class="flex items-center gap-2 text-dracula-purple text-sm font-medium mb-3">
+            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-entrepreneur transition-colors">{ent.store_name}</h3>
+            <div class="flex items-center gap-2 text-entrepreneur-dark text-sm font-medium mb-3">
                <MapPin size={18} weight="duotone" /> {ent.location}
             </div>
             <p class="text-dracula-fg/70 text-sm line-clamp-3">{ent.bio}</p>
-            <span class="inline-block mt-4 text-dracula-cyan font-bold text-sm">Ver Tienda &rarr;</span>
+            <span class="inline-block mt-4 text-entrepreneur font-bold text-sm">Ver Tienda &rarr;</span>
           </div>
         </a>
       ))}

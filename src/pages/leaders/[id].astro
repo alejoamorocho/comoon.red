@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import ShareButtons from '../../components/ShareButtons';
+import { LeaderTagsList } from '../../components/LeaderTagBadge';
 import { MapPin, UsersThree, Star, Image, Phone, EnvelopeSimple, Quotes, Moon, Heart, CheckCircle, ArrowLeft } from '@phosphor-icons/react';
 
 const { id } = Astro.params;
@@ -17,6 +18,7 @@ const leader = {
     story: "Naci en Buenaventura, un puerto donde la riqueza pasa de largo y la pobreza se queda. Desde nina vi como muchos vecinos no tenian que comer. A los 20 anos decidi que eso tenia que cambiar. Empece cocinando en mi casa para los ninos del barrio, y hoy alimentamos a mas de 50 familias cada dia. Mi sueno es que ningun nino se duerma con hambre.",
     location: "Buenaventura, Valle del Cauca",
     isVerified: true,
+    tags: ["alimentacion", "social", "comunidad"],
     photoUrl: "https://images.unsplash.com/photo-1531123414780-f74242c2b052?auto=format&fit=crop&w=400&q=80",
     gallery: [
         "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=400&q=80",
@@ -80,7 +82,7 @@ function formatCurrency(amount: number) {
 }
 ---
 
-<Layout title={`${leader.name} - Lider Social`}>
+<Layout title={`${leader.name} - Lider`}>
     <div class="max-w-5xl mx-auto py-8 px-4">
         <!-- Back Button -->
         <a href="/leaders" class="inline-flex items-center gap-2 text-dracula-comment hover:text-white mb-8 transition-colors group">
@@ -89,8 +91,8 @@ function formatCurrency(amount: number) {
         </a>
 
         <!-- Header Profile Card -->
-        <div class="glass p-8 rounded-2xl mb-12 border border-dracula-purple/30 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-dracula-purple/10 rounded-full blur-3xl -z-10"></div>
+        <div class="glass p-8 rounded-2xl mb-12 border border-leader/30 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-leader/10 rounded-full blur-3xl -z-10"></div>
 
             <div class="md:flex gap-10 items-start">
                 <img
@@ -110,10 +112,13 @@ function formatCurrency(amount: number) {
                                     </span>
                                 )}
                             </div>
-                            <div class="flex items-center gap-2 text-dracula-purple font-medium">
+                            <div class="flex items-center gap-2 text-leader font-medium mb-2">
                                 <MapPin size={20} weight="duotone" />
                                 <span>{leader.location}</span>
                             </div>
+                            {leader.tags && leader.tags.length > 0 && (
+                                <LeaderTagsList client:visible tags={leader.tags} size="md" maxVisible={4} />
+                            )}
                         </div>
                         <div class="mt-4 md:mt-0 flex gap-2">
                             <a href={`tel:${leader.contact.phone}`} class="p-3 bg-dracula-current/50 rounded-full hover:bg-dracula-green hover:text-dracula-bg transition-all" title="Llamar">
@@ -125,7 +130,7 @@ function formatCurrency(amount: number) {
                         </div>
                     </div>
 
-                    <p class="text-lg text-dracula-fg/90 mb-6 italic border-l-4 border-dracula-purple pl-4">{leader.bio}</p>
+                    <p class="text-lg text-dracula-fg/90 mb-6 italic border-l-4 border-leader pl-4">{leader.bio}</p>
 
                     <!-- Stats Grid -->
                     <div class="grid grid-cols-3 gap-4 mb-6 text-center bg-dracula-bg/40 p-4 rounded-xl">
@@ -146,7 +151,7 @@ function formatCurrency(amount: number) {
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-white/10 pt-4">
                         <div class="flex items-center gap-2">
                             <span class="text-sm text-dracula-comment flex items-center gap-2">
-                                <Moon size={16} weight="duotone" className="text-dracula-purple" />
+                                <Moon size={16} weight="duotone" className="text-comoon-purple" />
                                 Difusion Lunar
                             </span>
                             <ShareButtons client:visible title={leader.name} text={`Conoce a ${leader.name}, lider social en ${leader.location}. Apoya su causa en comoon`} />
@@ -164,7 +169,7 @@ function formatCurrency(amount: number) {
         <div class="grid md:grid-cols-2 gap-12 mb-16">
             <div>
                 <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Quotes className="text-dracula-purple" />
+                    <Quotes className="text-leader" />
                     Mi Historia
                 </h2>
                 <div class="prose prose-invert">
@@ -175,7 +180,7 @@ function formatCurrency(amount: number) {
             </div>
             <div>
                 <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Image className="text-dracula-purple" />
+                    <Image className="text-leader" />
                     Galeria de Impacto
                 </h2>
                 <div class="grid grid-cols-2 gap-3">
@@ -193,11 +198,11 @@ function formatCurrency(amount: number) {
         <!-- Active Cause -->
         <div id="causa" class="mb-16 scroll-mt-24">
             <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <UsersThree size={28} className="text-dracula-purple" />
+                <UsersThree size={28} className="text-leader" />
                 Causa Activa
             </h2>
-            <div class="glass p-8 rounded-2xl border border-dracula-purple/30">
-                <h3 class="text-2xl font-bold text-dracula-cyan mb-4">{leader.cause.title}</h3>
+            <div class="glass p-8 rounded-2xl border border-leader/30">
+                <h3 class="text-2xl font-bold text-leader mb-4">{leader.cause.title}</h3>
                 <p class="text-dracula-fg/80 mb-6 text-lg leading-relaxed">{leader.cause.description}</p>
 
                 <!-- Progress Bar -->
@@ -218,7 +223,7 @@ function formatCurrency(amount: number) {
                 <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
                     <a
                         href={`/causes/${leader.cause.id}`}
-                        class="text-dracula-purple hover:underline flex items-center gap-2"
+                        class="text-leader hover:underline flex items-center gap-2"
                     >
                         <Star size={18} />
                         Ver detalles completos de la causa
@@ -237,7 +242,7 @@ function formatCurrency(amount: number) {
         <!-- Products Supporting This Cause -->
         <div>
             <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <Star className="text-dracula-cyan" />
+                <Star className="text-entrepreneur" />
                 Productos que apoyan esta causa
             </h2>
             <p class="text-dracula-comment mb-6">

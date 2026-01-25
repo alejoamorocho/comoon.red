@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UsersThree, Storefront, MapPin, CheckCircle, Eye, EyeSlash, Lock } from '@phosphor-icons/react';
+import { UsersThree, Storefront, MapPin, CheckCircle, Eye, EyeSlash, Lock, Compass } from '@phosphor-icons/react';
 import colombiaData from '../data/colombia.json';
 
 interface City {
@@ -9,7 +9,7 @@ interface City {
 }
 
 export default function RegisterForm() {
-    const [role, setRole] = useState<'leader' | 'entrepreneur'>('leader');
+    const [role, setRole] = useState<'leader' | 'entrepreneur' | 'conauta'>('leader');
     const [department, setDepartment] = useState<string>('');
     const [city, setCity] = useState<string>('');
     const [citiesList, setCitiesList] = useState<string[]>([]);
@@ -77,7 +77,7 @@ export default function RegisterForm() {
             <div className="text-center py-12">
                 <CheckCircle size={64} className="text-dracula-green mx-auto mb-4" weight="fill" />
                 <h2 className="text-3xl font-bold text-white mb-2">Registro Exitoso!</h2>
-                <p className="text-dracula-fg/80 mb-6">Gracias por unirte a comoon. Ya puedes iniciar sesion y gestionar tu perfil.</p>
+                <p className="text-dracula-fg/80 mb-6">Gracias por unirte a <span className="font-bold"><span className="text-white">co</span><span className="text-comoon-purple">moon</span></span>. Ya puedes iniciar sesion y gestionar tu perfil.</p>
                 <div className="flex gap-4 justify-center">
                     <a href="/" className="px-6 py-2 border border-dracula-current text-white font-bold rounded-lg hover:border-white transition-colors">Inicio</a>
                     <a href="/login" className="px-6 py-2 bg-dracula-purple text-dracula-bg font-bold rounded-lg hover:bg-white transition-colors">
@@ -91,40 +91,53 @@ export default function RegisterForm() {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Role Selection */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-3 gap-3 mb-8">
                 <button
                     type="button"
                     onClick={() => setRole('leader')}
                     className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${role === 'leader'
-                        ? 'border-dracula-purple bg-dracula-purple/20 text-white'
-                        : 'border-dracula-current bg-transparent text-dracula-comment hover:border-dracula-purple/50'
+                        ? 'border-leader bg-leader/20 text-white'
+                        : 'border-dracula-current bg-transparent text-dracula-comment hover:border-leader/50'
                         }`}
                 >
-                    <UsersThree size={32} weight={role === 'leader' ? 'fill' : 'duotone'} />
-                    <span className="font-bold">Soy Lider Social</span>
+                    <UsersThree size={28} weight={role === 'leader' ? 'fill' : 'duotone'} />
+                    <span className="font-bold text-sm">Soy Lider</span>
                 </button>
                 <button
                     type="button"
                     onClick={() => setRole('entrepreneur')}
                     className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${role === 'entrepreneur'
-                        ? 'border-dracula-cyan bg-dracula-cyan/20 text-white'
-                        : 'border-dracula-current bg-transparent text-dracula-comment hover:border-dracula-cyan/50'
+                        ? 'border-entrepreneur bg-entrepreneur/20 text-white'
+                        : 'border-dracula-current bg-transparent text-dracula-comment hover:border-entrepreneur/50'
                         }`}
                 >
-                    <Storefront size={32} weight={role === 'entrepreneur' ? 'fill' : 'duotone'} />
-                    <span className="font-bold">Soy Emprendedor</span>
+                    <Storefront size={28} weight={role === 'entrepreneur' ? 'fill' : 'duotone'} />
+                    <span className="font-bold text-sm">Soy Emprendedor</span>
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setRole('conauta')}
+                    className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${role === 'conauta'
+                        ? 'border-conauta bg-conauta/20 text-white'
+                        : 'border-dracula-current bg-transparent text-dracula-comment hover:border-conauta/50'
+                        }`}
+                >
+                    <Compass size={28} weight={role === 'conauta' ? 'fill' : 'duotone'} />
+                    <span className="font-bold text-sm">Soy Conauta</span>
                 </button>
             </div>
 
             {/* Name and Email */}
             <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-bold text-dracula-fg mb-2">Nombre {role === 'leader' ? 'Completo' : 'de la Tienda'}</label>
+                    <label className="block text-sm font-bold text-dracula-fg mb-2">
+                        {role === 'leader' ? 'Nombre Completo' : role === 'entrepreneur' ? 'Nombre de la Tienda' : 'Nombre Completo'}
+                    </label>
                     <input
                         type="text"
                         required
                         className="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-2 text-white focus:border-dracula-purple outline-none"
-                        placeholder={role === 'leader' ? "Ej. Maria Perez" : "Ej. Artesanias del Valle"}
+                        placeholder={role === 'leader' ? "Ej. Maria Perez" : role === 'entrepreneur' ? "Ej. Artesanias del Valle" : "Ej. Juan Garcia"}
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
@@ -241,12 +254,20 @@ export default function RegisterForm() {
             </div>
 
             <div>
-                <label className="block text-sm font-bold text-dracula-fg mb-2">Biografia / Descripcion</label>
+                <label className="block text-sm font-bold text-dracula-fg mb-2">
+                    {role === 'conauta' ? 'Sobre ti' : 'Biografia / Descripcion'}
+                </label>
                 <textarea
-                    rows={4}
-                    required
+                    rows={role === 'conauta' ? 3 : 4}
+                    required={role !== 'conauta'}
                     className="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-2 text-white focus:border-dracula-purple outline-none"
-                    placeholder={role === 'leader' ? "Cuentanos sobre tu liderazgo y tu comunidad..." : "Describe tu emprendimiento y que productos ofreces..."}
+                    placeholder={
+                        role === 'leader'
+                            ? "Cuentanos sobre tu liderazgo y tu comunidad..."
+                            : role === 'entrepreneur'
+                            ? "Describe tu emprendimiento y que productos ofreces..."
+                            : "Cuentanos por que quieres ser parte de Comoon..."
+                    }
                     value={formData.bio}
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 ></textarea>
@@ -268,7 +289,11 @@ export default function RegisterForm() {
                 disabled={loading || !!passwordError}
                 className="w-full bg-dracula-green text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all shadow-[0_0_20px_rgba(80,250,123,0.2)] disabled:opacity-70 disabled:cursor-not-allowed"
             >
-                {loading ? 'Procesando...' : (role === 'leader' ? 'Registrarme como Lider' : 'Crear mi Tienda')}
+                {loading ? 'Procesando...' : (
+                    role === 'leader' ? 'Registrarme como Lider' :
+                    role === 'entrepreneur' ? 'Registrarme como Emprendedor' :
+                    'Registrarme como Conauta'
+                )}
             </button>
 
             <p className="text-center text-dracula-comment text-sm">

@@ -12,15 +12,15 @@ CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK(role IN ('admin', 'leader', 'entrepreneur')),
-  profile_id INTEGER, -- References leaders.id or entrepreneurs.id based on role
+  role TEXT NOT NULL CHECK(role IN ('admin', 'leader', 'entrepreneur', 'conauta')),
+  profile_id INTEGER, -- References leaders.id, entrepreneurs.id or conautas.id based on role
   is_active BOOLEAN DEFAULT 1,
   is_verified BOOLEAN DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Leaders (Social Leaders) table
+-- Leaders table
 CREATE TABLE leaders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER UNIQUE,
@@ -30,11 +30,21 @@ CREATE TABLE leaders (
   photo_url TEXT,
   contact_info JSON, -- { whatsapp, instagram, facebook, etc. }
   social_links JSON,
+  tags JSON, -- Array of tag IDs: ["ambiental", "social", "educacion"]
   is_verified BOOLEAN DEFAULT 0,
   verification_notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Leader Tags reference table (for available tags)
+CREATE TABLE leader_tags (
+  id TEXT PRIMARY KEY, -- slug: ambiental, social, animales, etc.
+  name TEXT NOT NULL,
+  color TEXT NOT NULL, -- emerald, blue, orange, etc.
+  icon TEXT NOT NULL, -- Leaf, UsersThree, PawPrint, etc.
+  description TEXT
 );
 
 -- Causes (Social Causes) table
@@ -89,6 +99,20 @@ CREATE TABLE products (
   FOREIGN KEY (cause_id) REFERENCES causes(id)
 );
 
+-- Conautas table (users who want to help without being leaders or entrepreneurs)
+CREATE TABLE conautas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER UNIQUE,
+  name TEXT NOT NULL,
+  bio TEXT,
+  photo_url TEXT,
+  location TEXT,
+  interests JSON, -- Array of interest tags
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
 -- Orders/Transactions table (for tracking contributions)
 CREATE TABLE transactions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -113,3 +137,15 @@ CREATE INDEX idx_causes_status ON causes(status);
 CREATE INDEX idx_products_entrepreneur_id ON products(entrepreneur_id);
 CREATE INDEX idx_products_cause_id ON products(cause_id);
 CREATE INDEX idx_transactions_cause_id ON transactions(cause_id);
+CREATE INDEX idx_conautas_user_id ON conautas(user_id);
+
+-- Seed leader tags
+INSERT INTO leader_tags (id, name, color, icon, description) VALUES
+('ambiental', 'Ambiental', 'emerald', 'Leaf', 'Causas relacionadas con medio ambiente y ecologia'),
+('social', 'Social', 'blue', 'UsersThree', 'Causas de bienestar comunitario y derechos humanos'),
+('animales', 'Animales', 'orange', 'PawPrint', 'Proteccion y bienestar animal'),
+('educacion', 'Educacion', 'purple', 'BookOpen', 'Acceso a educacion y formacion'),
+('salud', 'Salud', 'red', 'FirstAid', 'Salud comunitaria y acceso a servicios medicos'),
+('cultura', 'Cultura', 'pink', 'Palette', 'Preservacion cultural y artes'),
+('comunidad', 'Comunidad', 'cyan', 'House', 'Desarrollo comunitario y vivienda'),
+('alimentacion', 'Alimentacion', 'yellow', 'ForkKnife', 'Seguridad alimentaria y nutricion');

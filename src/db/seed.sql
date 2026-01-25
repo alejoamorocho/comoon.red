@@ -1,14 +1,15 @@
 -- Seed Data for 'comoon'
 -- Note: In production, passwords should be properly hashed (bcrypt/argon2)
 
--- Users (passwords are hashed versions of: admin123, lider123, emprendedor123)
+-- Users (passwords are hashed versions of: admin123, lider123, emprendedor123, conauta123)
 -- These are SHA-256 hashes for demo purposes. Use bcrypt in production!
 INSERT INTO users (email, password_hash, role, is_active, is_verified) VALUES
 ('admin@comoon.co', '$2a$10$demo_admin_hash_placeholder', 'admin', 1, 1),
 ('elena.marin@email.com', '$2a$10$demo_leader_hash_placeholder', 'leader', 1, 1),
 ('carlos.rodriguez@email.com', '$2a$10$demo_leader_hash_placeholder', 'leader', 1, 1),
 ('artesanias@email.com', '$2a$10$demo_entrepreneur_hash', 'entrepreneur', 1, 1),
-('cafeorigen@email.com', '$2a$10$demo_entrepreneur_hash', 'entrepreneur', 1, 1);
+('cafeorigen@email.com', '$2a$10$demo_entrepreneur_hash', 'entrepreneur', 1, 1),
+('conauta@comoon.co', '$2a$10$demo_conauta_hash_placeholder', 'conauta', 1, 1);
 
 -- Leaders
 INSERT INTO leaders (user_id, name, bio, location, photo_url, contact_info, social_links, is_verified) VALUES
@@ -39,6 +40,13 @@ INSERT INTO products (entrepreneur_id, cause_id, name, price, contribution_text,
 (1, 2, 'Sombrero Vueltiao Tradicional', 120000, 'Donamos $20.000 a la Escuela de Musica con cada sombrero.', 20000, 'fixed', 'https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?q=80&w=1000&auto=format&fit=crop', 'Simbolo cultural de Colombia. Tejido fino 19 vueltas.', 1),
 (2, 2, 'Cafe de Altura 500g', 35000, 'Apoyamos la cultura: $5.000 van para instrumentos musicales.', 5000, 'fixed', 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=1000&auto=format&fit=crop', 'Notas de chocolate y caramelo. Tueste medio.', 1),
 (2, 1, 'Kit de Degustacion', 60000, 'El 10% apoya la alimentacion de los ninos en Buenaventura.', 10, 'percentage', 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1000&auto=format&fit=crop', 'Incluye 3 variedades de cafe especial en presentacion de 120g.', 1);
+
+-- Conautas
+INSERT INTO conautas (user_id, name, bio, photo_url, location, interests) VALUES
+(6, 'Juan Garcia', 'Apasionado por el cambio social y el consumo responsable. Creo que cada pequena accion cuenta.', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop', 'Medellin, Antioquia', '["Medio Ambiente", "Educacion", "Cultura"]');
+
+-- Update users with profile_id for conauta
+UPDATE users SET profile_id = 1 WHERE id = 6;
 
 -- Sample transactions
 INSERT INTO transactions (product_id, cause_id, amount, customer_name, status) VALUES

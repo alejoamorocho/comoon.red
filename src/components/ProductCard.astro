@@ -57,7 +57,7 @@ const formattedPrice = new Intl.NumberFormat('es-CO', {
             <h3 class="text-lg font-bold text-white leading-tight line-clamp-2">{name}</h3>
         </a>
         <p class="text-dracula-comment text-sm mb-4">
-            de <span class="text-dracula-cyan font-medium">{entrepreneur}</span>
+            de <span class="text-entrepreneur font-medium">{entrepreneur}</span>
         </p>
 
         <!-- Impact Badge -->
@@ -70,7 +70,7 @@ const formattedPrice = new Intl.NumberFormat('es-CO', {
                         {contributionText} para
                         <a
                             href={causeId ? `/causes/${causeId}` : '#'}
-                            class="text-dracula-cyan hover:underline font-medium"
+                            class="text-leader hover:underline font-medium"
                         >
                             {cause}
                         </a>

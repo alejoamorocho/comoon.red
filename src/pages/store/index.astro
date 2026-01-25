@@ -109,7 +109,7 @@ if (filterLeader) {
         <!-- Header -->
         <div class="text-center mb-10">
             <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                <span class="text-dracula-cyan">Tienda</span> con <span class="text-dracula-purple">Proposito</span>
+                <span class="text-entrepreneur">Tienda</span> con <span class="text-comoon-purple">Proposito</span>
             </h1>
             <p class="text-lg text-dracula-fg/70 max-w-2xl mx-auto">
                 Productos unicos de emprendedores colombianos. <span class="text-dracula-green font-medium">Cada compra ilumina una causa social.</span>
@@ -129,7 +129,7 @@ if (filterLeader) {
         {activeFilter && (
             <div class="flex items-center justify-center gap-2 mb-6">
                 <span class="text-dracula-comment text-sm">Filtrando por {activeFilter.type}:</span>
-                <span class="bg-dracula-purple/20 text-dracula-purple px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2">
+                <span class="bg-leader/20 text-leader px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2">
                     {activeFilter.type === 'causa' ? <Heart size={14} /> : null}
                     {activeFilter.value}
                     <a href="/store" class="ml-2 hover:text-white">&times;</a>
@@ -173,7 +173,7 @@ if (filterLeader) {
         )}
 
         <!-- CTA Section -->
-        <div class="mt-16 text-center glass p-8 rounded-2xl border border-dracula-purple/30">
+        <div class="mt-16 text-center glass p-8 rounded-2xl border border-entrepreneur/30">
             <h2 class="text-2xl font-bold text-white mb-4">Eres emprendedor?</h2>
             <p class="text-dracula-fg/70 mb-6 max-w-xl mx-auto">
                 Publica tus productos y vinculalos a causas sociales. Vende con proposito y genera impacto real.

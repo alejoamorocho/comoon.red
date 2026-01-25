@@ -41,7 +41,7 @@ const progress = (cause.raised / cause.goal) * 100;
   <div class="max-w-4xl mx-auto py-12 px-4">
     <!-- Header -->
     <div class="text-center mb-12">
-        <span class="inline-flex items-center gap-2 bg-dracula-purple/20 text-dracula-purple px-4 py-1 rounded-full text-sm font-bold mb-4 border border-dracula-purple/50">
+        <span class="inline-flex items-center gap-2 bg-leader/20 text-leader px-4 py-1 rounded-full text-sm font-bold mb-4 border border-leader/50">
             <Star weight="fill" /> Causa Verificada
         </span>
         <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">{cause.title}</h1>
@@ -72,10 +72,10 @@ const progress = (cause.raised / cause.goal) * 100;
 
         <div class="mt-8 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4">
-                <img src={cause.leader.photoUrl} class="w-12 h-12 rounded-full object-cover border-2 border-dracula-purple" />
+                <img src={cause.leader.photoUrl} class="w-12 h-12 rounded-full object-cover border-2 border-leader" />
                 <div>
                     <p class="text-xs text-dracula-comment">Liderado por</p>
-                    <a href={`/leaders/${cause.leader.id}`} class="text-white font-bold hover:text-dracula-purple transition-colors">
+                    <a href={`/leaders/${cause.leader.id}`} class="text-white font-bold hover:text-leader transition-colors">
                         {cause.leader.name}
                     </a>
                 </div>
@@ -86,7 +86,7 @@ const progress = (cause.raised / cause.goal) * 100;
 
     <!-- Linked Products -->
     <div>
-        <h2 class="text-3xl font-bold text-dracula-cyan mb-8 text-center">Productos que financian esta causa</h2>
+        <h2 class="text-3xl font-bold text-entrepreneur mb-8 text-center">Productos que financian esta causa</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cause.products.map(p => <ProductCard {...p} />)}
         </div>

@@ -50,8 +50,8 @@ const entrepreneur = {
     </div>
 
   <div class="max-w-5xl mx-auto px-4 -mt-32 relative z-10">
-    <div class="glass p-8 rounded-2xl md:flex gap-8 items-start mb-12 border-t-4 border-dracula-cyan">
-       <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-dracula-cyan shrink-0 mx-auto md:mx-0 shadow-xl bg-dracula-bg">
+    <div class="glass p-8 rounded-2xl md:flex gap-8 items-start mb-12 border-t-4 border-entrepreneur">
+       <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-entrepreneur shrink-0 mx-auto md:mx-0 shadow-xl bg-dracula-bg">
           <img src={entrepreneur.photoUrl} alt={entrepreneur.store_name} class="w-full h-full object-cover" />
        </div>
        <div class="mt-4 md:mt-0 text-center md:text-left flex-1">
@@ -65,12 +65,12 @@ const entrepreneur = {
           
           <div class="flex justify-center md:justify-start gap-4 mb-6">
              {entrepreneur.social.instagram && (
-                 <a href="#" class="flex items-center gap-1 text-sm text-dracula-comment hover:text-dracula-purple transition-colors">
+                 <a href="#" class="flex items-center gap-1 text-sm text-dracula-comment hover:text-comoon-purple transition-colors">
                      <InstagramLogo size={18} /> {entrepreneur.social.instagram}
                  </a>
              )}
               {entrepreneur.social.website && (
-                 <a href="#" class="flex items-center gap-1 text-sm text-dracula-comment hover:text-dracula-cyan transition-colors">
+                 <a href="#" class="flex items-center gap-1 text-sm text-dracula-comment hover:text-entrepreneur transition-colors">
                      <Globe size={18} /> Web
                  </a>
              )}
@@ -89,7 +89,7 @@ const entrepreneur = {
         <!-- Story -->
         <div class="md:col-span-2">
             <h2 class="text-2xl font-bold text-white mb-4">Nuestra Historia</h2>
-            <p class="text-dracula-fg/80 leading-relaxed text-lg border-l-4 border-dracula-cyan pl-6 bg-dracula-current/10 py-4 rounded-r-xl">
+            <p class="text-dracula-fg/80 leading-relaxed text-lg border-l-4 border-entrepreneur pl-6 bg-dracula-current/10 py-4 rounded-r-xl">
                 {entrepreneur.story}
             </p>
         </div>
@@ -118,7 +118,7 @@ const entrepreneur = {
 
 
     <div class="mb-12">
-      <h2 class="text-2xl font-bold text-dracula-cyan mb-6">Nuestros Productos</h2>
+      <h2 class="text-2xl font-bold text-entrepreneur mb-6">Nuestros Productos</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {entrepreneur.products.map(p => <ProductCard {...p} />)}
       </div>

@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { PlusCircle, Image, Trophy, Users, CurrencyDollar, SignOut, Eye, PencilSimple, ChartLineUp } from '@phosphor-icons/react';
+import { TagSelector, LeaderTagsList } from '../../components/LeaderTagBadge';
+import { PlusCircle, Image, Trophy, Users, CurrencyDollar, SignOut, Eye, PencilSimple, ChartLineUp, Tag } from '@phosphor-icons/react';
 
 // Mock data - In real app, fetch from API based on logged-in user
 const leaderProfile = {
@@ -8,7 +9,8 @@ const leaderProfile = {
     name: "Elena Marin",
     location: "Buenaventura, Valle del Cauca",
     photo: "https://images.unsplash.com/photo-1531123414780-f74242c2b052?q=80&w=400&auto=format&fit=crop",
-    isVerified: true
+    isVerified: true,
+    tags: ["alimentacion", "social", "comunidad"]
 };
 
 const stats = {
@@ -42,11 +44,11 @@ function formatCurrency(amount: number) {
 }
 ---
 
-<Layout title="Dashboard Lider Social">
+<Layout title="Dashboard Lider">
     <div class="max-w-6xl mx-auto py-8 px-4">
         <!-- Header with Profile -->
         <div class="glass p-6 rounded-xl mb-8 flex flex-col md:flex-row items-center gap-6">
-            <img src={leaderProfile.photo} alt={leaderProfile.name} class="w-24 h-24 rounded-full object-cover border-4 border-dracula-purple" />
+            <img src={leaderProfile.photo} alt={leaderProfile.name} class="w-24 h-24 rounded-full object-cover border-4 border-leader" />
             <div class="flex-1 text-center md:text-left">
                 <div class="flex items-center gap-2 justify-center md:justify-start">
                     <h1 class="text-2xl font-bold text-white">{leaderProfile.name}</h1>
@@ -55,7 +57,12 @@ function formatCurrency(amount: number) {
                     )}
                 </div>
                 <p class="text-dracula-comment">{leaderProfile.location}</p>
-                <p class="text-dracula-purple font-medium mt-1">Lider Social</p>
+                <p class="text-leader font-medium mt-1">Lider</p>
+                {leaderProfile.tags && leaderProfile.tags.length > 0 && (
+                    <div class="mt-2">
+                        <LeaderTagsList client:visible tags={leaderProfile.tags} size="sm" maxVisible={4} />
+                    </div>
+                )}
             </div>
             <div class="flex gap-2">
                 <a href={`/leaders/${leaderProfile.id}`} class="px-4 py-2 bg-dracula-current text-white rounded-lg hover:bg-dracula-comment transition-colors flex items-center gap-2 text-sm">
@@ -85,7 +92,7 @@ function formatCurrency(amount: number) {
                 <p class="text-xs text-dracula-comment">Causas Activas</p>
             </div>
             <div class="glass p-4 rounded-xl text-center">
-                <Users size={32} className="mx-auto mb-2 text-dracula-cyan" />
+                <Users size={32} className="mx-auto mb-2 text-entrepreneur" />
                 <p class="text-2xl font-bold text-white">{stats.entrepreneursAllied}</p>
                 <p class="text-xs text-dracula-comment">Emprendedores Aliados</p>
             </div>
@@ -209,7 +216,7 @@ function formatCurrency(amount: number) {
                                     </div>
 
                                     <div class="flex items-center justify-between text-xs">
-                                        <span class="text-dracula-purple">{cause.productsLinked} productos vinculados</span>
+                                        <span class="text-entrepreneur">{cause.productsLinked} productos vinculados</span>
                                         <span class="bg-dracula-green/20 text-dracula-green px-2 py-1 rounded-full font-bold">Activa</span>
                                     </div>
                                 </div>
@@ -225,7 +232,7 @@ function formatCurrency(amount: number) {
             <div class="space-y-6">
                 <div class="glass p-6 rounded-xl">
                     <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                        <Users className="text-dracula-cyan" size={24} />
+                        <Users className="text-entrepreneur" size={24} />
                         Emprendedores Aliados
                     </h2>
                     <p class="text-sm text-dracula-comment mb-4">Estos emprendedores tienen productos que apoyan tus causas</p>
@@ -235,16 +242,29 @@ function formatCurrency(amount: number) {
                                 <img src={ent.photo} alt={ent.name} class="w-12 h-12 rounded-full object-cover" />
                                 <div class="flex-1">
                                     <h4 class="font-bold text-white text-sm">{ent.name}</h4>
-                                    <p class="text-xs text-dracula-cyan">{ent.products} productos vinculados</p>
+                                    <p class="text-xs text-entrepreneur">{ent.products} productos vinculados</p>
                                 </div>
                             </a>
                         ))}
                     </div>
                 </div>
 
+                <!-- Tag Selection -->
+                <div class="glass p-6 rounded-xl border border-leader/30 mb-6">
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+                        <Tag className="text-leader" size={20} />
+                        Mis Etiquetas
+                    </h3>
+                    <p class="text-sm text-dracula-comment mb-4">Selecciona las etiquetas que describen tu enfoque:</p>
+                    <TagSelector client:visible selectedTags={leaderProfile.tags} onChange={(tags) => console.log('Tags updated:', tags)} />
+                    <button class="w-full mt-4 px-4 py-2 border border-leader text-leader rounded-lg hover:bg-leader/10 transition-colors text-sm font-medium">
+                        Guardar Etiquetas
+                    </button>
+                </div>
+
                 <!-- Tips -->
-                <div class="glass p-6 rounded-xl border border-dracula-purple/30">
-                    <h3 class="font-bold text-dracula-purple mb-3">Consejos para Lideres</h3>
+                <div class="glass p-6 rounded-xl border border-leader/30">
+                    <h3 class="font-bold text-leader mb-3">Consejos para Lideres</h3>
                     <ul class="space-y-2 text-sm text-dracula-fg/80">
                         <li class="flex gap-2">
                             <span class="text-dracula-green">1.</span>

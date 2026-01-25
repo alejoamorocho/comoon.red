@@ -51,8 +51,8 @@ export default function StoreFilters({
                     }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
                         filterType === 'causa' || activeCauseId
-                            ? 'bg-dracula-purple/20 border-dracula-purple text-dracula-purple'
-                            : 'bg-dracula-current/30 border-dracula-current text-dracula-fg/80 hover:border-dracula-purple'
+                            ? 'bg-leader/20 border-leader text-leader'
+                            : 'bg-dracula-current/30 border-dracula-current text-dracula-fg/80 hover:border-leader'
                     }`}
                 >
                     <Heart size={18} weight="duotone" />
@@ -66,8 +66,8 @@ export default function StoreFilters({
                     }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
                         filterType === 'lider' || activeLeaderId
-                            ? 'bg-dracula-cyan/20 border-dracula-cyan text-dracula-cyan'
-                            : 'bg-dracula-current/30 border-dracula-current text-dracula-fg/80 hover:border-dracula-cyan'
+                            ? 'bg-leader/20 border-leader text-leader'
+                            : 'bg-dracula-current/30 border-dracula-current text-dracula-fg/80 hover:border-leader'
                     }`}
                 >
                     <UsersThree size={18} weight="duotone" />
@@ -112,8 +112,8 @@ export default function StoreFilters({
                                     onClick={() => handleFilterSelect('causa', cause.id)}
                                     className={`text-left p-3 rounded-lg border transition-all hover:scale-[1.02] ${
                                         activeCauseId === cause.id
-                                            ? 'bg-dracula-purple/20 border-dracula-purple'
-                                            : 'bg-dracula-bg/50 border-dracula-current hover:border-dracula-purple/50'
+                                            ? 'bg-leader/20 border-leader'
+                                            : 'bg-dracula-bg/50 border-dracula-current hover:border-leader/50'
                                     }`}
                                 >
                                     <p className="font-bold text-white text-sm">{cause.title}</p>
@@ -127,8 +127,8 @@ export default function StoreFilters({
                                     onClick={() => handleFilterSelect('lider', leader.id)}
                                     className={`text-left p-3 rounded-lg border transition-all hover:scale-[1.02] ${
                                         activeLeaderId === leader.id
-                                            ? 'bg-dracula-cyan/20 border-dracula-cyan'
-                                            : 'bg-dracula-bg/50 border-dracula-current hover:border-dracula-cyan/50'
+                                            ? 'bg-leader/20 border-leader'
+                                            : 'bg-dracula-bg/50 border-dracula-current hover:border-leader/50'
                                     }`}
                                 >
                                     <p className="font-bold text-white text-sm">{leader.name}</p>

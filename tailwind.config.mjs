@@ -17,6 +17,24 @@ export default {
                     red: '#ff5555',
                     yellow: '#f1fa8c',
                 },
+                comoon: {
+                    purple: '#9986bf',
+                },
+                leader: {
+                    DEFAULT: '#2dd4bf',
+                    light: '#5eead4',
+                    dark: '#14b8a6',
+                },
+                entrepreneur: {
+                    DEFAULT: '#22c55e',
+                    light: '#4ade80',
+                    dark: '#16a34a',
+                },
+                conauta: {
+                    DEFAULT: '#f59e0b',
+                    light: '#fbbf24',
+                    dark: '#d97706',
+                },
             },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],

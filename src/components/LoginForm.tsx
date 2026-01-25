@@ -28,6 +28,10 @@ export default function LoginForm() {
                 // Entrepreneur login
                 localStorage.setItem('user', JSON.stringify({ email, role: 'entrepreneur', name: 'Artesanias del Valle', id: 1 }));
                 window.location.href = '/dashboard/entrepreneur';
+            } else if (email === 'conauta@comoon.co' && password === 'conauta123') {
+                // Conauta login
+                localStorage.setItem('user', JSON.stringify({ email, role: 'conauta', name: 'Juan Garcia', id: 1 }));
+                window.location.href = '/dashboard/conauta';
             } else {
                 setError('Correo o contrasena incorrectos');
                 setLoading(false);
@@ -106,7 +110,7 @@ export default function LoginForm() {
             </button>
 
             <p className="text-center text-dracula-comment text-sm">
-                No tienes cuenta? <a href="/register" className="text-dracula-cyan hover:underline font-medium">Registrate</a>
+                No tienes cuenta? <a href="/register" className="text-comoon-purple hover:underline font-medium">Registrate</a>
             </p>
 
             {/* Demo Credentials */}
@@ -114,8 +118,9 @@ export default function LoginForm() {
                 <p className="text-dracula-comment text-xs font-bold mb-2">CREDENCIALES DE PRUEBA:</p>
                 <div className="space-y-1 text-xs text-dracula-fg/70">
                     <p><span className="text-dracula-purple">Admin:</span> admin@comoon.co / admin123</p>
-                    <p><span className="text-dracula-purple">Lider:</span> lider@comoon.co / lider123</p>
-                    <p><span className="text-dracula-cyan">Emprendedor:</span> emprendedor@comoon.co / emprendedor123</p>
+                    <p><span className="text-leader">Lider:</span> lider@comoon.co / lider123</p>
+                    <p><span className="text-entrepreneur">Emprendedor:</span> emprendedor@comoon.co / emprendedor123</p>
+                    <p><span className="text-conauta">Conauta:</span> conauta@comoon.co / conauta123</p>
                 </div>
             </div>
         </form>

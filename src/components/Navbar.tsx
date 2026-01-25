@@ -33,7 +33,10 @@ export default function Navbar() {
         <nav className="glass sticky top-4 z-50 mx-4 mt-4 rounded-xl px-6 py-4 flex justify-between items-center shadow-lg shadow-dracula-bg/50">
             <a href="/" className="flex items-center gap-2 group">
                 <ComoonLogo size={36} />
-                <span className="text-2xl font-bold tracking-tight text-white lowercase">comoon</span>
+                <span className="text-2xl font-bold tracking-tight lowercase">
+                    <span className="text-white">co</span>
+                    <span className="text-comoon-purple">moon</span>
+                </span>
             </a>
 
             <div className="flex items-center gap-4 md:gap-6">

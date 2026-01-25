@@ -57,7 +57,7 @@ function formatCurrency(amount: number) {
     <div class="max-w-6xl mx-auto py-8 px-4">
         <!-- Header with Profile -->
         <div class="glass p-6 rounded-xl mb-8 flex flex-col md:flex-row items-center gap-6">
-            <img src={entrepreneurProfile.photo} alt={entrepreneurProfile.storeName} class="w-24 h-24 rounded-xl object-cover border-4 border-dracula-cyan" />
+            <img src={entrepreneurProfile.photo} alt={entrepreneurProfile.storeName} class="w-24 h-24 rounded-xl object-cover border-4 border-entrepreneur" />
             <div class="flex-1 text-center md:text-left">
                 <div class="flex items-center gap-2 justify-center md:justify-start">
                     <h1 class="text-2xl font-bold text-white">{entrepreneurProfile.storeName}</h1>
@@ -66,7 +66,7 @@ function formatCurrency(amount: number) {
                     )}
                 </div>
                 <p class="text-dracula-comment">{entrepreneurProfile.location}</p>
-                <p class="text-dracula-cyan font-medium mt-1">Emprendedor</p>
+                <p class="text-entrepreneur font-medium mt-1">Emprendedor</p>
             </div>
             <div class="flex gap-2">
                 <a href={`/entrepreneurs/${entrepreneurProfile.id}`} class="px-4 py-2 bg-dracula-current text-white rounded-lg hover:bg-dracula-comment transition-colors flex items-center gap-2 text-sm">
@@ -86,7 +86,7 @@ function formatCurrency(amount: number) {
         <!-- Stats Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="glass p-4 rounded-xl text-center">
-                <ShoppingBag size={32} className="mx-auto mb-2 text-dracula-cyan" />
+                <ShoppingBag size={32} className="mx-auto mb-2 text-entrepreneur" />
                 <p class="text-2xl font-bold text-white">{stats.totalProducts}</p>
                 <p class="text-xs text-dracula-comment">Productos Activos</p>
             </div>
@@ -113,7 +113,7 @@ function formatCurrency(amount: number) {
                 <!-- Add Product Form -->
                 <div class="glass p-6 rounded-xl">
                     <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <PlusCircle className="text-dracula-cyan" size={24} />
+                        <PlusCircle className="text-entrepreneur" size={24} />
                         Agregar Nuevo Producto
                     </h2>
                     <form class="space-y-4" id="createProductForm">
@@ -124,7 +124,7 @@ function formatCurrency(amount: number) {
                                     type="text"
                                     name="name"
                                     placeholder="Ej. Collar de Semillas..."
-                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-entrepreneur outline-none"
                                     required
                                 />
                             </div>
@@ -135,7 +135,7 @@ function formatCurrency(amount: number) {
                                     name="price"
                                     placeholder="50000"
                                     min="1000"
-                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-entrepreneur outline-none"
                                     required
                                 />
                             </div>
@@ -147,14 +147,14 @@ function formatCurrency(amount: number) {
                                 name="description"
                                 rows="3"
                                 placeholder="Describe tu producto, materiales, proceso de fabricacion..."
-                                class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                                class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-entrepreneur outline-none"
                                 required
                             ></textarea>
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-dracula-fg mb-2">Foto del Producto</label>
-                            <div class="border-2 border-dashed border-dracula-comment rounded-lg p-6 text-center hover:border-dracula-cyan cursor-pointer transition-colors">
+                            <div class="border-2 border-dashed border-dracula-comment rounded-lg p-6 text-center hover:border-entrepreneur cursor-pointer transition-colors">
                                 <Image size={32} className="mx-auto mb-2 text-dracula-comment" />
                                 <p class="text-dracula-fg/60 text-sm">Arrastra una foto o haz clic para subir</p>
                             </div>
@@ -214,7 +214,7 @@ function formatCurrency(amount: number) {
 
                         <button
                             type="submit"
-                            class="w-full bg-dracula-cyan text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all shadow-[0_0_20px_rgba(139,233,253,0.2)]"
+                            class="w-full bg-entrepreneur text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all shadow-[0_0_20px_rgba(34,197,94,0.2)]"
                         >
                             Publicar Producto
                         </button>
@@ -234,7 +234,7 @@ function formatCurrency(amount: number) {
                                     <img src={product.photo} alt={product.name} class="w-16 h-16 rounded-lg object-cover" />
                                     <div class="flex-1">
                                         <h4 class="font-bold text-white">{product.name}</h4>
-                                        <p class="text-xs text-dracula-purple flex items-center gap-1 mt-1">
+                                        <p class="text-xs text-leader flex items-center gap-1 mt-1">
                                             <Heart size={12} />
                                             Apoya: {product.cause.title}
                                         </p>
@@ -246,7 +246,7 @@ function formatCurrency(amount: number) {
                                             <button class="p-1.5 text-dracula-fg/60 hover:text-white transition-colors" title="Editar">
                                                 <PencilSimple size={16} />
                                             </button>
-                                            <a href={`/store/${product.id}`} class="p-1.5 text-dracula-fg/60 hover:text-dracula-cyan transition-colors" title="Ver">
+                                            <a href={`/store/${product.id}`} class="p-1.5 text-dracula-fg/60 hover:text-entrepreneur transition-colors" title="Ver">
                                                 <Eye size={16} />
                                             </a>
                                             <button class="p-1.5 text-dracula-fg/60 hover:text-dracula-red transition-colors" title="Eliminar">
@@ -268,12 +268,12 @@ function formatCurrency(amount: number) {
                 <!-- Store Profile -->
                 <div class="glass p-6 rounded-xl">
                     <h3 class="font-bold text-white mb-4 flex items-center gap-2">
-                        <Storefront className="text-dracula-cyan" size={20} />
+                        <Storefront className="text-entrepreneur" size={20} />
                         Perfil de Tienda
                     </h3>
                     <img src={entrepreneurProfile.photo} alt={entrepreneurProfile.storeName} class="w-full h-32 object-cover rounded-lg mb-4" />
                     <p class="text-sm text-dracula-fg/80 mb-4">{entrepreneurProfile.bio}</p>
-                    <button class="w-full px-4 py-2 border border-dracula-cyan text-dracula-cyan rounded-lg hover:bg-dracula-cyan/10 transition-colors text-sm font-medium">
+                    <button class="w-full px-4 py-2 border border-entrepreneur text-entrepreneur rounded-lg hover:bg-entrepreneur/10 transition-colors text-sm font-medium">
                         Editar Perfil de Tienda
                     </button>
                 </div>
@@ -292,14 +292,14 @@ function formatCurrency(amount: number) {
                             </a>
                         ))}
                     </div>
-                    <a href="/leaders" class="block text-center text-dracula-purple text-sm mt-4 hover:underline">
+                    <a href="/leaders" class="block text-center text-leader text-sm mt-4 hover:underline">
                         Explorar mas causas
                     </a>
                 </div>
 
                 <!-- Tips -->
-                <div class="glass p-6 rounded-xl border border-dracula-cyan/30">
-                    <h3 class="font-bold text-dracula-cyan mb-3">Consejos para Emprendedores</h3>
+                <div class="glass p-6 rounded-xl border border-entrepreneur/30">
+                    <h3 class="font-bold text-entrepreneur mb-3">Consejos para Emprendedores</h3>
                     <ul class="space-y-2 text-sm text-dracula-fg/80">
                         <li class="flex gap-2">
                             <span class="text-dracula-green">1.</span>

@@ -19,7 +19,7 @@ export default function ShareButtons({ title, text, url, showLabel = false }: Sh
     };
 
     const shareWhatsApp = () => {
-        const shareText = `${text} - Descubre mas en comoon ${getUrl()}`;
+        const shareText = `${text} - Descubre mas en Comoon ${getUrl()}`;
         const link = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
         window.open(link, '_blank');
     };

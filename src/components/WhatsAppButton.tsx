@@ -14,7 +14,7 @@ export default function WhatsAppButton({
     variant = 'full'
 }: WhatsAppButtonProps) {
     // Message as specified in the business logic
-    const message = `Hola, me interesa el producto ${productName} y quiero apoyar la causa de ${leaderName} via comoon`;
+    const message = `Hola, me interesa el producto ${productName} y quiero apoyar la causa de ${leaderName} via Comoon`;
     const encodedMessage = encodeURIComponent(message);
 
     // If entrepreneur phone is provided, use it. Otherwise, open WhatsApp with just the message

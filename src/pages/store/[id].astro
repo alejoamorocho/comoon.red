@@ -83,7 +83,7 @@ const formattedContribution = new Intl.NumberFormat('es-CO', {
             <div>
                 <!-- Category & Price -->
                 <div class="flex items-center justify-between mb-4">
-                    <span class="bg-dracula-cyan/20 text-dracula-cyan px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
+                    <span class="bg-entrepreneur/20 text-entrepreneur px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
                         <Tag size={14} />
                         Artesania
                     </span>
@@ -97,13 +97,13 @@ const formattedContribution = new Intl.NumberFormat('es-CO', {
                 <p class="text-lg text-dracula-fg/80 mb-8 leading-relaxed">{product.description}</p>
 
                 <!-- Impact Section -->
-                <div class="glass p-6 rounded-2xl mb-8 border border-dracula-purple/30 relative overflow-hidden">
-                    <div class="absolute -right-6 -top-6 text-dracula-purple/10">
+                <div class="glass p-6 rounded-2xl mb-8 border border-leader/30 relative overflow-hidden">
+                    <div class="absolute -right-6 -top-6 text-leader/10">
                         <Heart size={120} weight="fill" />
                     </div>
                     <div class="relative">
                         <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                            <Moon size={20} weight="duotone" className="text-dracula-purple" />
+                            <Moon size={20} weight="duotone" className="text-comoon-purple" />
                             Impacto de tu compra
                         </h3>
                         <p class="text-dracula-fg/90 mb-4">
@@ -113,7 +113,7 @@ const formattedContribution = new Intl.NumberFormat('es-CO', {
                             href={`/causes/${product.causeId}`}
                             class="block bg-dracula-bg/50 p-4 rounded-xl hover:bg-dracula-current/50 transition-colors border border-white/5"
                         >
-                            <p class="text-dracula-cyan font-bold text-xl mb-1">"{product.cause}"</p>
+                            <p class="text-leader font-bold text-xl mb-1">"{product.cause}"</p>
                             <p class="text-sm text-dracula-comment">
                                 Causa liderada por <span class="text-white font-medium">{product.leaderName}</span>
                             </p>
@@ -134,11 +134,11 @@ const formattedContribution = new Intl.NumberFormat('es-CO', {
                 <!-- Entrepreneur Info -->
                 <div class="flex items-center justify-between p-4 bg-dracula-current/20 rounded-xl border border-white/5">
                     <div class="flex items-center gap-3">
-                        <Storefront size={24} className="text-dracula-cyan" />
+                        <Storefront size={24} className="text-entrepreneur" />
                         <div>
                             <a
                                 href={`/entrepreneurs/${product.entrepreneurId}`}
-                                class="font-bold text-white hover:text-dracula-cyan transition-colors"
+                                class="font-bold text-white hover:text-entrepreneur transition-colors"
                             >
                                 {product.entrepreneur}
                             </a>
@@ -150,7 +150,7 @@ const formattedContribution = new Intl.NumberFormat('es-CO', {
                     </div>
                     <a
                         href={`/entrepreneurs/${product.entrepreneurId}`}
-                        class="text-sm text-dracula-purple hover:underline"
+                        class="text-sm text-entrepreneur hover:underline"
                     >
                         Ver tienda
                     </a>
@@ -160,7 +160,7 @@ const formattedContribution = new Intl.NumberFormat('es-CO', {
                 <div class="mt-8 pt-6 border-t border-white/10">
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-dracula-comment flex items-center gap-2">
-                            <Moon size={16} weight="duotone" className="text-dracula-purple" />
+                            <Moon size={16} weight="duotone" className="text-comoon-purple" />
                             Difusion Lunar
                         </span>
                         <ShareButtons
@@ -178,8 +178,8 @@ const formattedContribution = new Intl.NumberFormat('es-CO', {
             <h2 class="text-2xl font-bold text-white mb-6">Mas productos que apoyan esta causa</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Placeholder for related products -->
-                <a href="/store?causa=1" class="glass p-6 rounded-xl text-center hover:border-dracula-purple/50 border border-transparent transition-all">
-                    <Heart size={40} className="mx-auto mb-3 text-dracula-purple" />
+                <a href="/store?causa=1" class="glass p-6 rounded-xl text-center hover:border-leader/50 border border-transparent transition-all">
+                    <Heart size={40} className="mx-auto mb-3 text-leader" />
                     <p class="font-bold text-white mb-2">Ver mas productos</p>
                     <p class="text-sm text-dracula-comment">que apoyan "{product.cause}"</p>
                 </a>

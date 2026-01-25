@@ -1,0 +1,219 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Compass, Heart, Share, ShoppingBag, SignOut, Eye, UsersThree, Storefront, Star, Rocket, MapPin } from '@phosphor-icons/react';
+
+// Mock data - In real app, fetch from API based on logged-in user
+const conautaProfile = {
+    id: 1,
+    name: "Juan Garcia",
+    location: "Medellin, Antioquia",
+    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    bio: "Apasionado por el cambio social y el consumo responsable.",
+    interests: ["Medio Ambiente", "Educacion", "Cultura"]
+};
+
+const stats = {
+    causesFollowed: 5,
+    productsShared: 12,
+    leadersSupported: 3
+};
+
+const featuredCauses = [
+    {
+        id: 1,
+        title: "Comedor Comunitario La Esperanza",
+        leader: "Elena Marin",
+        location: "Buenaventura",
+        progress: 25,
+        photo: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=200&q=80"
+    },
+    {
+        id: 2,
+        title: "Escuela de Musica del Pacifico",
+        leader: "Carlos Rodriguez",
+        location: "Quibdo",
+        progress: 45,
+        photo: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=200&q=80"
+    }
+];
+
+const recommendedProducts = [
+    {
+        id: 1,
+        name: "Bolso Tejido en Palma",
+        price: 85000,
+        entrepreneur: "Artesanias del Valle",
+        cause: "Comedor La Esperanza",
+        photo: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=200&q=80"
+    },
+    {
+        id: 3,
+        name: "Cafe de Altura 500g",
+        price: 35000,
+        entrepreneur: "Cafe Origen",
+        cause: "Escuela de Musica",
+        photo: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=200&q=80"
+    }
+];
+
+function formatCurrency(amount: number) {
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount);
+}
+---
+
+<Layout title="Dashboard Conauta">
+    <div class="max-w-6xl mx-auto py-8 px-4">
+        <!-- Header with Profile -->
+        <div class="glass p-6 rounded-xl mb-8 flex flex-col md:flex-row items-center gap-6">
+            <img src={conautaProfile.photo} alt={conautaProfile.name} class="w-24 h-24 rounded-full object-cover border-4 border-conauta" />
+            <div class="flex-1 text-center md:text-left">
+                <h1 class="text-2xl font-bold text-white">{conautaProfile.name}</h1>
+                <p class="text-dracula-comment flex items-center justify-center md:justify-start gap-1">
+                    <MapPin size={16} /> {conautaProfile.location}
+                </p>
+                <p class="text-conauta font-medium mt-1 flex items-center justify-center md:justify-start gap-1">
+                    <Compass size={16} /> Conauta
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <button
+                    onclick="localStorage.removeItem('user'); window.location.href = '/login';"
+                    class="px-4 py-2 bg-dracula-red/20 text-dracula-red rounded-lg hover:bg-dracula-red/30 transition-colors flex items-center gap-2 text-sm"
+                >
+                    <SignOut size={18} />
+                    Salir
+                </button>
+            </div>
+        </div>
+
+        <!-- What is a Conauta Banner -->
+        <div class="glass p-6 rounded-xl mb-8 border border-conauta/30 bg-gradient-to-r from-conauta/10 to-transparent">
+            <div class="flex items-start gap-4">
+                <div class="bg-conauta/20 p-3 rounded-full">
+                    <Rocket size={32} className="text-conauta" />
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-2">Eres un Conauta</h2>
+                    <p class="text-dracula-fg/80 mb-3">
+                        Los <span class="text-conauta font-bold">Conautas</span> son navegantes del cambio social.
+                        Tu rol es fundamental: compartes, difundes y apoyas comprando productos con proposito.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        {conautaProfile.interests.map(interest => (
+                            <span class="px-3 py-1 bg-conauta/20 text-conauta text-sm rounded-full font-medium">
+                                {interest}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-3 gap-4 mb-8">
+            <div class="glass p-4 rounded-xl text-center">
+                <Heart size={32} className="mx-auto mb-2 text-leader" />
+                <p class="text-2xl font-bold text-white">{stats.causesFollowed}</p>
+                <p class="text-xs text-dracula-comment">Causas Seguidas</p>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+                <Share size={32} className="mx-auto mb-2 text-conauta" />
+                <p class="text-2xl font-bold text-white">{stats.productsShared}</p>
+                <p class="text-xs text-dracula-comment">Compartidos</p>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+                <UsersThree size={32} className="mx-auto mb-2 text-entrepreneur" />
+                <p class="text-2xl font-bold text-white">{stats.leadersSupported}</p>
+                <p class="text-xs text-dracula-comment">Lideres Apoyados</p>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Causes to Follow -->
+            <div class="glass p-6 rounded-xl">
+                <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <Heart className="text-leader" size={24} />
+                    Causas Recomendadas
+                </h2>
+                <div class="space-y-4">
+                    {featuredCauses.map(cause => (
+                        <a href={`/causes/${cause.id}`} class="flex items-center gap-4 p-4 bg-dracula-bg/50 rounded-xl hover:bg-dracula-current/50 transition-colors">
+                            <img src={cause.photo} alt={cause.title} class="w-16 h-16 rounded-lg object-cover" />
+                            <div class="flex-1">
+                                <h3 class="font-bold text-white text-sm">{cause.title}</h3>
+                                <p class="text-xs text-dracula-comment">por {cause.leader} - {cause.location}</p>
+                                <div class="mt-2 w-full bg-dracula-current h-2 rounded-full overflow-hidden">
+                                    <div class="bg-leader h-full rounded-full" style={`width: ${cause.progress}%`}></div>
+                                </div>
+                            </div>
+                            <Star size={20} className="text-dracula-comment hover:text-conauta cursor-pointer" />
+                        </a>
+                    ))}
+                </div>
+                <a href="/leaders" class="block text-center text-leader text-sm mt-4 hover:underline font-medium">
+                    Ver todos los lideres y causas
+                </a>
+            </div>
+
+            <!-- Products to Share -->
+            <div class="glass p-6 rounded-xl">
+                <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <ShoppingBag className="text-entrepreneur" size={24} />
+                    Productos para Compartir
+                </h2>
+                <div class="space-y-4">
+                    {recommendedProducts.map(product => (
+                        <div class="flex items-center gap-4 p-4 bg-dracula-bg/50 rounded-xl">
+                            <img src={product.photo} alt={product.name} class="w-16 h-16 rounded-lg object-cover" />
+                            <div class="flex-1">
+                                <h3 class="font-bold text-white text-sm">{product.name}</h3>
+                                <p class="text-xs text-dracula-comment">{product.entrepreneur}</p>
+                                <p class="text-xs text-leader">Apoya: {product.cause}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-dracula-green text-sm">{formatCurrency(product.price)}</p>
+                                <button class="mt-2 p-2 bg-conauta/20 text-conauta rounded-lg hover:bg-conauta/30 transition-colors" title="Compartir">
+                                    <Share size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <a href="/store" class="block text-center text-entrepreneur text-sm mt-4 hover:underline font-medium">
+                    Ver toda la tienda
+                </a>
+            </div>
+        </div>
+
+        <!-- How to Help Section -->
+        <div class="glass p-6 rounded-xl mt-8 border border-conauta/30">
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <Compass className="text-conauta" size={24} />
+                Como puedes ayudar
+            </h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center p-4">
+                    <div class="bg-conauta/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Share size={28} className="text-conauta" />
+                    </div>
+                    <h3 class="font-bold text-white mb-2">Comparte</h3>
+                    <p class="text-sm text-dracula-fg/70">Difunde causas y productos en tus redes sociales para amplificar el impacto.</p>
+                </div>
+                <div class="text-center p-4">
+                    <div class="bg-entrepreneur/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ShoppingBag size={28} className="text-entrepreneur" />
+                    </div>
+                    <h3 class="font-bold text-white mb-2">Compra</h3>
+                    <p class="text-sm text-dracula-fg/70">Cada producto que compras genera una donacion directa a una causa social.</p>
+                </div>
+                <div class="text-center p-4">
+                    <div class="bg-leader/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <UsersThree size={28} className="text-leader" />
+                    </div>
+                    <h3 class="font-bold text-white mb-2">Conecta</h3>
+                    <p class="text-sm text-dracula-fg/70">Recomienda lideres y emprendedores a personas que puedan ayudar.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</Layout>
