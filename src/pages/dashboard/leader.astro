@@ -1,0 +1,278 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { PlusCircle, Image, Trophy, Users, CurrencyDollar, SignOut, Eye, PencilSimple, ChartLineUp } from '@phosphor-icons/react';
+
+// Mock data - In real app, fetch from API based on logged-in user
+const leaderProfile = {
+    id: 1,
+    name: "Elena Marin",
+    location: "Buenaventura, Valle del Cauca",
+    photo: "https://images.unsplash.com/photo-1531123414780-f74242c2b052?q=80&w=400&auto=format&fit=crop",
+    isVerified: true
+};
+
+const stats = {
+    totalRaised: 1250000,
+    totalGoal: 5000000,
+    entrepreneursAllied: 3,
+    activeCauses: 1,
+    totalProducts: 4
+};
+
+const myCauses = [
+    {
+        id: 1,
+        title: "Comedor Comunitario La Esperanza",
+        description: "Brindamos almuerzos diarios a 50 ninos del barrio Lleras.",
+        raised: 1250000,
+        goal: 5000000,
+        status: "active",
+        productsLinked: 2,
+        createdAt: "2024-01-15"
+    }
+];
+
+const alliedEntrepreneurs = [
+    { id: 1, name: "Artesanias del Valle", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop", products: 2 },
+    { id: 2, name: "Cafe Origen", photo: "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?q=80&w=100&auto=format&fit=crop", products: 1 },
+];
+
+function formatCurrency(amount: number) {
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount);
+}
+---
+
+<Layout title="Dashboard Lider Social">
+    <div class="max-w-6xl mx-auto py-8 px-4">
+        <!-- Header with Profile -->
+        <div class="glass p-6 rounded-xl mb-8 flex flex-col md:flex-row items-center gap-6">
+            <img src={leaderProfile.photo} alt={leaderProfile.name} class="w-24 h-24 rounded-full object-cover border-4 border-dracula-purple" />
+            <div class="flex-1 text-center md:text-left">
+                <div class="flex items-center gap-2 justify-center md:justify-start">
+                    <h1 class="text-2xl font-bold text-white">{leaderProfile.name}</h1>
+                    {leaderProfile.isVerified && (
+                        <span class="bg-dracula-green/20 text-dracula-green text-xs px-2 py-1 rounded-full font-bold">Verificado</span>
+                    )}
+                </div>
+                <p class="text-dracula-comment">{leaderProfile.location}</p>
+                <p class="text-dracula-purple font-medium mt-1">Lider Social</p>
+            </div>
+            <div class="flex gap-2">
+                <a href={`/leaders/${leaderProfile.id}`} class="px-4 py-2 bg-dracula-current text-white rounded-lg hover:bg-dracula-comment transition-colors flex items-center gap-2 text-sm">
+                    <Eye size={18} />
+                    Ver Perfil Publico
+                </a>
+                <button
+                    onclick="localStorage.removeItem('user'); window.location.href = '/login';"
+                    class="px-4 py-2 bg-dracula-red/20 text-dracula-red rounded-lg hover:bg-dracula-red/30 transition-colors flex items-center gap-2 text-sm"
+                >
+                    <SignOut size={18} />
+                    Salir
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass p-4 rounded-xl text-center">
+                <CurrencyDollar size={32} className="mx-auto mb-2 text-dracula-green" />
+                <p class="text-2xl font-bold text-white">{formatCurrency(stats.totalRaised)}</p>
+                <p class="text-xs text-dracula-comment">Total Recaudado</p>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+                <Trophy size={32} className="mx-auto mb-2 text-dracula-yellow" />
+                <p class="text-2xl font-bold text-white">{stats.activeCauses}</p>
+                <p class="text-xs text-dracula-comment">Causas Activas</p>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+                <Users size={32} className="mx-auto mb-2 text-dracula-cyan" />
+                <p class="text-2xl font-bold text-white">{stats.entrepreneursAllied}</p>
+                <p class="text-xs text-dracula-comment">Emprendedores Aliados</p>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+                <ChartLineUp size={32} className="mx-auto mb-2 text-dracula-pink" />
+                <p class="text-2xl font-bold text-white">{Math.round((stats.totalRaised / stats.totalGoal) * 100)}%</p>
+                <p class="text-xs text-dracula-comment">Meta Cumplida</p>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Create New Cause -->
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <PlusCircle className="text-dracula-green" size={24} />
+                        Crear Nueva Causa
+                    </h2>
+                    <form class="space-y-4" id="createCauseForm">
+                        <div>
+                            <label class="block text-sm font-bold text-dracula-fg mb-2">Titulo de la Causa</label>
+                            <input
+                                type="text"
+                                name="title"
+                                placeholder="Ej. Biblioteca Comunitaria para Ninos..."
+                                class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-purple outline-none"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-dracula-fg mb-2">Descripcion</label>
+                            <textarea
+                                name="description"
+                                rows="4"
+                                placeholder="Describe el impacto que tendra esta causa, a quienes beneficiara y como se usaran los fondos..."
+                                class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-purple outline-none"
+                                required
+                            ></textarea>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-dracula-fg mb-2">Meta Financiera (COP)</label>
+                                <input
+                                    type="number"
+                                    name="goal"
+                                    placeholder="5000000"
+                                    min="100000"
+                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-purple outline-none"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-dracula-fg mb-2">Categoria</label>
+                                <select
+                                    name="category"
+                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-purple outline-none"
+                                >
+                                    <option value="alimentacion">Alimentacion</option>
+                                    <option value="educacion">Educacion</option>
+                                    <option value="salud">Salud</option>
+                                    <option value="cultura">Cultura</option>
+                                    <option value="ambiente">Medio Ambiente</option>
+                                    <option value="otros">Otros</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-dracula-fg mb-2">Fotos de Evidencia</label>
+                            <div class="border-2 border-dashed border-dracula-comment rounded-lg p-8 text-center hover:border-dracula-purple cursor-pointer transition-colors">
+                                <Image size={40} className="mx-auto mb-2 text-dracula-comment" />
+                                <p class="text-dracula-fg/60">Arrastra fotos aqui o haz clic para subir</p>
+                                <p class="text-xs text-dracula-comment mt-1">Sube imagenes que muestren tu trabajo en la comunidad</p>
+                            </div>
+                        </div>
+                        <button
+                            type="submit"
+                            class="w-full bg-dracula-purple text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all shadow-[0_0_20px_rgba(189,147,249,0.2)]"
+                        >
+                            Publicar Causa
+                        </button>
+                    </form>
+                </div>
+
+                <!-- My Causes -->
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <Trophy className="text-dracula-yellow" size={24} />
+                        Mis Causas Activas
+                    </h2>
+                    {myCauses.length > 0 ? (
+                        <div class="space-y-4">
+                            {myCauses.map(cause => (
+                                <div class="bg-dracula-bg/50 p-5 rounded-xl border border-dracula-current">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div>
+                                            <h3 class="font-bold text-white text-lg">{cause.title}</h3>
+                                            <p class="text-sm text-dracula-comment mt-1">{cause.description}</p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button class="p-2 text-dracula-fg/60 hover:text-white transition-colors" title="Editar">
+                                                <PencilSimple size={20} />
+                                            </button>
+                                            <a href={`/causes/${cause.id}`} class="p-2 text-dracula-fg/60 hover:text-dracula-cyan transition-colors" title="Ver">
+                                                <Eye size={20} />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-dracula-green font-bold">{formatCurrency(cause.raised)}</span>
+                                            <span class="text-dracula-comment">de {formatCurrency(cause.goal)}</span>
+                                        </div>
+                                        <div class="w-full bg-dracula-current h-3 rounded-full overflow-hidden">
+                                            <div
+                                                class="bg-gradient-to-r from-dracula-green to-dracula-cyan h-full rounded-full transition-all"
+                                                style={`width: ${Math.min((cause.raised / cause.goal) * 100, 100)}%`}
+                                            ></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-dracula-purple">{cause.productsLinked} productos vinculados</span>
+                                        <span class="bg-dracula-green/20 text-dracula-green px-2 py-1 rounded-full font-bold">Activa</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-center text-dracula-comment py-8">No tienes causas activas. Crea tu primera causa arriba.</p>
+                    )}
+                </div>
+            </div>
+
+            <!-- Right Column - Entrepreneurs -->
+            <div class="space-y-6">
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Users className="text-dracula-cyan" size={24} />
+                        Emprendedores Aliados
+                    </h2>
+                    <p class="text-sm text-dracula-comment mb-4">Estos emprendedores tienen productos que apoyan tus causas</p>
+                    <div class="space-y-3">
+                        {alliedEntrepreneurs.map(ent => (
+                            <a href={`/entrepreneurs/${ent.id}`} class="flex items-center gap-3 p-3 bg-dracula-bg/50 rounded-lg hover:bg-dracula-current/50 transition-colors">
+                                <img src={ent.photo} alt={ent.name} class="w-12 h-12 rounded-full object-cover" />
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-white text-sm">{ent.name}</h4>
+                                    <p class="text-xs text-dracula-cyan">{ent.products} productos vinculados</p>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="glass p-6 rounded-xl border border-dracula-purple/30">
+                    <h3 class="font-bold text-dracula-purple mb-3">Consejos para Lideres</h3>
+                    <ul class="space-y-2 text-sm text-dracula-fg/80">
+                        <li class="flex gap-2">
+                            <span class="text-dracula-green">1.</span>
+                            Sube fotos reales de tu trabajo comunitario
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-dracula-green">2.</span>
+                            Actualiza el progreso de tu causa regularmente
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-dracula-green">3.</span>
+                            Comparte tu perfil en redes sociales
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-dracula-green">4.</span>
+                            Contacta emprendedores de tu region
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<script>
+    // Handle form submission (mock)
+    document.getElementById('createCauseForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Causa creada exitosamente! (Demo - en produccion se guardaria en la base de datos)');
+    });
+</script>

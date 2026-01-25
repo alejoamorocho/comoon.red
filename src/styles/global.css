@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	body {
+		@apply bg-dracula-bg text-dracula-fg font-sans antialiased;
+	}
+}
+
+@layer components {
+	.glass {
+		@apply bg-dracula-current/60 backdrop-blur-md border border-white/10;
+	}
+	
+	.btn-primary {
+		@apply px-4 py-2 rounded-lg bg-dracula-purple text-dracula-bg font-bold 
+               transition-all duration-300 hover:bg-opacity-90 hover:shadow-[0_0_15px_rgba(189,147,249,0.5)];
+	}
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded-lg bg-dracula-current text-dracula-fg font-medium
+           transition-all hover:bg-opacity-80;
+  }
+}

@@ -1,0 +1,324 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Users, UsersThree, Storefront, ShoppingBag, Target, ChartLineUp, CheckCircle, XCircle, Clock, Eye, Trash, PencilSimple } from '@phosphor-icons/react';
+
+// Mock data - In real app, fetch from API
+const stats = {
+    totalUsers: 156,
+    totalLeaders: 24,
+    totalEntrepreneurs: 42,
+    totalProducts: 128,
+    totalCauses: 18,
+    totalRaised: 45750000
+};
+
+const pendingLeaders = [
+    { id: 3, name: "Ana Perea", email: "ana.perea@email.com", location: "Tumaco, Narino", date: "2024-01-20", bio: "Lidereza comunitaria enfocada en derechos de la mujer." },
+    { id: 4, name: "Miguel Torres", email: "miguel.t@email.com", location: "Apartado, Antioquia", date: "2024-01-19", bio: "Trabajo con jovenes en riesgo desde hace 8 anos." }
+];
+
+const pendingEntrepreneurs = [
+    { id: 3, name: "Dulces del Choco", email: "dulces@email.com", location: "Quibdo, Choco", date: "2024-01-21" },
+];
+
+const recentCauses = [
+    { id: 1, title: "Comedor La Esperanza", leader: "Elena Marin", status: "active", raised: 1250000, goal: 5000000 },
+    { id: 2, title: "Escuela de Musica", leader: "Carlos Rodriguez", status: "active", raised: 4500000, goal: 12000000 },
+    { id: 3, title: "Huerta Comunitaria", leader: "Ana Perea", status: "pending", raised: 0, goal: 3000000 },
+];
+
+const recentUsers = [
+    { id: 1, email: "admin@comoon.co", role: "admin", status: "active", date: "2024-01-01" },
+    { id: 2, email: "elena.marin@email.com", role: "leader", status: "active", date: "2024-01-10" },
+    { id: 3, email: "artesanias@email.com", role: "entrepreneur", status: "active", date: "2024-01-12" },
+    { id: 4, email: "ana.perea@email.com", role: "leader", status: "pending", date: "2024-01-20" },
+];
+
+function formatCurrency(amount: number) {
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount);
+}
+---
+
+<Layout title="Panel de Administracion">
+    <div class="max-w-7xl mx-auto py-8 px-4">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Panel de Administracion</h1>
+                <p class="text-dracula-comment">Bienvenido, Administrador. Gestiona la plataforma comoon.</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex gap-2">
+                <a href="/dashboard/admin/users" class="px-4 py-2 bg-dracula-current text-white rounded-lg hover:bg-dracula-comment transition-colors text-sm font-medium">
+                    Ver todos los usuarios
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <div class="glass p-4 rounded-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-dracula-purple/20 rounded-lg flex items-center justify-center">
+                        <Users className="text-dracula-purple" size={20} />
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-white">{stats.totalUsers}</p>
+                        <p class="text-xs text-dracula-comment">Usuarios</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-4 rounded-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-dracula-cyan/20 rounded-lg flex items-center justify-center">
+                        <UsersThree className="text-dracula-cyan" size={20} />
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-white">{stats.totalLeaders}</p>
+                        <p class="text-xs text-dracula-comment">Lideres</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-4 rounded-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-dracula-orange/20 rounded-lg flex items-center justify-center">
+                        <Storefront className="text-dracula-orange" size={20} />
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-white">{stats.totalEntrepreneurs}</p>
+                        <p class="text-xs text-dracula-comment">Tiendas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-4 rounded-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-dracula-pink/20 rounded-lg flex items-center justify-center">
+                        <ShoppingBag className="text-dracula-pink" size={20} />
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-white">{stats.totalProducts}</p>
+                        <p class="text-xs text-dracula-comment">Productos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-4 rounded-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-dracula-yellow/20 rounded-lg flex items-center justify-center">
+                        <Target className="text-dracula-yellow" size={20} />
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-white">{stats.totalCauses}</p>
+                        <p class="text-xs text-dracula-comment">Causas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-4 rounded-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-dracula-green/20 rounded-lg flex items-center justify-center">
+                        <ChartLineUp className="text-dracula-green" size={20} />
+                    </div>
+                    <div>
+                        <p class="text-lg font-bold text-white">{formatCurrency(stats.totalRaised)}</p>
+                        <p class="text-xs text-dracula-comment">Recaudado</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Pending Approvals -->
+            <div class="space-y-6">
+                <!-- Pending Leaders -->
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Clock className="text-dracula-yellow" size={24} />
+                        Lideres Pendientes de Aprobacion
+                        <span class="ml-auto bg-dracula-yellow/20 text-dracula-yellow text-xs px-2 py-1 rounded-full">{pendingLeaders.length}</span>
+                    </h2>
+                    {pendingLeaders.length > 0 ? (
+                        <div class="space-y-3">
+                            {pendingLeaders.map(leader => (
+                                <div class="bg-dracula-bg/50 p-4 rounded-lg border border-dracula-current">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <h4 class="font-bold text-white">{leader.name}</h4>
+                                            <p class="text-sm text-dracula-comment">{leader.email}</p>
+                                            <p class="text-xs text-dracula-fg/60 mt-1">{leader.location}</p>
+                                            <p class="text-sm text-dracula-fg/80 mt-2">{leader.bio}</p>
+                                        </div>
+                                        <div class="flex gap-2 ml-4">
+                                            <button class="p-2 bg-dracula-green/20 text-dracula-green rounded-lg hover:bg-dracula-green/30 transition-colors" title="Aprobar">
+                                                <CheckCircle size={20} />
+                                            </button>
+                                            <button class="p-2 bg-dracula-red/20 text-dracula-red rounded-lg hover:bg-dracula-red/30 transition-colors" title="Rechazar">
+                                                <XCircle size={20} />
+                                            </button>
+                                            <button class="p-2 bg-dracula-current text-dracula-fg rounded-lg hover:bg-dracula-comment transition-colors" title="Ver detalles">
+                                                <Eye size={20} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-dracula-comment text-center py-4">No hay lideres pendientes</p>
+                    )}
+                </div>
+
+                <!-- Pending Entrepreneurs -->
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Clock className="text-dracula-orange" size={24} />
+                        Emprendedores Pendientes
+                        <span class="ml-auto bg-dracula-orange/20 text-dracula-orange text-xs px-2 py-1 rounded-full">{pendingEntrepreneurs.length}</span>
+                    </h2>
+                    {pendingEntrepreneurs.length > 0 ? (
+                        <div class="space-y-3">
+                            {pendingEntrepreneurs.map(ent => (
+                                <div class="bg-dracula-bg/50 p-4 rounded-lg border border-dracula-current flex items-center justify-between">
+                                    <div>
+                                        <h4 class="font-bold text-white">{ent.name}</h4>
+                                        <p class="text-sm text-dracula-comment">{ent.email}</p>
+                                        <p class="text-xs text-dracula-fg/60">{ent.location}</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button class="p-2 bg-dracula-green/20 text-dracula-green rounded-lg hover:bg-dracula-green/30 transition-colors" title="Aprobar">
+                                            <CheckCircle size={20} />
+                                        </button>
+                                        <button class="p-2 bg-dracula-red/20 text-dracula-red rounded-lg hover:bg-dracula-red/30 transition-colors" title="Rechazar">
+                                            <XCircle size={20} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-dracula-comment text-center py-4">No hay emprendedores pendientes</p>
+                    )}
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Causes Overview -->
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Target className="text-dracula-purple" size={24} />
+                        Causas Recientes
+                    </h2>
+                    <div class="space-y-3">
+                        {recentCauses.map(cause => (
+                            <div class="bg-dracula-bg/50 p-4 rounded-lg border border-dracula-current">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div>
+                                        <h4 class="font-bold text-white">{cause.title}</h4>
+                                        <p class="text-xs text-dracula-comment">Lider: {cause.leader}</p>
+                                    </div>
+                                    <span class={`px-2 py-1 rounded-full text-xs font-bold ${
+                                        cause.status === 'active' ? 'bg-dracula-green/20 text-dracula-green' :
+                                        cause.status === 'pending' ? 'bg-dracula-yellow/20 text-dracula-yellow' :
+                                        'bg-dracula-comment/20 text-dracula-comment'
+                                    }`}>
+                                        {cause.status === 'active' ? 'Activa' : cause.status === 'pending' ? 'Pendiente' : cause.status}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex-1 bg-dracula-current h-2 rounded-full overflow-hidden">
+                                        <div
+                                            class="bg-dracula-green h-full rounded-full transition-all"
+                                            style={`width: ${Math.min((cause.raised / cause.goal) * 100, 100)}%`}
+                                        ></div>
+                                    </div>
+                                    <span class="text-xs text-dracula-fg/70 whitespace-nowrap">
+                                        {Math.round((cause.raised / cause.goal) * 100)}%
+                                    </span>
+                                </div>
+                                <div class="flex justify-between mt-1">
+                                    <span class="text-xs text-dracula-green">{formatCurrency(cause.raised)}</span>
+                                    <span class="text-xs text-dracula-comment">de {formatCurrency(cause.goal)}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Users className="text-dracula-cyan" size={24} />
+                        Usuarios Recientes
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-left text-dracula-comment border-b border-dracula-current">
+                                    <th class="pb-2 font-medium">Email</th>
+                                    <th class="pb-2 font-medium">Rol</th>
+                                    <th class="pb-2 font-medium">Estado</th>
+                                    <th class="pb-2 font-medium">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {recentUsers.map(user => (
+                                    <tr class="border-b border-dracula-current/50">
+                                        <td class="py-3 text-white">{user.email}</td>
+                                        <td class="py-3">
+                                            <span class={`px-2 py-0.5 rounded text-xs font-medium ${
+                                                user.role === 'admin' ? 'bg-dracula-red/20 text-dracula-red' :
+                                                user.role === 'leader' ? 'bg-dracula-purple/20 text-dracula-purple' :
+                                                'bg-dracula-cyan/20 text-dracula-cyan'
+                                            }`}>
+                                                {user.role === 'admin' ? 'Admin' : user.role === 'leader' ? 'Lider' : 'Emprendedor'}
+                                            </span>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class={`inline-flex items-center gap-1 ${
+                                                user.status === 'active' ? 'text-dracula-green' : 'text-dracula-yellow'
+                                            }`}>
+                                                {user.status === 'active' ? <CheckCircle size={14} /> : <Clock size={14} />}
+                                                {user.status === 'active' ? 'Activo' : 'Pendiente'}
+                                            </span>
+                                        </td>
+                                        <td class="py-3">
+                                            <div class="flex gap-1">
+                                                <button class="p-1.5 text-dracula-fg/60 hover:text-white transition-colors" title="Editar">
+                                                    <PencilSimple size={16} />
+                                                </button>
+                                                <button class="p-1.5 text-dracula-fg/60 hover:text-dracula-red transition-colors" title="Eliminar">
+                                                    <Trash size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-8 glass p-6 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-4">Acciones Rapidas</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="/dashboard/admin/users" class="p-4 bg-dracula-bg/50 rounded-lg border border-dracula-current hover:border-dracula-purple transition-colors text-center">
+                    <Users size={32} className="mx-auto mb-2 text-dracula-purple" />
+                    <p class="font-medium text-white">Gestionar Usuarios</p>
+                </a>
+                <a href="/dashboard/admin/causes" class="p-4 bg-dracula-bg/50 rounded-lg border border-dracula-current hover:border-dracula-yellow transition-colors text-center">
+                    <Target size={32} className="mx-auto mb-2 text-dracula-yellow" />
+                    <p class="font-medium text-white">Revisar Causas</p>
+                </a>
+                <a href="/dashboard/admin/products" class="p-4 bg-dracula-bg/50 rounded-lg border border-dracula-current hover:border-dracula-pink transition-colors text-center">
+                    <ShoppingBag size={32} className="mx-auto mb-2 text-dracula-pink" />
+                    <p class="font-medium text-white">Ver Productos</p>
+                </a>
+                <a href="/dashboard/admin/reports" class="p-4 bg-dracula-bg/50 rounded-lg border border-dracula-current hover:border-dracula-green transition-colors text-center">
+                    <ChartLineUp size={32} className="mx-auto mb-2 text-dracula-green" />
+                    <p class="font-medium text-white">Reportes</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</Layout>

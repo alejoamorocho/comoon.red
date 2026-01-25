@@ -1,0 +1,127 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import ShareButtons from '../../components/ShareButtons';
+import { Storefront, MapPin, Globe, InstagramLogo, WhatsappLogo, Leaf } from '@phosphor-icons/react';
+
+const { id } = Astro.params;
+if (!id) {
+    return Astro.redirect('/404');
+}
+
+// Mock Data
+const entrepreneur = {
+  id: "1",
+  store_name: "Café Renacer",
+  bio: "Somos una cooperativa de jóvenes caficultores comprometidos con la paz y la calidad. Tostamos nuestro propio café en las montañas de Antioquia.",
+  story: "Empezamos hace 3 años con la idea de que el café podía ser el motor de cambio en nuestra región, históricamente golpeada por la violencia. Hoy, 15 familias viven dignamente gracias a este proyecto.",
+  location: "Andes, Antioquia",
+  photoUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80",
+  social: {
+      instagram: "@caferenacer",
+      website: "www.caferenacer.co",
+      whatsapp: "+5730000000"
+  },
+  impactStats: {
+      productsSold: 500,
+      donatedAmount: "$2,500,000",
+      causesSupported: 2
+  },
+  products: [
+      {
+        id: "1",
+        name: "Café de Origen - Edición Paz",
+        price: 35000,
+        entrepreneur: "Café Renacer",
+        cause: "Agua Potable para Todos",
+        leaderName: "Maria González",
+        contributionText: "Donamos $5.000",
+        photoUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80"
+      }
+  ]
+};
+---
+
+<Layout title={entrepreneur.store_name}>
+    <!-- Store Header Image -->
+    <div class="h-64 w-full relative">
+        <img src={entrepreneur.photoUrl} class="w-full h-full object-cover opacity-60" />
+        <div class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-transparent to-transparent"></div>
+    </div>
+
+  <div class="max-w-5xl mx-auto px-4 -mt-32 relative z-10">
+    <div class="glass p-8 rounded-2xl md:flex gap-8 items-start mb-12 border-t-4 border-dracula-cyan">
+       <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-dracula-cyan shrink-0 mx-auto md:mx-0 shadow-xl bg-dracula-bg">
+          <img src={entrepreneur.photoUrl} alt={entrepreneur.store_name} class="w-full h-full object-cover" />
+       </div>
+       <div class="mt-4 md:mt-0 text-center md:text-left flex-1">
+          <h1 class="text-4xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-2">
+            <Storefront weight="duotone" /> {entrepreneur.store_name}
+          </h1>
+          <div class="flex items-center justify-center md:justify-start gap-2 text-dracula-pink mb-4 font-medium">
+            <MapPin size={24} weight="duotone" />
+            <span>{entrepreneur.location}</span>
+          </div>
+          
+          <div class="flex justify-center md:justify-start gap-4 mb-6">
+             {entrepreneur.social.instagram && (
+                 <a href="#" class="flex items-center gap-1 text-sm text-dracula-comment hover:text-dracula-purple transition-colors">
+                     <InstagramLogo size={18} /> {entrepreneur.social.instagram}
+                 </a>
+             )}
+              {entrepreneur.social.website && (
+                 <a href="#" class="flex items-center gap-1 text-sm text-dracula-comment hover:text-dracula-cyan transition-colors">
+                     <Globe size={18} /> Web
+                 </a>
+             )}
+          </div>
+
+          <div class="flex flex-col md:flex-row justify-between items-center border-t border-white/10 pt-4 gap-4">
+              <ShareButtons client:visible title={entrepreneur.store_name} text={`Descubre la tienda ${entrepreneur.store_name} en comoon`} />
+              <a href={`https://wa.me/${entrepreneur.social.whatsapp}`} target="_blank" class="px-6 py-2 bg-dracula-green text-dracula-bg font-bold rounded-lg hover:brightness-110 transition-colors flex items-center gap-2">
+                  <WhatsappLogo size={20} weight="fill" /> Contáctanos
+              </a>
+          </div>
+       </div>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <!-- Story -->
+        <div class="md:col-span-2">
+            <h2 class="text-2xl font-bold text-white mb-4">Nuestra Historia</h2>
+            <p class="text-dracula-fg/80 leading-relaxed text-lg border-l-4 border-dracula-cyan pl-6 bg-dracula-current/10 py-4 rounded-r-xl">
+                {entrepreneur.story}
+            </p>
+        </div>
+
+        <!-- Impact Badge -->
+        <div class="glass p-6 rounded-xl border border-dracula-green/30">
+            <h3 class="text-xl font-bold text-dracula-green mb-4 flex items-center gap-2">
+                <Leaf weight="fill" /> Impacto Generado
+            </h3>
+            <ul class="space-y-4">
+                <li class="flex justify-between items-center border-b border-white/5 pb-2">
+                    <span class="text-sm text-dracula-comment text-left">Donaciones Entregadas</span>
+                    <span class="font-bold text-white text-right">{entrepreneur.impactStats.donatedAmount}</span>
+                </li>
+                <li class="flex justify-between items-center border-b border-white/5 pb-2">
+                    <span class="text-sm text-dracula-comment text-left">Causas Apoyadas</span>
+                    <span class="font-bold text-white text-right">{entrepreneur.impactStats.causesSupported}</span>
+                </li>
+                 <li class="flex justify-between items-center">
+                    <span class="text-sm text-dracula-comment text-left">Productos Vendidos</span>
+                    <span class="font-bold text-white text-right">{entrepreneur.impactStats.productsSold}+</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="mb-12">
+      <h2 class="text-2xl font-bold text-dracula-cyan mb-6">Nuestros Productos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {entrepreneur.products.map(p => <ProductCard {...p} />)}
+      </div>
+    </div>
+  </div>
+</Layout>

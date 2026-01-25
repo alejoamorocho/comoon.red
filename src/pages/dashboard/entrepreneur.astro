@@ -1,0 +1,333 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { PlusCircle, Tag, Link as LinkIcon, SignOut, Eye, PencilSimple, Storefront, CurrencyDollar, ShoppingBag, Heart, Trash, Image } from '@phosphor-icons/react';
+
+// Mock data - In real app, fetch from API based on logged-in user
+const entrepreneurProfile = {
+    id: 1,
+    storeName: "Artesanias del Valle",
+    location: "Cali, Valle del Cauca",
+    photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=400&auto=format&fit=crop",
+    bio: "Tienda familiar dedicada a preservar las tecnicas de tejido ancestrales.",
+    isVerified: true
+};
+
+const stats = {
+    totalProducts: 4,
+    totalContributed: 450000,
+    causesSupported: 2,
+    totalSales: 12
+};
+
+// Available causes to link products
+const availableCauses = [
+    { id: 1, title: "Comedor Comunitario La Esperanza", leader: "Elena Marin", location: "Buenaventura" },
+    { id: 2, title: "Escuela de Musica del Pacifico", leader: "Carlos Rodriguez", location: "Quibdo" },
+    { id: 3, title: "Huerta Comunitaria Verde", leader: "Ana Perea", location: "Tumaco" },
+];
+
+// My products
+const myProducts = [
+    {
+        id: 1,
+        name: "Bolso Tejido en Palma",
+        price: 85000,
+        photo: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=200&auto=format&fit=crop",
+        cause: { id: 1, title: "Comedor La Esperanza" },
+        contribution: "15%",
+        isActive: true
+    },
+    {
+        id: 2,
+        name: "Sombrero Vueltiao Tradicional",
+        price: 120000,
+        photo: "https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?q=80&w=200&auto=format&fit=crop",
+        cause: { id: 2, title: "Escuela de Musica" },
+        contribution: "$20.000",
+        isActive: true
+    }
+];
+
+function formatCurrency(amount: number) {
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount);
+}
+---
+
+<Layout title="Dashboard Emprendedor">
+    <div class="max-w-6xl mx-auto py-8 px-4">
+        <!-- Header with Profile -->
+        <div class="glass p-6 rounded-xl mb-8 flex flex-col md:flex-row items-center gap-6">
+            <img src={entrepreneurProfile.photo} alt={entrepreneurProfile.storeName} class="w-24 h-24 rounded-xl object-cover border-4 border-dracula-cyan" />
+            <div class="flex-1 text-center md:text-left">
+                <div class="flex items-center gap-2 justify-center md:justify-start">
+                    <h1 class="text-2xl font-bold text-white">{entrepreneurProfile.storeName}</h1>
+                    {entrepreneurProfile.isVerified && (
+                        <span class="bg-dracula-green/20 text-dracula-green text-xs px-2 py-1 rounded-full font-bold">Verificado</span>
+                    )}
+                </div>
+                <p class="text-dracula-comment">{entrepreneurProfile.location}</p>
+                <p class="text-dracula-cyan font-medium mt-1">Emprendedor</p>
+            </div>
+            <div class="flex gap-2">
+                <a href={`/entrepreneurs/${entrepreneurProfile.id}`} class="px-4 py-2 bg-dracula-current text-white rounded-lg hover:bg-dracula-comment transition-colors flex items-center gap-2 text-sm">
+                    <Eye size={18} />
+                    Ver Tienda Publica
+                </a>
+                <button
+                    onclick="localStorage.removeItem('user'); window.location.href = '/login';"
+                    class="px-4 py-2 bg-dracula-red/20 text-dracula-red rounded-lg hover:bg-dracula-red/30 transition-colors flex items-center gap-2 text-sm"
+                >
+                    <SignOut size={18} />
+                    Salir
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass p-4 rounded-xl text-center">
+                <ShoppingBag size={32} className="mx-auto mb-2 text-dracula-cyan" />
+                <p class="text-2xl font-bold text-white">{stats.totalProducts}</p>
+                <p class="text-xs text-dracula-comment">Productos Activos</p>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+                <CurrencyDollar size={32} className="mx-auto mb-2 text-dracula-green" />
+                <p class="text-2xl font-bold text-white">{formatCurrency(stats.totalContributed)}</p>
+                <p class="text-xs text-dracula-comment">Total Donado</p>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+                <Heart size={32} className="mx-auto mb-2 text-dracula-pink" />
+                <p class="text-2xl font-bold text-white">{stats.causesSupported}</p>
+                <p class="text-xs text-dracula-comment">Causas Apoyadas</p>
+            </div>
+            <div class="glass p-4 rounded-xl text-center">
+                <Storefront size={32} className="mx-auto mb-2 text-dracula-orange" />
+                <p class="text-2xl font-bold text-white">{stats.totalSales}</p>
+                <p class="text-xs text-dracula-comment">Ventas Totales</p>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Add Product Form -->
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <PlusCircle className="text-dracula-cyan" size={24} />
+                        Agregar Nuevo Producto
+                    </h2>
+                    <form class="space-y-4" id="createProductForm">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-dracula-fg mb-2">Nombre del Producto</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Ej. Collar de Semillas..."
+                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-dracula-fg mb-2">Precio (COP)</label>
+                                <input
+                                    type="number"
+                                    name="price"
+                                    placeholder="50000"
+                                    min="1000"
+                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-dracula-fg mb-2">Descripcion</label>
+                            <textarea
+                                name="description"
+                                rows="3"
+                                placeholder="Describe tu producto, materiales, proceso de fabricacion..."
+                                class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-dracula-fg mb-2">Foto del Producto</label>
+                            <div class="border-2 border-dashed border-dracula-comment rounded-lg p-6 text-center hover:border-dracula-cyan cursor-pointer transition-colors">
+                                <Image size={32} className="mx-auto mb-2 text-dracula-comment" />
+                                <p class="text-dracula-fg/60 text-sm">Arrastra una foto o haz clic para subir</p>
+                            </div>
+                        </div>
+
+                        <!-- CRITICAL: Cause Linkage -->
+                        <div class="bg-dracula-purple/10 p-5 rounded-xl border border-dracula-purple/30">
+                            <label class="block text-sm font-bold text-dracula-purple mb-3 flex items-center gap-2">
+                                <LinkIcon size={18} />
+                                Vincular a una Causa (Obligatorio)
+                            </label>
+                            <select
+                                name="cause"
+                                class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-purple outline-none mb-3"
+                                required
+                            >
+                                <option value="">Selecciona una causa para apoyar...</option>
+                                {availableCauses.map(cause => (
+                                    <option value={cause.id}>{cause.title} - {cause.leader} ({cause.location})</option>
+                                ))}
+                            </select>
+
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-dracula-fg mb-2">Tipo de Contribucion</label>
+                                    <select
+                                        name="contributionType"
+                                        class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-3 py-2 text-white text-sm"
+                                    >
+                                        <option value="percentage">Porcentaje (%)</option>
+                                        <option value="fixed">Monto Fijo ($)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-dracula-fg mb-2">Cantidad</label>
+                                    <input
+                                        type="number"
+                                        name="contributionAmount"
+                                        placeholder="10"
+                                        min="1"
+                                        class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-3 py-2 text-white text-sm"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="block text-xs font-bold text-dracula-fg mb-2">Mensaje de Contribucion</label>
+                                <input
+                                    type="text"
+                                    name="contributionMessage"
+                                    placeholder="Ej. Donamos el 10% de cada venta a..."
+                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-3 py-2 text-white text-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="w-full bg-dracula-cyan text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all shadow-[0_0_20px_rgba(139,233,253,0.2)]"
+                        >
+                            Publicar Producto
+                        </button>
+                    </form>
+                </div>
+
+                <!-- My Products -->
+                <div class="glass p-6 rounded-xl">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <Tag className="text-dracula-orange" size={24} />
+                        Mis Productos Activos
+                    </h2>
+                    {myProducts.length > 0 ? (
+                        <div class="space-y-3">
+                            {myProducts.map(product => (
+                                <div class="flex items-center gap-4 bg-dracula-bg/50 p-4 rounded-xl border border-dracula-current">
+                                    <img src={product.photo} alt={product.name} class="w-16 h-16 rounded-lg object-cover" />
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-white">{product.name}</h4>
+                                        <p class="text-xs text-dracula-purple flex items-center gap-1 mt-1">
+                                            <Heart size={12} />
+                                            Apoya: {product.cause.title}
+                                        </p>
+                                        <p class="text-xs text-dracula-comment">Contribucion: {product.contribution} por venta</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-bold text-dracula-green text-lg">{formatCurrency(product.price)}</p>
+                                        <div class="flex gap-1 mt-2">
+                                            <button class="p-1.5 text-dracula-fg/60 hover:text-white transition-colors" title="Editar">
+                                                <PencilSimple size={16} />
+                                            </button>
+                                            <a href={`/store/${product.id}`} class="p-1.5 text-dracula-fg/60 hover:text-dracula-cyan transition-colors" title="Ver">
+                                                <Eye size={16} />
+                                            </a>
+                                            <button class="p-1.5 text-dracula-fg/60 hover:text-dracula-red transition-colors" title="Eliminar">
+                                                <Trash size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-center text-dracula-comment py-8">No tienes productos. Agrega tu primer producto arriba.</p>
+                    )}
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Store Profile -->
+                <div class="glass p-6 rounded-xl">
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+                        <Storefront className="text-dracula-cyan" size={20} />
+                        Perfil de Tienda
+                    </h3>
+                    <img src={entrepreneurProfile.photo} alt={entrepreneurProfile.storeName} class="w-full h-32 object-cover rounded-lg mb-4" />
+                    <p class="text-sm text-dracula-fg/80 mb-4">{entrepreneurProfile.bio}</p>
+                    <button class="w-full px-4 py-2 border border-dracula-cyan text-dracula-cyan rounded-lg hover:bg-dracula-cyan/10 transition-colors text-sm font-medium">
+                        Editar Perfil de Tienda
+                    </button>
+                </div>
+
+                <!-- Supported Causes -->
+                <div class="glass p-6 rounded-xl">
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+                        <Heart className="text-dracula-pink" size={20} />
+                        Causas que Apoyas
+                    </h3>
+                    <div class="space-y-2">
+                        {availableCauses.slice(0, 2).map(cause => (
+                            <a href={`/causes/${cause.id}`} class="block p-3 bg-dracula-bg/50 rounded-lg hover:bg-dracula-current/50 transition-colors">
+                                <h4 class="font-medium text-white text-sm">{cause.title}</h4>
+                                <p class="text-xs text-dracula-comment">{cause.leader} - {cause.location}</p>
+                            </a>
+                        ))}
+                    </div>
+                    <a href="/leaders" class="block text-center text-dracula-purple text-sm mt-4 hover:underline">
+                        Explorar mas causas
+                    </a>
+                </div>
+
+                <!-- Tips -->
+                <div class="glass p-6 rounded-xl border border-dracula-cyan/30">
+                    <h3 class="font-bold text-dracula-cyan mb-3">Consejos para Emprendedores</h3>
+                    <ul class="space-y-2 text-sm text-dracula-fg/80">
+                        <li class="flex gap-2">
+                            <span class="text-dracula-green">1.</span>
+                            Usa fotos de alta calidad de tus productos
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-dracula-green">2.</span>
+                            Vincula cada producto a una causa activa
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-dracula-green">3.</span>
+                            Describe claramente tu aporte social
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-dracula-green">4.</span>
+                            Comparte tu tienda en redes sociales
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<script>
+    // Handle form submission (mock)
+    document.getElementById('createProductForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Producto creado exitosamente! (Demo - en produccion se guardaria en la base de datos)');
+    });
+</script>

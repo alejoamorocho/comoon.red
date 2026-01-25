@@ -1,0 +1,47 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import LeaderCard from '../../components/LeaderCard.astro';
+
+// Dummy Data
+const leaders = [
+  {
+    id: "1",
+    name: "Maria González",
+    bio: "Luchadora incansable por los derechos del agua en el Chocó. Lleva 10 años organizando a su comunidad.",
+    location: "Quibdó, Chocó",
+    cause: "Agua Potable para Todos",
+    photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    name: "Carlos Rodriguez",
+    bio: "Educador popular que busca construir la primera biblioteca comunitaria en su barrio.",
+    location: "Aguablanca, Cali",
+    cause: "Biblioteca Popular El Saber",
+    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    name: "Ana Perea",
+    bio: "Defensora de la soberanía alimentaria y las huertas urbanas.",
+    location: "Ciudad Bolívar, Bogotá",
+    cause: "Huertas por la Paz",
+    photoUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80"
+  }
+];
+---
+
+<Layout title="Líderes Sociales">
+  <div class="py-12">
+    <div class="text-center mb-16">
+      <h1 class="text-4xl font-bold mb-4 text-dracula-purple">Nuestros Líderes</h1>
+      <p class="text-lg text-dracula-fg/70 max-w-2xl mx-auto">
+        Rostros reales de transformación. Cada uno de ellos lidera una causa verificada que necesita tu apoyo.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {leaders.map(leader => (
+        <LeaderCard {...leader} />
+      ))}
+    </div>
+  </div>
+</Layout>

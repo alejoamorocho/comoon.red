@@ -1,0 +1,32 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = "Conectando líderes sociales y emprendedores bajo la luz de la luna." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | comoon</title>
+	</head>
+	<body class="bg-dracula-bg text-dracula-fg min-h-screen flex flex-col">
+		<Navbar client:load />
+		<main class="flex-grow container mx-auto px-4 py-8">
+			<slot />
+		</main>
+		<footer class="text-center py-6 text-dracula-comment text-sm">
+			<p>&copy; {new Date().getFullYear()} comoon. Cada compra ilumina una causa.</p>
+		</footer>
+	</body>
+</html>

@@ -1,0 +1,308 @@
+[
+    {
+        "id": 0,
+        "departamento": "Amazonas",
+        "ciudades": [
+            "Leticia",
+            "Puerto Nariño"
+        ]
+    },
+    {
+        "id": 1,
+        "departamento": "Antioquia",
+        "ciudades": [
+            "Medellín",
+            "Bello",
+            "Itagüí",
+            "Envigado",
+            "Apartadó",
+            "Rionegro",
+            "Turbo",
+            "Caucasia"
+        ]
+    },
+    {
+        "id": 2,
+        "departamento": "Arauca",
+        "ciudades": [
+            "Arauca",
+            "Saravena",
+            "Tame"
+        ]
+    },
+    {
+        "id": 3,
+        "departamento": "Atlántico",
+        "ciudades": [
+            "Barranquilla",
+            "Soledad",
+            "Malambo",
+            "Sabanalarga"
+        ]
+    },
+    {
+        "id": 4,
+        "departamento": "Bolívar",
+        "ciudades": [
+            "Cartagena",
+            "Magangué",
+            "El Carmen de Bolívar",
+            "Turbaco"
+        ]
+    },
+    {
+        "id": 5,
+        "departamento": "Boyacá",
+        "ciudades": [
+            "Tunja",
+            "Duitama",
+            "Sogamoso",
+            "Chiquinquirá"
+        ]
+    },
+    {
+        "id": 6,
+        "departamento": "Caldas",
+        "ciudades": [
+            "Manizales",
+            "La Dorada",
+            "Chinchiná",
+            "Villamaría"
+        ]
+    },
+    {
+        "id": 7,
+        "departamento": "Caquetá",
+        "ciudades": [
+            "Florencia",
+            "San Vicente del Caguán"
+        ]
+    },
+    {
+        "id": 8,
+        "departamento": "Casanare",
+        "ciudades": [
+            "Yopal",
+            "Aguazul",
+            "Villanueva"
+        ]
+    },
+    {
+        "id": 9,
+        "departamento": "Cauca",
+        "ciudades": [
+            "Popayán",
+            "Santander de Quilichao",
+            "Patía"
+        ]
+    },
+    {
+        "id": 10,
+        "departamento": "Cesar",
+        "ciudades": [
+            "Valledupar",
+            "Aguachica",
+            "Agustín Codazzi"
+        ]
+    },
+    {
+        "id": 11,
+        "departamento": "Chocó",
+        "ciudades": [
+            "Quibdó",
+            "Istmina",
+            "Tadó"
+        ]
+    },
+    {
+        "id": 12,
+        "departamento": "Cundinamarca",
+        "ciudades": [
+            "Bogotá",
+            "Soacha",
+            "Fusagasugá",
+            "Facatativá",
+            "Zipaquirá",
+            "Chía",
+            "Girardot",
+            "Mosquera",
+            "Madrid",
+            "Funza",
+            "Cajicá"
+        ]
+    },
+    {
+        "id": 13,
+        "departamento": "Córdoba",
+        "ciudades": [
+            "Montería",
+            "Lorica",
+            "Sahagún",
+            "Cereté"
+        ]
+    },
+    {
+        "id": 14,
+        "departamento": "Guainía",
+        "ciudades": [
+            "Inírida"
+        ]
+    },
+    {
+        "id": 15,
+        "departamento": "Guaviare",
+        "ciudades": [
+            "San José del Guaviare"
+        ]
+    },
+    {
+        "id": 16,
+        "departamento": "Huila",
+        "ciudades": [
+            "Neiva",
+            "Pitalito",
+            "Garzón",
+            "La Plata"
+        ]
+    },
+    {
+        "id": 17,
+        "departamento": "La Guajira",
+        "ciudades": [
+            "Riohacha",
+            "Maicao",
+            "Uribia"
+        ]
+    },
+    {
+        "id": 18,
+        "departamento": "Magdalena",
+        "ciudades": [
+            "Santa Marta",
+            "Ciénaga",
+            "Zona Bananera",
+            "Plato"
+        ]
+    },
+    {
+        "id": 19,
+        "departamento": "Meta",
+        "ciudades": [
+            "Villavicencio",
+            "Acacías",
+            "Granada"
+        ]
+    },
+    {
+        "id": 20,
+        "departamento": "Nariño",
+        "ciudades": [
+            "Pasto",
+            "Tumaco",
+            "Ipiales"
+        ]
+    },
+    {
+        "id": 21,
+        "departamento": "Norte de Santander",
+        "ciudades": [
+            "Cúcuta",
+            "Ocaña",
+            "Villa del Rosario",
+            "Los Patios"
+        ]
+    },
+    {
+        "id": 22,
+        "departamento": "Putumayo",
+        "ciudades": [
+            "Mocoa",
+            "Puerto Asís"
+        ]
+    },
+    {
+        "id": 23,
+        "departamento": "Quindío",
+        "ciudades": [
+            "Armenia",
+            "Calarcá",
+            "La Tebaida",
+            "Montenegro"
+        ]
+    },
+    {
+        "id": 24,
+        "departamento": "Risaralda",
+        "ciudades": [
+            "Pereira",
+            "Dosquebradas",
+            "Santa Rosa de Cabal"
+        ]
+    },
+    {
+        "id": 25,
+        "departamento": "San Andrés y Providencia",
+        "ciudades": [
+            "San Andrés",
+            "Providencia"
+        ]
+    },
+    {
+        "id": 26,
+        "departamento": "Santander",
+        "ciudades": [
+            "Bucaramanga",
+            "Floridablanca",
+            "Barrancabermeja",
+            "Girón",
+            "Piedecuesta",
+            "San Gil"
+        ]
+    },
+    {
+        "id": 27,
+        "departamento": "Sucre",
+        "ciudades": [
+            "Sincelejo",
+            "Corozal",
+            "San Marcos"
+        ]
+    },
+    {
+        "id": 28,
+        "departamento": "Tolima",
+        "ciudades": [
+            "Ibagué",
+            "El Espinal",
+            "Melgar"
+        ]
+    },
+    {
+        "id": 29,
+        "departamento": "Valle del Cauca",
+        "ciudades": [
+            "Cali",
+            "Buenaventura",
+            "Palmira",
+            "Tuluá",
+            "Buga",
+            "Cartago",
+            "Yumbo",
+            "Jamundí"
+        ]
+    },
+    {
+        "id": 30,
+        "departamento": "Vaupés",
+        "ciudades": [
+            "Mitú"
+        ]
+    },
+    {
+        "id": 31,
+        "departamento": "Vichada",
+        "ciudades": [
+            "Puerto Carreño"
+        ]
+    }
+]

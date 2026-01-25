@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import LoginForm from '../../components/LoginForm';
+---
+
+<Layout title="Iniciar Sesion">
+    <div class="max-w-md mx-auto py-12">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">Bienvenido de nuevo</h1>
+            <p class="text-dracula-fg/70">Inicia sesion para acceder a tu panel de control</p>
+        </div>
+
+        <div class="glass p-8 rounded-2xl">
+            <LoginForm client:load />
+        </div>
+    </div>
+</Layout>

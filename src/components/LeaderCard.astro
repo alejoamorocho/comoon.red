@@ -1,0 +1,33 @@
+---
+interface Props {
+  id: string;
+  name: string;
+  bio: string;
+  location: string;
+  cause: string;
+  photoUrl: string;
+}
+
+const { id, name, bio, location, cause, photoUrl } = Astro.props;
+---
+
+<div class="glass rounded-xl overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+  <div class="h-48 overflow-hidden relative group">
+    <img src={photoUrl} alt={name} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+    <div class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-transparent to-transparent opacity-80"></div>
+    <div class="absolute bottom-4 left-4">
+      <h3 class="text-xl font-bold text-white">{name}</h3>
+      <p class="text-dracula-purple text-sm font-medium flex items-center gap-1">
+        <span class="icon-map-pin">📍</span> {location}
+      </p>
+    </div>
+  </div>
+  <div class="p-4">
+    <div class="mb-4">
+      <span class="text-xs uppercase tracking-wider text-dracula-comment font-bold">Causa Principal</span>
+      <h4 class="text-dracula-cyan font-bold leading-tight mt-1">{cause}</h4>
+    </div>
+    <p class="text-dracula-fg/80 text-sm line-clamp-3">{bio}</p>
+    <a href={`/leaders/${id}`} class="block text-center mt-4 text-dracula-purple hover:text-white transition-colors text-sm font-bold">Ver Perfil Completo &rarr;</a>
+  </div>
+</div>

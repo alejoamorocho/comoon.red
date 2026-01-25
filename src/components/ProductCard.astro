@@ -1,0 +1,91 @@
+---
+import WhatsAppButton from './WhatsAppButton';
+import { Heart } from '@phosphor-icons/react';
+
+interface Props {
+    id: string;
+    name: string;
+    price: number;
+    entrepreneur: string;
+    entrepreneurPhone?: string;
+    cause: string;
+    causeId?: string;
+    leaderName: string;
+    photoUrl: string;
+    contributionText: string;
+}
+
+const {
+    id,
+    name,
+    price,
+    entrepreneur,
+    entrepreneurPhone,
+    cause,
+    causeId,
+    leaderName,
+    photoUrl,
+    contributionText
+} = Astro.props;
+
+// Format price in Colombian Pesos
+const formattedPrice = new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0
+}).format(price);
+---
+
+<div class="glass rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-dracula-purple/10 transition-all duration-300 border border-white/5 group">
+    <!-- Product Image -->
+    <div class="h-52 overflow-hidden relative bg-dracula-current/20">
+        <a href={`/store/${id}`}>
+            <img
+                src={photoUrl}
+                alt={name}
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+        </a>
+        <div class="absolute top-3 right-3 bg-dracula-bg/90 backdrop-blur px-3 py-1.5 rounded-full text-sm font-bold text-dracula-green shadow-lg">
+            {formattedPrice}
+        </div>
+    </div>
+
+    <div class="p-5">
+        <!-- Product Info -->
+        <a href={`/store/${id}`} class="block mb-1 hover:text-dracula-cyan transition-colors">
+            <h3 class="text-lg font-bold text-white leading-tight line-clamp-2">{name}</h3>
+        </a>
+        <p class="text-dracula-comment text-sm mb-4">
+            de <span class="text-dracula-cyan font-medium">{entrepreneur}</span>
+        </p>
+
+        <!-- Impact Badge -->
+        <div class="bg-dracula-bg/60 p-3 rounded-xl border border-dracula-purple/20 mb-4">
+            <div class="flex items-start gap-2">
+                <Heart size={16} weight="fill" className="text-dracula-purple mt-0.5 shrink-0" />
+                <div>
+                    <p class="text-xs text-dracula-purple font-bold mb-0.5">Impacto Directo</p>
+                    <p class="text-xs text-dracula-fg/80 leading-relaxed">
+                        {contributionText} para
+                        <a
+                            href={causeId ? `/causes/${causeId}` : '#'}
+                            class="text-dracula-cyan hover:underline font-medium"
+                        >
+                            {cause}
+                        </a>
+                        de <span class="text-white font-medium">{leaderName}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- WhatsApp Button -->
+        <WhatsAppButton
+            client:visible
+            productName={name}
+            leaderName={leaderName}
+            entrepreneurPhone={entrepreneurPhone}
+        />
+    </div>
+</div>

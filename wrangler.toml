@@ -1,0 +1,23 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "comoon"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# [site]
+# bucket = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "comoon-db"
+database_id = "xxxx-xxxx-xxxx-xxxx" # Placeholder: Run 'npx wrangler d1 create comoon-db' to get ID
+
+# [vars]
+# MY_VAR = "my-variable"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"

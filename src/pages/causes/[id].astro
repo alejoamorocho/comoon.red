@@ -1,0 +1,95 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import ShareButtons from '../../components/ShareButtons';
+import { UsersThree, Star, Money, TrendUp } from '@phosphor-icons/react';
+
+// SSR Mode
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/404');
+
+// Mock Data
+const cause = {
+    id: "1",
+    title: "Agua Potable para Todos",
+    description: "Construcción de sistemas de recolección de lluvia y filtros para 50 familias en la zona rural de Quibdó. El acceso al agua potable reduce enfermedades y mejora la calidad de vida de los niños.",
+    goal: 5000000,
+    raised: 1200000,
+    leader: {
+        id: "1",
+        name: "Maria González",
+        photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=400&q=80"
+    },
+    products: [
+        {
+            id: "1",
+            name: "Café de Origen - Edición Paz",
+            price: 35000,
+            entrepreneur: "Café Renacer",
+            cause: "Agua Potable para Todos",
+            leaderName: "Maria González",
+            contributionText: "Donamos $5.000",
+            photoUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80"
+        }
+    ]
+};
+
+const progress = (cause.raised / cause.goal) * 100;
+---
+
+<Layout title={cause.title}>
+  <div class="max-w-4xl mx-auto py-12 px-4">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <span class="inline-flex items-center gap-2 bg-dracula-purple/20 text-dracula-purple px-4 py-1 rounded-full text-sm font-bold mb-4 border border-dracula-purple/50">
+            <Star weight="fill" /> Causa Verificada
+        </span>
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">{cause.title}</h1>
+        <p class="text-xl text-dracula-fg/80 max-w-2xl mx-auto leading-relaxed">{cause.description}</p>
+    </div>
+
+    <!-- Progress Card -->
+    <div class="glass p-8 rounded-2xl mb-12 border border-dracula-green/30 shadow-[0_0_30px_rgba(80,250,123,0.1)]">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-4 gap-4">
+            <div>
+                <p class="text-dracula-comment text-sm font-bold uppercase tracking-wider mb-1">Recaudado</p>
+                <p class="text-4xl font-bold text-dracula-green flex items-center gap-2">
+                    <Money /> ${cause.raised.toLocaleString()}
+                </p>
+            </div>
+            <div class="text-right">
+                <p class="text-dracula-comment text-sm font-bold uppercase tracking-wider mb-1">Meta</p>
+                <p class="text-2xl font-bold text-white">${cause.goal.toLocaleString()}</p>
+            </div>
+        </div>
+
+        <div class="w-full bg-dracula-bg h-6 rounded-full overflow-hidden border border-white/5 relative">
+            <div class="bg-gradient-to-r from-dracula-green to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style={`width: ${progress}%`}></div>
+        </div>
+        <p class="text-right text-xs text-dracula-cyan mt-2 font-bold flex justify-end items-center gap-1">
+            <TrendUp /> {progress.toFixed(1)}% completado
+        </p>
+
+        <div class="mt-8 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <img src={cause.leader.photoUrl} class="w-12 h-12 rounded-full object-cover border-2 border-dracula-purple" />
+                <div>
+                    <p class="text-xs text-dracula-comment">Liderado por</p>
+                    <a href={`/leaders/${cause.leader.id}`} class="text-white font-bold hover:text-dracula-purple transition-colors">
+                        {cause.leader.name}
+                    </a>
+                </div>
+            </div>
+            <ShareButtons client:visible title={cause.title} text={`Ayuda a la causa "${cause.title}" comprando productos en comoon`} />
+        </div>
+    </div>
+
+    <!-- Linked Products -->
+    <div>
+        <h2 class="text-3xl font-bold text-dracula-cyan mb-8 text-center">Productos que financian esta causa</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {cause.products.map(p => <ProductCard {...p} />)}
+        </div>
+    </div>
+  </div>
+</Layout>
