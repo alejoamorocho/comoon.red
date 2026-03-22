@@ -13,6 +13,9 @@ export interface ProductRow {
   contribution_amount: number | null;
   contribution_type: string;
   photo_url: string | null;
+  gallery_photos: string | null;
+  category: string | null;
+  availability: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -92,12 +95,16 @@ export class ProductRepository extends BaseRepository<ProductRow> {
     contribution_amount?: number | null;
     contribution_type?: string;
     photo_url?: string | null;
+    gallery_photos?: unknown;
+    category?: string | null;
+    availability?: string;
   }): Promise<ProductRow> {
     const result = await this.db
       .prepare(
         `INSERT INTO products (entrepreneur_id, leader_id, cause_id, name, description, price,
-         contribution_text, contribution_amount, contribution_type, photo_url)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         contribution_text, contribution_amount, contribution_type, photo_url,
+         gallery_photos, category, availability)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         data.entrepreneur_id || null,
@@ -110,6 +117,9 @@ export class ProductRepository extends BaseRepository<ProductRow> {
         data.contribution_amount || null,
         data.contribution_type || 'percentage',
         data.photo_url || null,
+        data.gallery_photos ? JSON.stringify(data.gallery_photos) : null,
+        data.category || null,
+        data.availability || 'available',
       )
       .run();
 
@@ -152,6 +162,9 @@ export class ProductRepository extends BaseRepository<ProductRow> {
       contribution_type: string;
       photo_url: string | null;
       is_active: boolean;
+      gallery_photos: unknown;
+      category: string | null;
+      availability: string;
     }>,
   ): Promise<ProductRow | null> {
     const fields: string[] = [];
@@ -188,6 +201,18 @@ export class ProductRepository extends BaseRepository<ProductRow> {
     if (data.is_active !== undefined) {
       fields.push('is_active = ?');
       values.push(data.is_active ? 1 : 0);
+    }
+    if (data.gallery_photos !== undefined) {
+      fields.push('gallery_photos = ?');
+      values.push(data.gallery_photos ? JSON.stringify(data.gallery_photos) : null);
+    }
+    if (data.category !== undefined) {
+      fields.push('category = ?');
+      values.push(data.category);
+    }
+    if (data.availability !== undefined) {
+      fields.push('availability = ?');
+      values.push(data.availability);
     }
 
     if (fields.length === 0) return this.findById(id);

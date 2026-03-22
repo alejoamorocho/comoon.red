@@ -11,6 +11,16 @@ export interface EntrepreneurRow {
   department: string | null;
   photo_url: string | null;
   contact_info: string | null;
+  cover_url: string | null;
+  logo_url: string | null;
+  store_story: string | null;
+  what_makes_special: string | null;
+  social_connection: string | null;
+  years_in_business: number | null;
+  email: string | null;
+  preferred_contact: string | null;
+  store_policies: string | null;
+  shipping_info: string | null;
   is_verified: boolean;
   verification_notes: string | null;
   created_at: string;
@@ -80,6 +90,16 @@ export class EntrepreneurRepository extends BaseRepository<EntrepreneurRow> {
       department: string | null;
       photo_url: string | null;
       contact_info: unknown;
+      cover_url: string | null;
+      logo_url: string | null;
+      store_story: string | null;
+      what_makes_special: string | null;
+      social_connection: string | null;
+      years_in_business: number | null;
+      email: string | null;
+      preferred_contact: string | null;
+      store_policies: string | null;
+      shipping_info: string | null;
     }>,
   ): Promise<EntrepreneurRow | null> {
     const fields: string[] = [];
@@ -112,6 +132,46 @@ export class EntrepreneurRepository extends BaseRepository<EntrepreneurRow> {
     if (data.contact_info !== undefined) {
       fields.push('contact_info = ?');
       values.push(data.contact_info ? JSON.stringify(data.contact_info) : null);
+    }
+    if (data.cover_url !== undefined) {
+      fields.push('cover_url = ?');
+      values.push(data.cover_url);
+    }
+    if (data.logo_url !== undefined) {
+      fields.push('logo_url = ?');
+      values.push(data.logo_url);
+    }
+    if (data.store_story !== undefined) {
+      fields.push('store_story = ?');
+      values.push(data.store_story);
+    }
+    if (data.what_makes_special !== undefined) {
+      fields.push('what_makes_special = ?');
+      values.push(data.what_makes_special);
+    }
+    if (data.social_connection !== undefined) {
+      fields.push('social_connection = ?');
+      values.push(data.social_connection);
+    }
+    if (data.years_in_business !== undefined) {
+      fields.push('years_in_business = ?');
+      values.push(data.years_in_business);
+    }
+    if (data.email !== undefined) {
+      fields.push('email = ?');
+      values.push(data.email);
+    }
+    if (data.preferred_contact !== undefined) {
+      fields.push('preferred_contact = ?');
+      values.push(data.preferred_contact);
+    }
+    if (data.store_policies !== undefined) {
+      fields.push('store_policies = ?');
+      values.push(data.store_policies);
+    }
+    if (data.shipping_info !== undefined) {
+      fields.push('shipping_info = ?');
+      values.push(data.shipping_info);
     }
 
     if (fields.length === 0) return this.findById(id);

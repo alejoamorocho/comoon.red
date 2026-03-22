@@ -12,6 +12,9 @@ export const createProductSchema = z.object({
   contribution_amount: z.number().min(0).optional(),
   contribution_type: contributionTypeSchema.optional().default('percentage'),
   photo_url: z.string().url().optional(),
+  gallery_photos: z.array(z.string()).max(6).optional(),
+  category: z.string().max(100).optional(),
+  availability: z.enum(['available', 'out_of_stock', 'preorder']).optional(),
 });
 
 export const updateProductSchema = z.object({
@@ -23,6 +26,9 @@ export const updateProductSchema = z.object({
   contribution_type: contributionTypeSchema.optional(),
   photo_url: z.string().url().optional(),
   is_active: z.boolean().optional(),
+  gallery_photos: z.array(z.string()).max(6).optional(),
+  category: z.string().max(100).optional(),
+  availability: z.enum(['available', 'out_of_stock', 'preorder']).optional(),
 });
 
 export const productsQuerySchema = z.object({

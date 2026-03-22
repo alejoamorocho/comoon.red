@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { PlusCircle, CircleNotch, CheckCircle, Calculator } from '@phosphor-icons/react';
+import { PlusCircle, CircleNotch, CheckCircle, Calculator, CaretDown } from '@phosphor-icons/react';
+import ImageUpload from '../ImageUpload';
 
 interface Cause {
   id: number;
@@ -26,6 +27,26 @@ export default function CreateProductForm({ userRole = 'entrepreneur' }: CreateP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  // Extra optional fields
+  const [showMore, setShowMore] = useState(false);
+  const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
+  const [productCategory, setProductCategory] = useState('');
+  const [availability, setAvailability] = useState('available');
+
+  const updateGalleryPhoto = (index: number, url: string) => {
+    setGalleryPhotos((prev) => {
+      const updated = [...prev];
+      updated[index] = url;
+      return updated.filter((u) => u !== '');
+    });
+  };
+
+  const addGallerySlot = () => {
+    if (galleryPhotos.length < 4) {
+      setGalleryPhotos((prev) => [...prev, '']);
+    }
+  };
 
   useEffect(() => {
     // For leaders, fetch only their own causes; for entrepreneurs, fetch all active
@@ -73,6 +94,10 @@ export default function CreateProductForm({ userRole = 'entrepreneur' }: CreateP
           contribution_type: contributionType,
           contribution_text: contributionText || null,
           photo_url: photoUrl || null,
+          gallery_photos:
+            galleryPhotos.filter((u) => u).length > 0 ? galleryPhotos.filter((u) => u) : null,
+          category: productCategory || null,
+          availability: availability || null,
         }),
       });
 
@@ -156,18 +181,14 @@ export default function CreateProductForm({ userRole = 'entrepreneur' }: CreateP
         />
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-bold text-dracula-fg">
-          Foto del Producto (URL)
-        </label>
-        <input
-          type="url"
-          value={photoUrl}
-          onChange={(e) => setPhotoUrl(e.target.value)}
-          placeholder="https://..."
-          className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur"
-        />
-      </div>
+      <ImageUpload
+        value={photoUrl}
+        onChange={setPhotoUrl}
+        shape="rect"
+        size="lg"
+        label="Foto del Producto"
+        accentColor="entrepreneur"
+      />
 
       {/* Cause selection */}
       <div className="rounded-xl border border-dracula-purple/30 bg-dracula-purple/10 p-5">
@@ -245,6 +266,79 @@ export default function CreateProductForm({ userRole = 'entrepreneur' }: CreateP
             className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-3 py-2 text-sm text-white"
           />
         </div>
+      </div>
+
+      {/* Collapsible extra details */}
+      <div className="rounded-xl border border-dracula-current/50 bg-dracula-bg/30">
+        <button
+          type="button"
+          onClick={() => setShowMore(!showMore)}
+          className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold text-dracula-comment transition-colors hover:text-dracula-fg"
+        >
+          <span>Mas detalles (opcional)</span>
+          <CaretDown size={16} className={`transition-transform ${showMore ? 'rotate-180' : ''}`} />
+        </button>
+
+        {showMore && (
+          <div className="space-y-4 border-t border-dracula-current/50 px-4 pb-4 pt-4">
+            {/* Gallery photos */}
+            <div>
+              <label className="mb-2 block text-sm font-bold text-dracula-fg">
+                Galeria de fotos (max 4)
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {galleryPhotos.map((url, i) => (
+                  <ImageUpload
+                    key={i}
+                    value={url}
+                    onChange={(newUrl) => updateGalleryPhoto(i, newUrl)}
+                    shape="rect"
+                    size="md"
+                    label=""
+                    accentColor="entrepreneur"
+                  />
+                ))}
+                {galleryPhotos.length < 4 && (
+                  <button
+                    type="button"
+                    onClick={addGallerySlot}
+                    className="flex h-28 w-48 items-center justify-center rounded-xl border-2 border-dashed border-dracula-current text-sm text-dracula-comment transition-colors hover:border-dracula-comment hover:text-dracula-fg"
+                  >
+                    + Agregar foto
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-bold text-dracula-fg">Categoria</label>
+                <input
+                  type="text"
+                  value={productCategory}
+                  onChange={(e) => setProductCategory(e.target.value)}
+                  placeholder="Ej. Artesanias, Alimentos..."
+                  className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur"
+                />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-bold text-dracula-fg">
+                  Disponibilidad
+                </label>
+                <select
+                  value={availability}
+                  onChange={(e) => setAvailability(e.target.value)}
+                  className="w-full appearance-none rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur"
+                >
+                  <option value="available">Disponible</option>
+                  <option value="preorder">Pre-orden</option>
+                  <option value="limited">Edicion limitada</option>
+                  <option value="out_of_stock">Agotado</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <button

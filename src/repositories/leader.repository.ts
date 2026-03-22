@@ -14,6 +14,22 @@ export interface LeaderRow {
   contact_info: string | null;
   social_links: string | null;
   tags: string | null;
+  cover_url: string | null;
+  organization_name: string | null;
+  who_we_are: string | null;
+  our_why: string | null;
+  how_to_help: string | null;
+  years_active: number | null;
+  impact_scope: string | null;
+  community: string | null;
+  areas_of_influence: string | null;
+  people_impacted: number | null;
+  achievements: string | null;
+  testimonials: string | null;
+  media_gallery: string | null;
+  awards: string | null;
+  email: string | null;
+  preferred_contact: string | null;
   is_verified: boolean;
   verification_notes: string | null;
   created_at: string;
@@ -177,6 +193,22 @@ export class LeaderRepository extends BaseRepository<LeaderRow> {
       contact_info: unknown;
       social_links: unknown;
       tags: unknown;
+      cover_url: string | null;
+      organization_name: string | null;
+      who_we_are: string | null;
+      our_why: string | null;
+      how_to_help: string | null;
+      years_active: number | null;
+      impact_scope: string | null;
+      community: string | null;
+      areas_of_influence: unknown;
+      people_impacted: number | null;
+      achievements: unknown;
+      testimonials: unknown;
+      media_gallery: unknown;
+      awards: unknown;
+      email: string | null;
+      preferred_contact: string | null;
     }>,
   ): Promise<LeaderRow | null> {
     const fields: string[] = [];
@@ -217,6 +249,70 @@ export class LeaderRepository extends BaseRepository<LeaderRow> {
     if (data.tags !== undefined) {
       fields.push('tags = ?');
       values.push(data.tags ? JSON.stringify(data.tags) : null);
+    }
+    if (data.cover_url !== undefined) {
+      fields.push('cover_url = ?');
+      values.push(data.cover_url);
+    }
+    if (data.organization_name !== undefined) {
+      fields.push('organization_name = ?');
+      values.push(data.organization_name);
+    }
+    if (data.who_we_are !== undefined) {
+      fields.push('who_we_are = ?');
+      values.push(data.who_we_are);
+    }
+    if (data.our_why !== undefined) {
+      fields.push('our_why = ?');
+      values.push(data.our_why);
+    }
+    if (data.how_to_help !== undefined) {
+      fields.push('how_to_help = ?');
+      values.push(data.how_to_help);
+    }
+    if (data.years_active !== undefined) {
+      fields.push('years_active = ?');
+      values.push(data.years_active);
+    }
+    if (data.impact_scope !== undefined) {
+      fields.push('impact_scope = ?');
+      values.push(data.impact_scope);
+    }
+    if (data.community !== undefined) {
+      fields.push('community = ?');
+      values.push(data.community);
+    }
+    if (data.areas_of_influence !== undefined) {
+      fields.push('areas_of_influence = ?');
+      values.push(data.areas_of_influence ? JSON.stringify(data.areas_of_influence) : null);
+    }
+    if (data.people_impacted !== undefined) {
+      fields.push('people_impacted = ?');
+      values.push(data.people_impacted);
+    }
+    if (data.achievements !== undefined) {
+      fields.push('achievements = ?');
+      values.push(data.achievements ? JSON.stringify(data.achievements) : null);
+    }
+    if (data.testimonials !== undefined) {
+      fields.push('testimonials = ?');
+      values.push(data.testimonials ? JSON.stringify(data.testimonials) : null);
+    }
+    if (data.media_gallery !== undefined) {
+      fields.push('media_gallery = ?');
+      values.push(data.media_gallery ? JSON.stringify(data.media_gallery) : null);
+    }
+    if (data.awards !== undefined) {
+      fields.push('awards = ?');
+      values.push(data.awards ? JSON.stringify(data.awards) : null);
+    }
+    if (data.email !== undefined) {
+      fields.push('email = ?');
+      values.push(data.email);
+    }
+    if (data.preferred_contact !== undefined) {
+      fields.push('preferred_contact = ?');
+      values.push(data.preferred_contact);
     }
 
     if (fields.length === 0) return this.findById(id);

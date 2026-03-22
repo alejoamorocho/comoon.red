@@ -1,15 +1,23 @@
 import { useState, useEffect } from 'react';
 import {
-  CircleNotch,
-  CheckCircle,
+  Storefront,
+  Heart,
+  MapPin,
+  Info,
+  ShareNetwork,
+  CaretDown,
+  Envelope,
+  Globe,
   WhatsappLogo,
   InstagramLogo,
   FacebookLogo,
   XLogo,
   TiktokLogo,
   ThreadsLogo,
-  Globe,
+  CircleNotch,
+  CheckCircle,
 } from '@phosphor-icons/react';
+import ImageUpload from '../ImageUpload';
 import colombiaData from '../../data/colombia.json';
 
 interface EditEntrepreneurProfileFormProps {
@@ -18,10 +26,52 @@ interface EditEntrepreneurProfileFormProps {
     store_name: string;
     bio: string;
     photo_url: string;
+    cover_url: string;
+    logo_url: string;
     department: string;
     city: string;
     contact_info: string;
+    store_story: string;
+    what_makes_special: string;
+    social_connection: string;
+    years_in_business: number | null;
+    email: string;
+    preferred_contact: string;
+    store_policies: string;
+    shipping_info: string;
   };
+}
+
+function Section({
+  icon,
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="bg-dracula-darker/50 overflow-hidden rounded-xl border border-dracula-current/50">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-dracula-current/20"
+      >
+        {icon}
+        <span className="flex-1 font-bold text-dracula-fg">{title}</span>
+        <CaretDown
+          size={18}
+          className={`text-dracula-comment transition-transform ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {open && <div className="space-y-4 px-5 pb-5">{children}</div>}
+    </div>
+  );
 }
 
 export default function EditEntrepreneurProfileForm({
@@ -36,19 +86,42 @@ export default function EditEntrepreneurProfileForm({
     }
   })();
 
+  // Section 1: Tu Tienda
   const [storeName, setStoreName] = useState(initialData.store_name || '');
-  const [bio, setBio] = useState(initialData.bio || '');
   const [photoUrl, setPhotoUrl] = useState(initialData.photo_url || '');
+  const [logoUrl, setLogoUrl] = useState(initialData.logo_url || '');
+  const [coverUrl, setCoverUrl] = useState(initialData.cover_url || '');
+
+  // Section 2: Tu Historia
+  const [bio, setBio] = useState(initialData.bio || '');
+  const [storeStory, setStoreStory] = useState(initialData.store_story || '');
+  const [whatMakesSpecial, setWhatMakesSpecial] = useState(initialData.what_makes_special || '');
+  const [socialConnection, setSocialConnection] = useState(initialData.social_connection || '');
+
+  // Section 3: Ubicacion
   const [department, setDepartment] = useState(initialData.department || '');
   const [city, setCity] = useState(initialData.city || '');
   const [citiesList, setCitiesList] = useState<string[]>([]);
+
+  // Section 4: Informacion de tu Tienda
+  const [yearsInBusiness, setYearsInBusiness] = useState<number | null>(
+    initialData.years_in_business,
+  );
+  const [storePolicies, setStorePolicies] = useState(initialData.store_policies || '');
+  const [shippingInfo, setShippingInfo] = useState(initialData.shipping_info || '');
+
+  // Section 5: Redes Sociales y Contacto
   const [whatsapp, setWhatsapp] = useState(parsedContact.whatsapp || '');
   const [instagram, setInstagram] = useState(parsedContact.instagram || '');
   const [facebook, setFacebook] = useState(parsedContact.facebook || '');
   const [xTwitter, setXTwitter] = useState(parsedContact.x || '');
-  const [threads, setThreads] = useState(parsedContact.threads || '');
   const [tiktok, setTiktok] = useState(parsedContact.tiktok || '');
+  const [threads, setThreads] = useState(parsedContact.threads || '');
   const [website, setWebsite] = useState(parsedContact.website || '');
+  const [email, setEmail] = useState(initialData.email || '');
+  const [preferredContact, setPreferredContact] = useState(initialData.preferred_contact || '');
+
+  // Form state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
@@ -85,8 +158,18 @@ export default function EditEntrepreneurProfileForm({
           store_name: storeName,
           bio,
           photo_url: photoUrl || null,
+          cover_url: coverUrl || null,
+          logo_url: logoUrl || null,
           department,
           city,
+          store_story: storeStory,
+          what_makes_special: whatMakesSpecial,
+          social_connection: socialConnection,
+          years_in_business: yearsInBusiness,
+          email: email || null,
+          preferred_contact: preferredContact || null,
+          store_policies: storePolicies,
+          shipping_info: shippingInfo,
           contact_info: {
             whatsapp: whatsapp || undefined,
             instagram: instagram || undefined,
@@ -113,6 +196,16 @@ export default function EditEntrepreneurProfileForm({
     }
   };
 
+  const inputClass =
+    'w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur';
+  const textareaClass =
+    'w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur resize-none';
+  const selectClass =
+    'w-full appearance-none rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur';
+  const socialInputClass =
+    'flex-1 rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2.5 text-sm text-white outline-none focus:border-entrepreneur';
+  const helperClass = 'mt-1 text-xs text-dracula-comment italic';
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
@@ -126,7 +219,39 @@ export default function EditEntrepreneurProfileForm({
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      {/* Section 1: Tu Tienda */}
+      <Section
+        icon={<Storefront size={20} className="text-entrepreneur" />}
+        title="Tu Tienda"
+        defaultOpen
+      >
+        <div className="grid gap-6 md:grid-cols-3">
+          <ImageUpload
+            value={photoUrl}
+            onChange={setPhotoUrl}
+            shape="rect"
+            size="lg"
+            label="Foto principal de tu tienda"
+            accentColor="entrepreneur"
+          />
+          <ImageUpload
+            value={logoUrl}
+            onChange={setLogoUrl}
+            shape="circle"
+            size="md"
+            label="Logo de tu tienda"
+            accentColor="entrepreneur"
+          />
+          <ImageUpload
+            value={coverUrl}
+            onChange={setCoverUrl}
+            shape="rect"
+            size="lg"
+            label="Foto de portada"
+            accentColor="entrepreneur"
+          />
+        </div>
+
         <div>
           <label className="mb-2 block text-sm font-bold text-dracula-fg">
             Nombre de la Tienda
@@ -135,73 +260,161 @@ export default function EditEntrepreneurProfileForm({
             type="text"
             value={storeName}
             onChange={(e) => setStoreName(e.target.value)}
-            className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur"
+            className={inputClass}
           />
         </div>
+      </Section>
+
+      {/* Section 2: Tu Historia */}
+      <Section
+        icon={<Heart size={20} className="text-entrepreneur" />}
+        title="Tu Historia"
+        defaultOpen
+      >
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Foto (URL)</label>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Bio</label>
+          <textarea
+            rows={3}
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            className={textareaClass}
+          />
+          <p className={helperClass}>Describe tu tienda en pocas palabras.</p>
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">
+            Historia de tu Emprendimiento
+          </label>
+          <textarea
+            rows={4}
+            value={storeStory}
+            onChange={(e) => setStoreStory(e.target.value)}
+            className={textareaClass}
+          />
+          <p className={helperClass}>
+            Cuenta como nacio tu emprendimiento. La gente conecta con historias reales.
+          </p>
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">
+            Que Hace Especiales tus Productos
+          </label>
+          <textarea
+            rows={3}
+            value={whatMakesSpecial}
+            onChange={(e) => setWhatMakesSpecial(e.target.value)}
+            className={textareaClass}
+          />
+          <p className={helperClass}>Que hace unicos tus productos? Que los diferencia?</p>
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Conexion Social</label>
+          <textarea
+            rows={3}
+            value={socialConnection}
+            onChange={(e) => setSocialConnection(e.target.value)}
+            className={textareaClass}
+          />
+          <p className={helperClass}>
+            Como conecta tu negocio con las causas sociales? Esto inspira a tus clientes.
+          </p>
+        </div>
+      </Section>
+
+      {/* Section 3: Ubicacion */}
+      <Section
+        icon={<MapPin size={20} className="text-entrepreneur" />}
+        title="Ubicacion"
+        defaultOpen
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-bold text-dracula-fg">Departamento</label>
+            <select
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Selecciona...</option>
+              {colombiaData.map((d) => (
+                <option key={d.id} value={d.departamento}>
+                  {d.departamento}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-bold text-dracula-fg">Ciudad</label>
+            <select
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              disabled={!department}
+              className={`${selectClass} disabled:opacity-50`}
+            >
+              <option value="">Selecciona...</option>
+              {citiesList.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </Section>
+
+      {/* Section 4: Informacion de tu Tienda */}
+      <Section
+        icon={<Info size={20} className="text-entrepreneur" />}
+        title="Informacion de tu Tienda"
+      >
+        <div>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Anos en el Negocio</label>
           <input
-            type="url"
-            value={photoUrl}
-            onChange={(e) => setPhotoUrl(e.target.value)}
-            className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur"
+            type="number"
+            min={0}
+            value={yearsInBusiness ?? ''}
+            onChange={(e) =>
+              setYearsInBusiness(e.target.value ? parseInt(e.target.value, 10) : null)
+            }
+            className={inputClass}
           />
         </div>
-      </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-bold text-dracula-fg">Descripcion</label>
-        <textarea
-          rows={4}
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur"
-        />
-        <p
-          className={`mt-1 text-xs ${bio.length >= 50 ? 'text-dracula-green' : 'text-dracula-comment'}`}
-        >
-          {bio.length}/50 caracteres minimos
-        </p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Departamento</label>
-          <select
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-            className="w-full appearance-none rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur"
-          >
-            <option value="">Selecciona...</option>
-            {colombiaData.map((d) => (
-              <option key={d.id} value={d.departamento}>
-                {d.departamento}
-              </option>
-            ))}
-          </select>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">
+            Politicas de la Tienda
+          </label>
+          <textarea
+            rows={3}
+            value={storePolicies}
+            onChange={(e) => setStorePolicies(e.target.value)}
+            className={textareaClass}
+          />
+          <p className={helperClass}>Politicas de cambio, devolucion, garantia...</p>
         </div>
-        <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Ciudad</label>
-          <select
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            disabled={!department}
-            className="w-full appearance-none rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-entrepreneur disabled:opacity-50"
-          >
-            <option value="">Selecciona...</option>
-            {citiesList.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
-      <div>
-        <label className="mb-3 block text-sm font-bold text-dracula-fg">
-          Redes Sociales y Contacto
-        </label>
+        <div>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">
+            Informacion de Envio
+          </label>
+          <textarea
+            rows={3}
+            value={shippingInfo}
+            onChange={(e) => setShippingInfo(e.target.value)}
+            className={textareaClass}
+          />
+          <p className={helperClass}>Haces envios? Cuales son tus tiempos y costos?</p>
+        </div>
+      </Section>
+
+      {/* Section 5: Redes Sociales y Contacto */}
+      <Section
+        icon={<ShareNetwork size={20} className="text-entrepreneur" />}
+        title="Redes Sociales y Contacto"
+      >
         <div className="space-y-3">
           {/* WhatsApp */}
           <div className="flex items-center gap-3">
@@ -211,7 +424,7 @@ export default function EditEntrepreneurProfileForm({
               value={whatsapp}
               onChange={(e) => setWhatsapp(e.target.value)}
               placeholder="+57 300 123 4567"
-              className="flex-1 rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2.5 text-sm text-white outline-none focus:border-entrepreneur"
+              className={socialInputClass}
             />
           </div>
           {/* Instagram */}
@@ -222,7 +435,7 @@ export default function EditEntrepreneurProfileForm({
               value={instagram}
               onChange={(e) => setInstagram(e.target.value)}
               placeholder="@tucuenta"
-              className="flex-1 rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2.5 text-sm text-white outline-none focus:border-entrepreneur"
+              className={socialInputClass}
             />
           </div>
           {/* Facebook */}
@@ -233,7 +446,7 @@ export default function EditEntrepreneurProfileForm({
               value={facebook}
               onChange={(e) => setFacebook(e.target.value)}
               placeholder="facebook.com/tupagina"
-              className="flex-1 rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2.5 text-sm text-white outline-none focus:border-entrepreneur"
+              className={socialInputClass}
             />
           </div>
           {/* X (Twitter) */}
@@ -244,7 +457,7 @@ export default function EditEntrepreneurProfileForm({
               value={xTwitter}
               onChange={(e) => setXTwitter(e.target.value)}
               placeholder="@tucuenta"
-              className="flex-1 rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2.5 text-sm text-white outline-none focus:border-entrepreneur"
+              className={socialInputClass}
             />
           </div>
           {/* TikTok */}
@@ -255,7 +468,7 @@ export default function EditEntrepreneurProfileForm({
               value={tiktok}
               onChange={(e) => setTiktok(e.target.value)}
               placeholder="@tucuenta"
-              className="flex-1 rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2.5 text-sm text-white outline-none focus:border-entrepreneur"
+              className={socialInputClass}
             />
           </div>
           {/* Threads */}
@@ -266,7 +479,7 @@ export default function EditEntrepreneurProfileForm({
               value={threads}
               onChange={(e) => setThreads(e.target.value)}
               placeholder="@tucuenta"
-              className="flex-1 rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2.5 text-sm text-white outline-none focus:border-entrepreneur"
+              className={socialInputClass}
             />
           </div>
           {/* Website */}
@@ -277,12 +490,42 @@ export default function EditEntrepreneurProfileForm({
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
               placeholder="https://..."
-              className="flex-1 rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2.5 text-sm text-white outline-none focus:border-entrepreneur"
+              className={socialInputClass}
+            />
+          </div>
+          {/* Email */}
+          <div className="flex items-center gap-3">
+            <Envelope size={20} className="shrink-0 text-dracula-cyan" />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@email.com"
+              className={socialInputClass}
             />
           </div>
         </div>
-      </div>
 
+        <div>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">
+            Metodo de Contacto Preferido
+          </label>
+          <select
+            value={preferredContact}
+            onChange={(e) => setPreferredContact(e.target.value)}
+            className={selectClass}
+          >
+            <option value="">Selecciona...</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="instagram">Instagram</option>
+            <option value="facebook">Facebook</option>
+            <option value="email">Email</option>
+            <option value="website">Sitio Web</option>
+          </select>
+        </div>
+      </Section>
+
+      {/* Public profile link */}
       <div className="rounded-lg border border-dracula-current/50 bg-dracula-bg/50 p-4">
         <p className="mb-1 text-xs text-dracula-comment">Tu tienda publica:</p>
         <a

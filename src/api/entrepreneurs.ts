@@ -54,6 +54,16 @@ entrepreneurs.put('/:id', requireAuth, async (c) => {
     department?: string;
     photo_url?: string;
     contact_info?: Record<string, string>;
+    cover_url?: string;
+    logo_url?: string;
+    store_story?: string;
+    what_makes_special?: string;
+    social_connection?: string;
+    years_in_business?: number;
+    email?: string;
+    preferred_contact?: string;
+    store_policies?: string;
+    shipping_info?: string;
   }>();
 
   const services = c.get('services');
@@ -64,6 +74,16 @@ entrepreneurs.put('/:id', requireAuth, async (c) => {
     department: body.department,
     photo_url: body.photo_url,
     contact_info: body.contact_info,
+    cover_url: body.cover_url,
+    logo_url: body.logo_url,
+    store_story: body.store_story,
+    what_makes_special: body.what_makes_special,
+    social_connection: body.social_connection,
+    years_in_business: body.years_in_business,
+    email: body.email,
+    preferred_contact: body.preferred_contact,
+    store_policies: body.store_policies,
+    shipping_info: body.shipping_info,
   });
 
   return c.json(success(entrepreneur));

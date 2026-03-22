@@ -10,6 +10,14 @@ export interface CauseRow {
   current_amount: number;
   photo_url: string | null;
   evidence_photos: string | null;
+  location: string | null;
+  beneficiary_count: number | null;
+  start_date: string | null;
+  end_date: string | null;
+  category: string | null;
+  needs: string | null;
+  fund_usage: string | null;
+  impact_metrics: string | null;
   status: string;
   admin_notes: string | null;
   created_at: string;
@@ -70,11 +78,20 @@ export class CauseRepository extends BaseRepository<CauseRow> {
     photo_url?: string | null;
     evidence_photos?: unknown;
     status?: string;
+    location?: string | null;
+    beneficiary_count?: number | null;
+    start_date?: string | null;
+    end_date?: string | null;
+    category?: string | null;
+    needs?: unknown;
+    fund_usage?: string | null;
+    impact_metrics?: unknown;
   }): Promise<CauseRow> {
     const result = await this.db
       .prepare(
-        `INSERT INTO causes (leader_id, title, description, target_goal, photo_url, evidence_photos, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO causes (leader_id, title, description, target_goal, photo_url, evidence_photos, status,
+         location, beneficiary_count, start_date, end_date, category, needs, fund_usage, impact_metrics)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         data.leader_id,
@@ -84,6 +101,14 @@ export class CauseRepository extends BaseRepository<CauseRow> {
         data.photo_url || null,
         data.evidence_photos ? JSON.stringify(data.evidence_photos) : null,
         data.status || 'active',
+        data.location || null,
+        data.beneficiary_count || null,
+        data.start_date || null,
+        data.end_date || null,
+        data.category || null,
+        data.needs ? JSON.stringify(data.needs) : null,
+        data.fund_usage || null,
+        data.impact_metrics ? JSON.stringify(data.impact_metrics) : null,
       )
       .run();
 
@@ -101,6 +126,14 @@ export class CauseRepository extends BaseRepository<CauseRow> {
       evidence_photos: unknown;
       status: string;
       admin_notes: string | null;
+      location: string | null;
+      beneficiary_count: number | null;
+      start_date: string | null;
+      end_date: string | null;
+      category: string | null;
+      needs: unknown;
+      fund_usage: string | null;
+      impact_metrics: unknown;
     }>,
   ): Promise<CauseRow | null> {
     const fields: string[] = [];
@@ -133,6 +166,38 @@ export class CauseRepository extends BaseRepository<CauseRow> {
     if (data.admin_notes !== undefined) {
       fields.push('admin_notes = ?');
       values.push(data.admin_notes);
+    }
+    if (data.location !== undefined) {
+      fields.push('location = ?');
+      values.push(data.location);
+    }
+    if (data.beneficiary_count !== undefined) {
+      fields.push('beneficiary_count = ?');
+      values.push(data.beneficiary_count);
+    }
+    if (data.start_date !== undefined) {
+      fields.push('start_date = ?');
+      values.push(data.start_date);
+    }
+    if (data.end_date !== undefined) {
+      fields.push('end_date = ?');
+      values.push(data.end_date);
+    }
+    if (data.category !== undefined) {
+      fields.push('category = ?');
+      values.push(data.category);
+    }
+    if (data.needs !== undefined) {
+      fields.push('needs = ?');
+      values.push(data.needs ? JSON.stringify(data.needs) : null);
+    }
+    if (data.fund_usage !== undefined) {
+      fields.push('fund_usage = ?');
+      values.push(data.fund_usage);
+    }
+    if (data.impact_metrics !== undefined) {
+      fields.push('impact_metrics = ?');
+      values.push(data.impact_metrics ? JSON.stringify(data.impact_metrics) : null);
     }
 
     if (fields.length === 0) return this.findById(id);

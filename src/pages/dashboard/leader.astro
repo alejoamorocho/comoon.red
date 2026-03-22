@@ -7,6 +7,10 @@ import ProfileCompletionCard from '../../components/dashboard/ProfileCompletionC
 import CreateCauseForm from '../../components/dashboard/CreateCauseForm';
 import CreateProductForm from '../../components/dashboard/CreateProductForm';
 import EditLeaderProfileForm from '../../components/dashboard/EditLeaderProfileForm';
+import EditCauseForm from '../../components/dashboard/EditCauseForm';
+import EditProductForm from '../../components/dashboard/EditProductForm';
+import CauseManagementList from '../../components/dashboard/CauseManagementList';
+import ProductManagementList from '../../components/dashboard/ProductManagementList';
 import { LeaderTagsList } from '../../components/LeaderTagBadge';
 import {
   PlusCircle,
@@ -89,6 +93,22 @@ if (db && user?.profileId) {
       contact_info: leader.contact_info || '{}',
       photo_url: leader.photo_url || '',
       tags_raw: leader.tags || '[]',
+      cover_url: leader.cover_url || '',
+      organization_name: leader.organization_name || '',
+      who_we_are: leader.who_we_are || '',
+      our_why: leader.our_why || '',
+      how_to_help: leader.how_to_help || '',
+      years_active: leader.years_active || null,
+      impact_scope: leader.impact_scope || '',
+      community: leader.community || '',
+      areas_of_influence: leader.areas_of_influence || '[]',
+      people_impacted: leader.people_impacted || null,
+      achievements: leader.achievements || '[]',
+      testimonials: leader.testimonials || '[]',
+      media_gallery: leader.media_gallery || '[]',
+      awards: leader.awards || '[]',
+      email: leader.email || '',
+      preferred_contact: leader.preferred_contact || '',
     };
 
     // Fetch causes
@@ -195,23 +215,54 @@ if (db && user?.profileId) {
   }
 }
 
-const profileCompletion = getLeaderCompletionPercentage({
-  name: leaderProfile.name,
-  bio: leaderProfile.bio,
-  photo_url: leaderProfile.photo,
-  location: leaderProfile.location,
-  tags: leaderProfile.tags,
-  activeCausesCount: stats.activeCauses,
-});
+// Fetch data for edit forms
+const editCauseId = url.searchParams.get('id');
+let editCauseData: Record<string, any> | null = null;
+let editProductData: Record<string, any> | null = null;
 
-const missingFields = getLeaderMissingFields({
+if (db && user?.profileId && activeTab === 'editar-causa' && editCauseId) {
+  editCauseData = await db
+    .prepare('SELECT * FROM causes WHERE id = ? AND leader_id = ?')
+    .bind(parseInt(editCauseId), user.profileId)
+    .first();
+}
+
+if (db && user?.profileId && activeTab === 'editar-producto' && editCauseId) {
+  const productRow = await db
+    .prepare(
+      'SELECT p.*, c.title as cause_title FROM products p JOIN causes c ON p.cause_id = c.id WHERE p.id = ? AND (p.leader_id = ? OR EXISTS (SELECT 1 FROM causes c2 WHERE c2.id = p.cause_id AND c2.leader_id = ?))',
+    )
+    .bind(parseInt(editCauseId), user.profileId, user.profileId)
+    .first();
+  if (productRow) {
+    editProductData = productRow;
+  }
+}
+
+// Build product counts for CauseManagementList
+const productCounts: Record<number, number> = {};
+for (const cause of myCauses) {
+  productCounts[cause.id] = cause.productsLinked;
+}
+
+const leaderProfileData = {
   name: leaderProfile.name,
   bio: leaderProfile.bio,
   photo_url: leaderProfile.photo,
   location: leaderProfile.location,
   tags: leaderProfile.tags,
   activeCausesCount: stats.activeCauses,
-});
+  who_we_are: leaderProfile.who_we_are || '',
+  our_why: leaderProfile.our_why || '',
+  how_to_help: leaderProfile.how_to_help || '',
+  contact_info: leaderProfile.contact_info || '{}',
+  people_impacted: leaderProfile.people_impacted || null,
+  achievements: leaderProfile.achievements || '[]',
+  testimonials: leaderProfile.testimonials || '[]',
+};
+
+const profileCompletion = getLeaderCompletionPercentage(leaderProfileData);
+const missingFields = getLeaderMissingFields(leaderProfileData);
 ---
 
 <Layout title="Dashboard Lider">
@@ -417,7 +468,7 @@ const missingFields = getLeaderMissingFields({
     <!-- Tab: Causas -->
     {
       activeTab === 'causas' && (
-        <div class="space-y-4">
+        <div>
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
               <Trophy className="text-dracula-yellow" size={24} />
@@ -431,71 +482,20 @@ const missingFields = getLeaderMissingFields({
               Nueva Causa
             </a>
           </div>
-          {myCauses.length > 0 ? (
-            <div class="space-y-4">
-              {myCauses.map((cause) => (
-                <div class="glass p-6 rounded-xl">
-                  <div class="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 class="font-bold text-white text-lg">{cause.title}</h3>
-                      <p class="text-sm text-dracula-comment mt-1">{cause.description}</p>
-                    </div>
-                    <div class="flex gap-2">
-                      <a
-                        href={`/causes/${cause.id}`}
-                        class="p-2 text-dracula-fg/60 hover:text-dracula-cyan transition-colors"
-                        title="Ver"
-                      >
-                        <Eye size={20} />
-                      </a>
-                    </div>
-                  </div>
-                  {cause.goal > 0 && (
-                    <div class="mb-4">
-                      <div class="flex justify-between text-sm mb-1">
-                        <span class="text-dracula-green font-bold">
-                          {formatCurrency(cause.raised)}
-                        </span>
-                        <span class="text-dracula-comment">de {formatCurrency(cause.goal)}</span>
-                      </div>
-                      <div class="w-full bg-dracula-current h-3 rounded-full overflow-hidden">
-                        <div
-                          class="bg-gradient-to-r from-dracula-green to-dracula-cyan h-full rounded-full transition-all"
-                          style={`width: ${Math.min((cause.raised / cause.goal) * 100, 100)}%`}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  <div class="flex items-center justify-between text-xs">
-                    <span class="text-entrepreneur">
-                      {cause.productsLinked} productos vinculados
-                    </span>
-                    <span
-                      class={`px-2 py-1 rounded-full font-bold ${
-                        cause.status === 'active'
-                          ? 'bg-dracula-green/20 text-dracula-green'
-                          : 'bg-dracula-comment/20 text-dracula-comment'
-                      }`}
-                    >
-                      {cause.status === 'active' ? 'Activa' : cause.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div class="glass p-12 rounded-xl text-center">
-              <Trophy size={48} className="mx-auto mb-4 text-dracula-comment" />
-              <p class="text-dracula-comment mb-4">No tienes causas aun.</p>
-              <a
-                href="/dashboard/leader?tab=crear"
-                class="inline-flex items-center gap-2 px-6 py-3 bg-leader text-dracula-bg font-bold rounded-xl hover:brightness-110 transition-all"
-              >
-                <PlusCircle size={20} />
-                Crear tu primera causa
-              </a>
-            </div>
-          )}
+          <CauseManagementList
+            client:visible
+            causes={myCauses.map((c) => ({
+              id: c.id,
+              title: c.title,
+              description: c.description || null,
+              target_goal: c.goal || null,
+              current_amount: c.raised,
+              photo_url: null,
+              status: c.status,
+              created_at: c.createdAt,
+            }))}
+            productCounts={productCounts}
+          />
         </div>
       )
     }
@@ -521,56 +521,20 @@ const missingFields = getLeaderMissingFields({
           </div>
 
           {/* Products List */}
-          {leaderProducts.length > 0 ? (
-            <div class="space-y-3">
-              {leaderProducts.map((product) => (
-                <div class="glass p-4 rounded-xl flex items-center gap-4">
-                  {product.photoUrl ? (
-                    <img
-                      src={product.photoUrl}
-                      alt={product.name}
-                      class="w-16 h-16 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <div class="w-16 h-16 rounded-lg bg-entrepreneur/20 flex items-center justify-center">
-                      <ShoppingBag size={24} className="text-entrepreneur" />
-                    </div>
-                  )}
-                  <div class="flex-1 min-w-0">
-                    <h4 class="font-bold text-white text-sm truncate">{product.name}</h4>
-                    <p class="text-xs text-dracula-comment">{product.causeName}</p>
-                    <div class="flex items-center gap-2 mt-1">
-                      <span class="text-dracula-green font-bold text-sm">
-                        {new Intl.NumberFormat('es-CO', {
-                          style: 'currency',
-                          currency: 'COP',
-                          maximumFractionDigits: 0,
-                        }).format(product.price)}
-                      </span>
-                      <span
-                        class={`text-xs px-2 py-0.5 rounded-full ${product.isOwn ? 'bg-leader/20 text-leader' : 'bg-entrepreneur/20 text-entrepreneur'}`}
-                      >
-                        {product.isOwn ? 'Propio' : product.sellerName}
-                      </span>
-                    </div>
-                  </div>
-                  <a
-                    href={`/store/${product.id}`}
-                    class="text-dracula-comment hover:text-white transition-colors"
-                  >
-                    <Eye size={20} />
-                  </a>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div class="glass p-8 rounded-xl text-center">
-              <ShoppingBag size={48} className="mx-auto mb-4 text-dracula-comment" />
-              <p class="text-dracula-comment">
-                No hay productos aun. Crea tu primer producto arriba!
-              </p>
-            </div>
-          )}
+          <ProductManagementList
+            client:visible
+            products={leaderProducts.map((p) => ({
+              id: p.id,
+              name: p.name,
+              description: null,
+              price: p.price,
+              photo_url: p.photoUrl || null,
+              cause_title: p.causeName,
+              is_active: true,
+              created_at: p.createdAt,
+            }))}
+            userRole="leader"
+          />
         </div>
       )
     }
@@ -731,10 +695,26 @@ const missingFields = getLeaderMissingFields({
                 name: leaderProfile.name,
                 bio: leaderProfile.bio,
                 photo_url: leaderProfile.photo_url || leaderProfile.photo,
+                cover_url: leaderProfile.cover_url || '',
                 department: leaderProfile.department || '',
                 city: leaderProfile.city || '',
                 contact_info: leaderProfile.contact_info || '{}',
                 tags: leaderProfile.tags_raw || '[]',
+                organization_name: leaderProfile.organization_name || '',
+                who_we_are: leaderProfile.who_we_are || '',
+                our_why: leaderProfile.our_why || '',
+                how_to_help: leaderProfile.how_to_help || '',
+                years_active: leaderProfile.years_active || null,
+                impact_scope: leaderProfile.impact_scope || '',
+                community: leaderProfile.community || '',
+                areas_of_influence: leaderProfile.areas_of_influence || '[]',
+                people_impacted: leaderProfile.people_impacted || null,
+                achievements: leaderProfile.achievements || '[]',
+                testimonials: leaderProfile.testimonials || '[]',
+                media_gallery: leaderProfile.media_gallery || '[]',
+                awards: leaderProfile.awards || '[]',
+                email: leaderProfile.email || '',
+                preferred_contact: leaderProfile.preferred_contact || '',
               }}
             />
           </div>
@@ -743,6 +723,87 @@ const missingFields = getLeaderMissingFields({
             <a href="#" class="text-sm text-dracula-purple hover:underline">
               Cambiar contrasena
             </a>
+          </div>
+        </div>
+      )
+    }
+
+    <!-- Tab: Editar Causa (hidden) -->
+    {
+      activeTab === 'editar-causa' && editCauseData && (
+        <div class="max-w-3xl mx-auto">
+          <div class="glass p-6 rounded-xl">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <PencilSimple className="text-leader" size={24} />
+                Editar Causa
+              </h2>
+              <a
+                href="/dashboard/leader?tab=causas"
+                class="text-sm text-dracula-comment hover:text-white transition-colors"
+              >
+                &larr; Volver a Mis Causas
+              </a>
+            </div>
+            <EditCauseForm
+              client:visible
+              causeId={editCauseData.id as number}
+              initialData={{
+                title: (editCauseData.title as string) || '',
+                description: (editCauseData.description as string) || '',
+                target_goal: editCauseData.target_goal as number | null,
+                photo_url: (editCauseData.photo_url as string) || '',
+                evidence_photos: (editCauseData.evidence_photos as string) || '[]',
+                location: (editCauseData.location as string) || '',
+                beneficiary_count: editCauseData.beneficiary_count as number | null,
+                start_date: (editCauseData.start_date as string) || '',
+                end_date: (editCauseData.end_date as string) || '',
+                category: (editCauseData.category as string) || '',
+                needs: (editCauseData.needs as string) || '[]',
+                fund_usage: (editCauseData.fund_usage as string) || '',
+                impact_metrics: (editCauseData.impact_metrics as string) || '{}',
+              }}
+            />
+          </div>
+        </div>
+      )
+    }
+
+    <!-- Tab: Editar Producto (hidden) -->
+    {
+      activeTab === 'editar-producto' && editProductData && (
+        <div class="max-w-3xl mx-auto">
+          <div class="glass p-6 rounded-xl">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <PencilSimple className="text-entrepreneur" size={24} />
+                Editar Producto
+              </h2>
+              <a
+                href="/dashboard/leader?tab=productos"
+                class="text-sm text-dracula-comment hover:text-white transition-colors"
+              >
+                &larr; Volver a Mi Tienda
+              </a>
+            </div>
+            <EditProductForm
+              client:visible
+              productId={editProductData.id as number}
+              initialData={{
+                name: (editProductData.name as string) || '',
+                description: (editProductData.description as string) || '',
+                price: editProductData.price as number,
+                photo_url: (editProductData.photo_url as string) || '',
+                gallery_photos: (editProductData.gallery_photos as string) || '[]',
+                cause_id: editProductData.cause_id as number,
+                cause_title: (editProductData.cause_title as string) || '',
+                contribution_type: (editProductData.contribution_type as string) || 'percentage',
+                contribution_amount: editProductData.contribution_amount as number | null,
+                contribution_text: (editProductData.contribution_text as string) || '',
+                category: (editProductData.category as string) || '',
+                availability: (editProductData.availability as string) || 'available',
+              }}
+            />
           </div>
         </div>
       )

@@ -50,6 +50,15 @@ export class CauseService {
       description?: string | null;
       target_goal?: number | null;
       photo_url?: string | null;
+      evidence_photos?: unknown;
+      location?: string | null;
+      beneficiary_count?: number | null;
+      start_date?: string | null;
+      end_date?: string | null;
+      category?: string | null;
+      needs?: unknown;
+      fund_usage?: string | null;
+      impact_metrics?: unknown;
     },
   ): Promise<CauseRow> {
     const leaderId = await this.leaderRepo.findLeaderIdByUserId(userId);
@@ -63,8 +72,28 @@ export class CauseService {
       description: data.description,
       target_goal: data.target_goal,
       photo_url: data.photo_url,
+      evidence_photos: data.evidence_photos,
       status: 'active',
+      location: data.location,
+      beneficiary_count: data.beneficiary_count,
+      start_date: data.start_date,
+      end_date: data.end_date,
+      category: data.category,
+      needs: data.needs,
+      fund_usage: data.fund_usage,
+      impact_metrics: data.impact_metrics,
     });
+  }
+
+  async archive(userId: number, causeId: number): Promise<CauseRow> {
+    const leaderId = await this.leaderRepo.findLeaderIdByUserId(userId);
+    if (!leaderId) throw new NotFoundError('Leader profile');
+    const cause = await this.causeRepo.findByLeaderIdAndId(causeId, leaderId);
+    if (!cause) throw new ForbiddenError('No tienes permiso para archivar esta causa');
+    await this.causeRepo.updateStatus(causeId, 'archived');
+    const updated = await this.causeRepo.findById(causeId);
+    if (!updated) throw new NotFoundError('Cause');
+    return updated;
   }
 
   async update(
@@ -75,6 +104,15 @@ export class CauseService {
       description: string | null;
       target_goal: number | null;
       photo_url: string | null;
+      evidence_photos: unknown;
+      location: string | null;
+      beneficiary_count: number | null;
+      start_date: string | null;
+      end_date: string | null;
+      category: string | null;
+      needs: unknown;
+      fund_usage: string | null;
+      impact_metrics: unknown;
     }>,
   ): Promise<CauseRow> {
     const leaderId = await this.leaderRepo.findLeaderIdByUserId(userId);

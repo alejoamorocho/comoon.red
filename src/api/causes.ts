@@ -47,6 +47,15 @@ causes.post('/', requireAuth, requireRole('leader', 'admin'), async (c) => {
     description?: string;
     target_goal?: number;
     photo_url?: string;
+    evidence_photos?: string[];
+    location?: string;
+    beneficiary_count?: number;
+    start_date?: string;
+    end_date?: string;
+    category?: string;
+    needs?: string[];
+    fund_usage?: string;
+    impact_metrics?: Record<string, string | number>;
   }>();
 
   if (!body.title) {
@@ -59,6 +68,15 @@ causes.post('/', requireAuth, requireRole('leader', 'admin'), async (c) => {
     description: body.description || null,
     target_goal: body.target_goal || null,
     photo_url: body.photo_url || null,
+    evidence_photos: body.evidence_photos,
+    location: body.location || null,
+    beneficiary_count: body.beneficiary_count || null,
+    start_date: body.start_date || null,
+    end_date: body.end_date || null,
+    category: body.category || null,
+    needs: body.needs,
+    fund_usage: body.fund_usage || null,
+    impact_metrics: body.impact_metrics,
   });
 
   return c.json(success(cause), 201);
@@ -73,10 +91,28 @@ causes.put('/:id', requireAuth, requireRole('leader', 'admin'), async (c) => {
     description?: string;
     target_goal?: number;
     photo_url?: string;
+    evidence_photos?: string[];
+    location?: string;
+    beneficiary_count?: number;
+    start_date?: string;
+    end_date?: string;
+    category?: string;
+    needs?: string[];
+    fund_usage?: string;
+    impact_metrics?: Record<string, string | number>;
   }>();
 
   const services = c.get('services');
   const cause = await services.cause.update(user!.id, causeId, body);
+  return c.json(success(cause));
+});
+
+// DELETE /api/causes/:id - Archive own cause
+causes.delete('/:id', requireAuth, requireRole('leader', 'admin'), async (c) => {
+  const user = c.get('user');
+  const causeId = parseInt(c.req.param('id'), 10);
+  const services = c.get('services');
+  const cause = await services.cause.archive(user!.id, causeId);
   return c.json(success(cause));
 });
 

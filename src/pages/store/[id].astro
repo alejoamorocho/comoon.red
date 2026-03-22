@@ -2,7 +2,18 @@
 import Layout from '../../layouts/Layout.astro';
 import ContactButtons from '../../components/ContactButtons';
 import ShareButtons from '../../components/ShareButtons';
-import { ArrowLeft, Tag, Heart, Storefront, MapPin, Moon, UsersThree } from '@phosphor-icons/react';
+import {
+  ArrowLeft,
+  Tag,
+  Heart,
+  Storefront,
+  MapPin,
+  Moon,
+  UsersThree,
+  Images,
+  CheckCircle,
+  Clock as ClockIcon,
+} from '@phosphor-icons/react';
 
 const { id } = Astro.params;
 if (!id) {
@@ -84,6 +95,27 @@ const contributionDisplay =
 
 const sellerProfileUrl =
   sellerType === 'leader' ? `/leaders/${sellerId}` : `/entrepreneurs/${sellerId}`;
+
+let galleryPhotos: string[] = [];
+try {
+  galleryPhotos = JSON.parse(product.gallery_photos || '[]');
+} catch {}
+
+const availabilityMap: Record<string, { label: string; classes: string }> = {
+  available: {
+    label: 'Disponible',
+    classes: 'bg-dracula-green/20 text-dracula-green border-dracula-green/40',
+  },
+  out_of_stock: {
+    label: 'Agotado',
+    classes: 'bg-dracula-red/20 text-dracula-red border-dracula-red/40',
+  },
+  pre_order: {
+    label: 'Pre-orden',
+    classes: 'bg-dracula-yellow/20 text-dracula-yellow border-dracula-yellow/40',
+  },
+};
+const availability = product.availability ? availabilityMap[product.availability] || null : null;
 ---
 
 <Layout
@@ -109,6 +141,7 @@ const sellerProfileUrl =
           {
             product.photo_url ? (
               <img
+                id="main-product-image"
                 src={product.photo_url}
                 alt={product.name}
                 class="w-full h-auto rounded-xl shadow-2xl"
@@ -120,19 +153,78 @@ const sellerProfileUrl =
             )
           }
         </div>
+        {
+          galleryPhotos.length > 0 && (
+            <div>
+              <p class="text-sm text-dracula-comment mb-2 flex items-center gap-1">
+                <Images size={16} />
+                Galería ({galleryPhotos.length + (product.photo_url ? 1 : 0)} fotos)
+              </p>
+              <div class="flex gap-2 overflow-x-auto pb-2">
+                {product.photo_url && (
+                  <button
+                    class="gallery-thumb shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-entrepreneur hover:border-white transition-colors"
+                    data-src={product.photo_url}
+                    onclick="document.getElementById('main-product-image').src = this.dataset.src"
+                  >
+                    <img
+                      src={product.photo_url}
+                      alt="Principal"
+                      class="w-full h-full object-cover"
+                    />
+                  </button>
+                )}
+                {galleryPhotos.map((photo: string, i: number) => (
+                  <button
+                    class="gallery-thumb shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/10 hover:border-entrepreneur transition-colors"
+                    data-src={photo}
+                    onclick="document.getElementById('main-product-image').src = this.dataset.src"
+                  >
+                    <img
+                      src={photo}
+                      alt={`Foto ${i + 1}`}
+                      loading="lazy"
+                      class="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+        }
       </div>
 
       <!-- Product Details -->
       <div>
-        <!-- Price -->
-        <div class="flex items-center justify-between mb-4">
+        <!-- Price & Badges -->
+        <div class="flex flex-wrap items-center gap-2 mb-4">
           <span
             class={`px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 ${sellerType === 'leader' ? 'bg-leader/20 text-leader' : 'bg-entrepreneur/20 text-entrepreneur'}`}
           >
             {sellerType === 'leader' ? <UsersThree size={14} /> : <Tag size={14} />}
             {sellerType === 'leader' ? 'Producto de Lider' : 'Producto'}
           </span>
-          <span class="text-3xl font-bold text-dracula-green">{formattedPrice}</span>
+          {
+            product.category && (
+              <span class="px-3 py-1 rounded-full text-sm font-medium bg-dracula-purple/20 text-dracula-purple border border-dracula-purple/30 flex items-center gap-1">
+                <Tag size={12} />
+                {product.category}
+              </span>
+            )
+          }
+          {
+            availability && (
+              <span
+                class={`px-3 py-1 rounded-full text-sm font-bold border flex items-center gap-1 ${availability.classes}`}
+              >
+                {product.availability === 'available' && <CheckCircle size={14} weight="fill" />}
+                {product.availability === 'out_of_stock' && <ClockIcon size={14} weight="fill" />}
+                {product.availability === 'pre_order' && <ClockIcon size={14} weight="fill" />}
+                {availability.label}
+              </span>
+            )
+          }
+          <span class="text-3xl font-bold text-dracula-green ml-auto">{formattedPrice}</span>
         </div>
 
         <!-- Title -->
@@ -145,22 +237,26 @@ const sellerProfileUrl =
           )
         }
 
-        <!-- Impact Section -->
-        <div class="glass p-6 rounded-2xl mb-8 border border-leader/30 relative overflow-hidden">
+        <!-- Impact Section (Prominent) -->
+        <div
+          class="glass p-8 rounded-2xl mb-8 border-2 border-leader/40 relative overflow-hidden bg-leader/5 shadow-[0_0_30px_rgba(139,92,246,0.08)]"
+        >
           <div class="absolute -right-6 -top-6 text-leader/10">
-            <Heart size={120} weight="fill" />
+            <Heart size={140} weight="fill" />
           </div>
           <div class="relative">
-            <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
-              <Moon size={20} weight="duotone" className="text-comoon-purple" />
-              Impacto de tu compra
+            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+              <Heart size={24} weight="fill" className="text-leader" />
+              Tu compra genera impacto real
             </h3>
-            <p class="text-dracula-fg/90 mb-4">{contributionDisplay}</p>
+            <p class="text-2xl font-bold text-leader mb-4">{contributionDisplay}</p>
             <a
               href={`/causes/${product.cause_id}`}
-              class="block bg-dracula-bg/50 p-4 rounded-xl hover:bg-dracula-current/50 transition-colors border border-white/5"
+              class="block bg-dracula-bg/60 p-5 rounded-xl hover:bg-dracula-current/50 transition-colors border border-leader/20 group"
             >
-              <p class="text-leader font-bold text-xl mb-1">"{product.cause_title}"</p>
+              <p class="text-leader font-bold text-xl mb-1 group-hover:underline">
+                "{product.cause_title}"
+              </p>
               <p class="text-sm text-dracula-comment">
                 Causa liderada por <span class="text-white font-medium">{product.leader_name}</span>
               </p>

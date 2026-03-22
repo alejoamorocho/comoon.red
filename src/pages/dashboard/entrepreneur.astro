@@ -5,6 +5,8 @@ import StatCard from '../../components/dashboard/StatCard.astro';
 import QuickActions from '../../components/dashboard/QuickActions.astro';
 import ProfileCompletionCard from '../../components/dashboard/ProfileCompletionCard.astro';
 import CreateProductForm from '../../components/dashboard/CreateProductForm';
+import EditProductForm from '../../components/dashboard/EditProductForm';
+import ProductManagementList from '../../components/dashboard/ProductManagementList';
 import EditEntrepreneurProfileForm from '../../components/dashboard/EditEntrepreneurProfileForm';
 import {
   PlusCircle,
@@ -73,6 +75,16 @@ if (db && user?.profileId) {
       city: entrepreneur.city || '',
       contact_info: entrepreneur.contact_info || '{}',
       photo_url: entrepreneur.photo_url || '',
+      cover_url: entrepreneur.cover_url || '',
+      logo_url: entrepreneur.logo_url || '',
+      store_story: entrepreneur.store_story || '',
+      what_makes_special: entrepreneur.what_makes_special || '',
+      social_connection: entrepreneur.social_connection || '',
+      years_in_business: entrepreneur.years_in_business || null,
+      email: entrepreneur.email || '',
+      preferred_contact: entrepreneur.preferred_contact || '',
+      store_policies: entrepreneur.store_policies || '',
+      shipping_info: entrepreneur.shipping_info || '',
     };
 
     // Fetch products with cause info
@@ -138,21 +150,31 @@ if (db && user?.profileId) {
   }
 }
 
-const profileCompletion = getEntrepreneurCompletionPercentage({
-  store_name: entrepreneurProfile.storeName,
-  bio: entrepreneurProfile.bio,
-  photo_url: entrepreneurProfile.photo,
-  location: entrepreneurProfile.location,
-  activeProductsCount: stats.totalProducts,
-});
+// Fetch data for edit product form
+const editProductId = url.searchParams.get('id');
+let editProductData: Record<string, any> | null = null;
 
-const missingFields = getEntrepreneurMissingFields({
+if (db && user?.profileId && activeTab === 'editar-producto' && editProductId) {
+  editProductData = await db
+    .prepare(
+      'SELECT p.*, c.title as cause_title FROM products p JOIN causes c ON p.cause_id = c.id WHERE p.id = ? AND p.entrepreneur_id = ?',
+    )
+    .bind(parseInt(editProductId), user.profileId)
+    .first();
+}
+
+const entrepreneurProfileData = {
   store_name: entrepreneurProfile.storeName,
   bio: entrepreneurProfile.bio,
   photo_url: entrepreneurProfile.photo,
   location: entrepreneurProfile.location,
   activeProductsCount: stats.totalProducts,
-});
+  store_story: entrepreneurProfile.store_story || '',
+  contact_info: entrepreneurProfile.contact_info || '{}',
+};
+
+const profileCompletion = getEntrepreneurCompletionPercentage(entrepreneurProfileData);
+const missingFields = getEntrepreneurMissingFields(entrepreneurProfileData);
 ---
 
 <Layout title="Dashboard Emprendedor">
@@ -348,61 +370,20 @@ const missingFields = getEntrepreneurMissingFields({
               Nuevo Producto
             </a>
           </div>
-          {myProducts.length > 0 ? (
-            <div class="space-y-3">
-              {myProducts.map((product) => (
-                <div class="glass p-5 rounded-xl flex flex-col md:flex-row items-center gap-5">
-                  {product.photo ? (
-                    <img
-                      src={product.photo}
-                      alt={product.name}
-                      class="w-24 h-24 rounded-xl object-cover"
-                    />
-                  ) : (
-                    <div class="w-24 h-24 rounded-xl bg-entrepreneur/20 flex items-center justify-center">
-                      <ShoppingBag size={32} className="text-entrepreneur" />
-                    </div>
-                  )}
-                  <div class="flex-1 text-center md:text-left">
-                    <h4 class="font-bold text-white text-lg">{product.name}</h4>
-                    <p class="text-sm text-leader flex items-center gap-1 mt-1 justify-center md:justify-start">
-                      <Heart size={14} />
-                      Apoya: {product.cause.title}
-                    </p>
-                    <p class="text-xs text-dracula-comment mt-1">
-                      Contribucion: {product.contribution} por venta
-                    </p>
-                  </div>
-                  <div class="text-center">
-                    <p class="font-bold text-dracula-green text-xl">
-                      {formatCurrency(product.price)}
-                    </p>
-                    <div class="flex gap-2 mt-3 justify-center">
-                      <a
-                        href={`/store/${product.id}`}
-                        class="p-2 text-dracula-fg/60 hover:text-entrepreneur transition-colors rounded-lg hover:bg-dracula-current"
-                        title="Ver"
-                      >
-                        <Eye size={18} />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div class="glass p-12 rounded-xl text-center">
-              <ShoppingBag size={48} className="mx-auto mb-4 text-dracula-comment" />
-              <p class="text-dracula-comment mb-4">No tienes productos aun.</p>
-              <a
-                href="/dashboard/entrepreneur?tab=agregar"
-                class="inline-flex items-center gap-2 px-6 py-3 bg-entrepreneur text-dracula-bg font-bold rounded-xl hover:brightness-110 transition-all"
-              >
-                <PlusCircle size={20} />
-                Agregar tu primer producto
-              </a>
-            </div>
-          )}
+          <ProductManagementList
+            client:visible
+            products={myProducts.map((p) => ({
+              id: p.id,
+              name: p.name,
+              description: null,
+              price: p.price,
+              photo_url: p.photo || null,
+              cause_title: p.cause.title,
+              is_active: p.isActive,
+              created_at: '',
+            }))}
+            userRole="entrepreneur"
+          />
         </div>
       )
     }
@@ -507,9 +488,19 @@ const missingFields = getEntrepreneurMissingFields({
                 store_name: entrepreneurProfile.store_name || entrepreneurProfile.storeName,
                 bio: entrepreneurProfile.bio,
                 photo_url: entrepreneurProfile.photo_url || entrepreneurProfile.photo,
+                cover_url: entrepreneurProfile.cover_url || '',
+                logo_url: entrepreneurProfile.logo_url || '',
                 department: entrepreneurProfile.department || '',
                 city: entrepreneurProfile.city || '',
                 contact_info: entrepreneurProfile.contact_info || '{}',
+                store_story: entrepreneurProfile.store_story || '',
+                what_makes_special: entrepreneurProfile.what_makes_special || '',
+                social_connection: entrepreneurProfile.social_connection || '',
+                years_in_business: entrepreneurProfile.years_in_business || null,
+                email: entrepreneurProfile.email || '',
+                preferred_contact: entrepreneurProfile.preferred_contact || '',
+                store_policies: entrepreneurProfile.store_policies || '',
+                shipping_info: entrepreneurProfile.shipping_info || '',
               }}
             />
           </div>
@@ -518,6 +509,46 @@ const missingFields = getEntrepreneurMissingFields({
             <a href="#" class="text-sm text-dracula-purple hover:underline">
               Cambiar contrasena
             </a>
+          </div>
+        </div>
+      )
+    }
+
+    <!-- Tab: Editar Producto (hidden) -->
+    {
+      activeTab === 'editar-producto' && editProductData && (
+        <div class="max-w-3xl mx-auto">
+          <div class="glass p-6 rounded-xl">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <PencilSimple className="text-entrepreneur" size={24} />
+                Editar Producto
+              </h2>
+              <a
+                href="/dashboard/entrepreneur?tab=productos"
+                class="text-sm text-dracula-comment hover:text-white transition-colors"
+              >
+                &larr; Volver a Mis Productos
+              </a>
+            </div>
+            <EditProductForm
+              client:visible
+              productId={editProductData.id as number}
+              initialData={{
+                name: (editProductData.name as string) || '',
+                description: (editProductData.description as string) || '',
+                price: editProductData.price as number,
+                photo_url: (editProductData.photo_url as string) || '',
+                gallery_photos: (editProductData.gallery_photos as string) || '[]',
+                cause_id: editProductData.cause_id as number,
+                cause_title: (editProductData.cause_title as string) || '',
+                contribution_type: (editProductData.contribution_type as string) || 'percentage',
+                contribution_amount: editProductData.contribution_amount as number | null,
+                contribution_text: (editProductData.contribution_text as string) || '',
+                category: (editProductData.category as string) || '',
+                availability: (editProductData.availability as string) || 'available',
+              }}
+            />
           </div>
         </div>
       )

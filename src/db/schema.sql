@@ -26,9 +26,29 @@ CREATE TABLE IF NOT EXISTS leaders (
   city TEXT,
   department TEXT,
   photo_url TEXT,
+  cover_url TEXT,
   contact_info JSON, -- { whatsapp, instagram, facebook, etc. }
   social_links JSON,
   tags JSON, -- Array of tag IDs: ["ambiental", "social", "educacion"]
+  -- Identity & Story
+  organization_name TEXT,
+  who_we_are TEXT,        -- "Quiénes somos"
+  our_why TEXT,            -- "Por qué hacemos lo que hacemos"
+  how_to_help TEXT,        -- "Con qué nos puedes ayudar"
+  years_active INTEGER,
+  impact_scope TEXT,       -- 'local', 'regional', 'nacional'
+  -- Location & Reach
+  community TEXT,          -- Barrio/comunidad
+  areas_of_influence JSON, -- Array of location strings
+  -- Impact & Credibility
+  people_impacted INTEGER,
+  achievements JSON,       -- [{title, description, year}]
+  testimonials JSON,       -- [{name, text, photo_url}]
+  media_gallery JSON,      -- [{url, caption}]
+  awards JSON,             -- [{title, year, organization}]
+  -- Contact
+  email TEXT,
+  preferred_contact TEXT,
   is_verified BOOLEAN DEFAULT 0,
   verification_notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -57,6 +77,15 @@ CREATE TABLE IF NOT EXISTS causes (
   evidence_photos JSON, -- Array of photo URLs
   status TEXT DEFAULT 'active' CHECK(status IN ('pending', 'active', 'completed', 'archived', 'rejected')),
   admin_notes TEXT,
+  -- Enhanced fields
+  location TEXT,
+  beneficiary_count INTEGER,
+  start_date TEXT,
+  end_date TEXT,
+  category TEXT,
+  needs JSON,             -- ["voluntarios","dinero","insumos"]
+  fund_usage TEXT,
+  impact_metrics JSON,    -- {families_helped: N, ...}
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (leader_id) REFERENCES leaders(id)
@@ -72,7 +101,18 @@ CREATE TABLE IF NOT EXISTS entrepreneurs (
   city TEXT,
   department TEXT,
   photo_url TEXT,
+  cover_url TEXT,
+  logo_url TEXT,
   contact_info JSON, -- { whatsapp, instagram, website, etc. }
+  -- Store Identity
+  store_story TEXT,
+  what_makes_special TEXT,
+  social_connection TEXT,
+  years_in_business INTEGER,
+  email TEXT,
+  preferred_contact TEXT,
+  store_policies TEXT,
+  shipping_info TEXT,
   is_verified BOOLEAN DEFAULT 0,
   verification_notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -104,6 +144,9 @@ CREATE TABLE IF NOT EXISTS products (
   contribution_amount REAL, -- Fixed amount or percentage
   contribution_type TEXT DEFAULT 'percentage' CHECK(contribution_type IN ('percentage', 'fixed')),
   photo_url TEXT,
+  gallery_photos JSON,   -- Array of photo URLs
+  category TEXT,
+  availability TEXT DEFAULT 'available',
   is_active BOOLEAN DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

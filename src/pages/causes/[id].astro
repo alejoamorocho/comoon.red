@@ -15,6 +15,12 @@ import {
   ArrowRight,
   Image,
   MapPin,
+  Users,
+  CalendarBlank,
+  Tag,
+  HandHeart,
+  ChartBar,
+  ListChecks,
 } from '@phosphor-icons/react';
 
 const { id } = Astro.params;
@@ -129,6 +135,26 @@ try {
   evidencePhotos = JSON.parse(cause.evidence_photos || '[]');
 } catch {}
 
+let needs: Array<Record<string, any>> = [];
+try {
+  needs = JSON.parse(cause.needs || '[]');
+} catch {}
+
+let impactMetrics: Array<Record<string, any>> = [];
+try {
+  impactMetrics = JSON.parse(cause.impact_metrics || '[]');
+} catch {}
+
+const needsColorMap: Record<string, string> = {
+  voluntarios: 'bg-dracula-purple/20 text-dracula-purple border-dracula-purple/40',
+  dinero: 'bg-dracula-green/20 text-dracula-green border-dracula-green/40',
+  insumos: 'bg-dracula-orange/20 text-dracula-orange border-dracula-orange/40',
+  transporte: 'bg-dracula-cyan/20 text-dracula-cyan border-dracula-cyan/40',
+  difusion: 'bg-dracula-pink/20 text-dracula-pink border-dracula-pink/40',
+  equipamiento: 'bg-dracula-yellow/20 text-dracula-yellow border-dracula-yellow/40',
+};
+const defaultNeedColor = 'bg-white/10 text-white border-white/20';
+
 import { getRelativeTime } from '../../utils/format';
 import { UPDATE_TYPE_CONFIG } from '../../types/feed';
 ---
@@ -162,7 +188,119 @@ import { UPDATE_TYPE_CONFIG } from '../../types/feed';
       <p class="text-xl text-dracula-fg/80 max-w-2xl mx-auto leading-relaxed">
         {cause.description}
       </p>
+
+      {/* Metadata badges row */}
+      <div class="flex flex-wrap items-center justify-center gap-3 mt-6">
+        {
+          cause.category && (
+            <span class="inline-flex items-center gap-1 bg-dracula-purple/20 text-dracula-purple px-3 py-1 rounded-full text-sm font-bold border border-dracula-purple/40">
+              <Tag size={14} weight="fill" />
+              {cause.category}
+            </span>
+          )
+        }
+        {
+          cause.location && (
+            <span class="inline-flex items-center gap-1 bg-leader/20 text-leader px-3 py-1 rounded-full text-sm font-medium border border-leader/40">
+              <MapPin size={14} weight="fill" />
+              {cause.location}
+            </span>
+          )
+        }
+        {
+          cause.beneficiary_count && (
+            <span class="inline-flex items-center gap-1 bg-dracula-cyan/20 text-dracula-cyan px-3 py-1 rounded-full text-sm font-medium border border-dracula-cyan/40">
+              <Users size={14} weight="fill" />
+              {Number(cause.beneficiary_count).toLocaleString('es-CO')} beneficiarios
+            </span>
+          )
+        }
+      </div>
+
+      {/* Timeline */}
+      {
+        (cause.start_date || cause.end_date) && (
+          <div class="flex items-center justify-center gap-4 mt-4 text-sm text-dracula-comment">
+            <CalendarBlank size={16} className="text-dracula-yellow" />
+            {cause.start_date && (
+              <span>Inicio: {new Date(cause.start_date).toLocaleDateString('es-CO')}</span>
+            )}
+            {cause.start_date && cause.end_date && <span class="text-white/20">|</span>}
+            {cause.end_date && (
+              <span>Fin: {new Date(cause.end_date).toLocaleDateString('es-CO')}</span>
+            )}
+          </div>
+        )
+      }
     </div>
+
+    {/* Needs / Necesidades */}
+    {
+      needs.length > 0 && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <ListChecks size={28} className="text-dracula-orange" weight="duotone" />
+            Qué necesitamos
+          </h2>
+          <div class="flex flex-wrap gap-3">
+            {needs.map((need: any) => {
+              const label = typeof need === 'string' ? need : need.label || need.type || '';
+              const key = label.toLowerCase();
+              const colorClass = needsColorMap[key] || defaultNeedColor;
+              return (
+                <span
+                  class={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold border ${colorClass}`}
+                >
+                  <HandHeart size={16} weight="fill" />
+                  {label}
+                  {need.detail && <span class="font-normal opacity-80">&mdash; {need.detail}</span>}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )
+    }
+
+    {/* Fund Usage / Uso de fondos */}
+    {
+      cause.fund_usage && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Money size={28} className="text-dracula-green" weight="duotone" />
+            Uso de los fondos
+          </h2>
+          <div class="glass p-8 rounded-2xl border border-dracula-green/20 bg-dracula-green/5 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 text-dracula-green/10">
+              <Money size={100} weight="fill" />
+            </div>
+            <p class="text-lg text-dracula-fg/90 leading-relaxed relative z-10 whitespace-pre-line">
+              {cause.fund_usage}
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Impact Metrics */}
+    {
+      impactMetrics.length > 0 && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <ChartBar size={28} className="text-dracula-cyan" weight="duotone" />
+            Métricas de impacto
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {impactMetrics.map((m: any) => (
+              <div class="glass p-5 rounded-2xl text-center border border-dracula-cyan/20">
+                <p class="text-3xl font-bold text-dracula-cyan">{m.value}</p>
+                <p class="text-sm text-dracula-comment mt-1">{m.label || m.name}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
 
     <!-- Progress Card -->
     <div

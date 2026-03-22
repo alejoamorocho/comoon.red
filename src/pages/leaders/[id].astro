@@ -16,6 +16,13 @@ import {
   CheckCircle,
   ArrowLeft,
   ShoppingBag,
+  Buildings,
+  HandHeart,
+  Lightbulb,
+  Trophy,
+  Camera,
+  Users,
+  CalendarBlank,
 } from '@phosphor-icons/react';
 
 const { id } = Astro.params;
@@ -115,6 +122,25 @@ const progressPercent =
     : 0;
 const location =
   [leader.city, leader.department].filter(Boolean).join(', ') || leader.location || '';
+
+// Parse enhanced profile JSON fields safely
+let achievements: Array<Record<string, any>> = [];
+try {
+  achievements = JSON.parse(leader.achievements || '[]');
+} catch {}
+
+let testimonials: Array<Record<string, any>> = [];
+try {
+  testimonials = JSON.parse(leader.testimonials || '[]');
+} catch {}
+
+let mediaGallery: string[] = [];
+try {
+  mediaGallery = JSON.parse(leader.media_gallery || '[]');
+} catch {}
+
+const activeCausesCount = myCauses.filter((c) => c.status === 'active').length;
+const hasStats = leader.people_impacted || leader.years_active || activeCausesCount > 0;
 ---
 
 <Layout
@@ -123,6 +149,20 @@ const location =
   ogImage={leader.photo_url}
   ogType="profile"
 >
+  {/* Cover Banner */}
+  {
+    leader.cover_url && (
+      <div class="w-full h-64 md:h-80 relative overflow-hidden">
+        <img
+          src={leader.cover_url}
+          alt={`Portada de ${leader.name}`}
+          class="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-transparent to-transparent" />
+      </div>
+    )
+  }
+
   <div class="max-w-5xl mx-auto py-8 px-4">
     <!-- Back Button -->
     <a
@@ -165,6 +205,14 @@ const location =
                   )
                 }
               </div>
+              {
+                leader.organization_name && (
+                  <p class="text-leader/80 font-medium flex items-center gap-2 mb-1">
+                    <Buildings size={18} weight="duotone" />
+                    {leader.organization_name}
+                  </p>
+                )
+              }
               {
                 location && (
                   <div class="flex items-center gap-2 text-leader font-medium mb-2">
@@ -225,6 +273,187 @@ const location =
         </div>
       </div>
     </div>
+
+    {/* Quiénes Somos */}
+    {
+      leader.who_we_are && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Heart size={28} weight="duotone" className="text-dracula-pink" />
+            Quiénes Somos
+          </h2>
+          <div class="glass p-8 rounded-2xl border border-dracula-pink/20 bg-dracula-pink/5">
+            <p class="text-lg text-dracula-fg/90 leading-relaxed whitespace-pre-line">
+              {leader.who_we_are}
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Por qué hacemos lo que hacemos */}
+    {
+      leader.our_why && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Lightbulb size={28} weight="duotone" className="text-dracula-yellow" />
+            Por qué hacemos lo que hacemos
+          </h2>
+          <div class="glass p-8 rounded-2xl border-l-4 border-dracula-yellow bg-dracula-yellow/5">
+            <p class="text-lg text-dracula-fg/90 leading-relaxed italic whitespace-pre-line">
+              "{leader.our_why}"
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Con qué nos puedes ayudar */}
+    {
+      leader.how_to_help && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <HandHeart size={28} weight="duotone" className="text-dracula-green" />
+            Con qué nos puedes ayudar
+          </h2>
+          <div class="glass p-8 rounded-2xl border-2 border-dracula-green/30 bg-dracula-green/5 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 text-dracula-green/10">
+              <HandHeart size={100} weight="fill" />
+            </div>
+            <p class="text-lg text-dracula-fg/90 leading-relaxed relative z-10 whitespace-pre-line">
+              {leader.how_to_help}
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Impact Stats */}
+    {
+      hasStats && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Star size={28} weight="duotone" className="text-leader" />
+            Impacto
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {leader.people_impacted && (
+              <div class="glass p-6 rounded-2xl text-center border border-leader/20">
+                <Users size={32} className="text-leader mx-auto mb-2" weight="duotone" />
+                <p class="text-3xl font-bold text-white">
+                  {Number(leader.people_impacted).toLocaleString('es-CO')}
+                </p>
+                <p class="text-sm text-dracula-comment">Personas impactadas</p>
+              </div>
+            )}
+            {leader.years_active && (
+              <div class="glass p-6 rounded-2xl text-center border border-leader/20">
+                <CalendarBlank size={32} className="text-leader mx-auto mb-2" weight="duotone" />
+                <p class="text-3xl font-bold text-white">{leader.years_active}</p>
+                <p class="text-sm text-dracula-comment">Años activo(a)</p>
+              </div>
+            )}
+            {activeCausesCount > 0 && (
+              <div class="glass p-6 rounded-2xl text-center border border-leader/20">
+                <Heart size={32} className="text-leader mx-auto mb-2" weight="duotone" />
+                <p class="text-3xl font-bold text-white">{activeCausesCount}</p>
+                <p class="text-sm text-dracula-comment">Causas activas</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    {/* Achievements / Logros */}
+    {
+      achievements.length > 0 && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Trophy size={28} weight="duotone" className="text-dracula-yellow" />
+            Logros
+          </h2>
+          <div class="space-y-4">
+            {achievements.map((a: any, i: number) => (
+              <div class="glass p-6 rounded-2xl border-l-4 border-dracula-yellow/60 flex gap-4 items-start">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-dracula-yellow/20 flex items-center justify-center">
+                  <span class="text-dracula-yellow font-bold text-sm">{i + 1}</span>
+                </div>
+                <div>
+                  {a.title && <h3 class="text-lg font-bold text-white mb-1">{a.title}</h3>}
+                  {a.description && (
+                    <p class="text-dracula-fg/80 text-sm leading-relaxed">{a.description}</p>
+                  )}
+                  {a.date && <p class="text-xs text-dracula-comment mt-2">{a.date}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    {/* Testimonials / Testimonios */}
+    {
+      testimonials.length > 0 && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Quotes size={28} weight="duotone" className="text-dracula-cyan" />
+            Testimonios
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {testimonials.map((t: any) => (
+              <div class="glass p-6 rounded-2xl border border-dracula-cyan/20 relative">
+                <div class="absolute top-4 right-4 text-dracula-cyan/20">
+                  <Quotes size={40} weight="fill" />
+                </div>
+                <p class="text-dracula-fg/90 italic mb-4 leading-relaxed relative z-10">
+                  "{t.quote || t.text}"
+                </p>
+                <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                  {t.photo && (
+                    <img
+                      src={t.photo}
+                      alt={t.name || 'Testimonio'}
+                      class="w-10 h-10 rounded-full object-cover border-2 border-dracula-cyan/40"
+                    />
+                  )}
+                  <div>
+                    {t.name && <p class="text-white font-bold text-sm">{t.name}</p>}
+                    {t.role && <p class="text-xs text-dracula-comment">{t.role}</p>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    {/* Media Gallery / Galería */}
+    {
+      mediaGallery.length > 0 && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Camera size={28} weight="duotone" className="text-dracula-purple" />
+            Galería
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {mediaGallery.map((photo: string, i: number) => (
+              <div class="rounded-xl overflow-hidden border border-white/10 hover:border-leader/40 transition-colors">
+                <img
+                  src={photo}
+                  alt={`Galería ${i + 1}`}
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
 
     <!-- Active Cause -->
     {

@@ -39,6 +39,9 @@ products.post('/', requireAuth, requireRole('entrepreneur', 'leader', 'admin'), 
     contribution_amount?: number;
     contribution_type?: string;
     photo_url?: string;
+    gallery_photos?: string[];
+    category?: string;
+    availability?: string;
   }>();
 
   if (!body.name || !body.cause_id || !body.price) {
@@ -63,6 +66,9 @@ products.post('/', requireAuth, requireRole('entrepreneur', 'leader', 'admin'), 
     contribution_amount: body.contribution_amount || null,
     contribution_type: body.contribution_type || 'percentage',
     photo_url: body.photo_url || null,
+    gallery_photos: body.gallery_photos,
+    category: body.category || null,
+    availability: body.availability || 'available',
   });
 
   return c.json(success(product), 201);
@@ -94,9 +100,32 @@ products.put('/:id', requireAuth, requireRole('entrepreneur', 'leader', 'admin')
     contribution_type?: string;
     photo_url?: string;
     is_active?: boolean;
+    gallery_photos?: string[];
+    category?: string;
+    availability?: string;
   }>();
 
   const product = await services.product.update(productId, body);
+  return c.json(success(product));
+});
+
+// DELETE /api/products/:id - Deactivate own product
+products.delete('/:id', requireAuth, requireRole('entrepreneur', 'leader', 'admin'), async (c) => {
+  const user = c.get('user');
+  const productId = parseInt(c.req.param('id'), 10);
+  const services = c.get('services');
+
+  // Verify ownership
+  const existing = await services.product.findById(productId);
+  const isOwner =
+    user!.role === 'leader'
+      ? existing.leader_id === user!.profileId
+      : existing.entrepreneur_id === user!.profileId;
+  if (user!.role !== 'admin' && !isOwner) {
+    return c.json({ error: 'No tienes permiso para eliminar este producto' }, 403);
+  }
+
+  const product = await services.product.update(productId, { is_active: false });
   return c.json(success(product));
 });
 

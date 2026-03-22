@@ -4,7 +4,20 @@ import ProductCard from '../../components/ProductCard.astro';
 import ContactButtons from '../../components/ContactButtons';
 import ShareButtons from '../../components/ShareButtons';
 import { formatCOP as formatCurrency } from '../../utils/format';
-import { Storefront, MapPin, Heart, ShoppingBag, UsersThree, Moon } from '@phosphor-icons/react';
+import {
+  Storefront,
+  MapPin,
+  Heart,
+  ShoppingBag,
+  UsersThree,
+  Moon,
+  BookOpen,
+  Sparkle,
+  Handshake,
+  CalendarBlank,
+  Package,
+  Truck,
+} from '@phosphor-icons/react';
 
 const { id } = Astro.params;
 if (!id) return Astro.redirect('/404');
@@ -82,6 +95,15 @@ const location =
   '';
 const totalProducts = products.length;
 const totalCausesSupported = causesSupported.length;
+
+let storePolicies: string = '';
+try {
+  storePolicies = entrepreneur.store_policies || '';
+} catch {}
+let shippingInfo: string = '';
+try {
+  shippingInfo = entrepreneur.shipping_info || '';
+} catch {}
 ---
 
 <Layout
@@ -93,9 +115,9 @@ const totalCausesSupported = causesSupported.length;
   <!-- Header Banner -->
   <div class="h-64 w-full relative">
     {
-      entrepreneur.photo_url ? (
+      entrepreneur.cover_url || entrepreneur.photo_url ? (
         <img
-          src={entrepreneur.photo_url}
+          src={entrepreneur.cover_url || entrepreneur.photo_url}
           alt={entrepreneur.store_name}
           class="w-full h-full object-cover opacity-60"
         />
@@ -115,22 +137,33 @@ const totalCausesSupported = causesSupported.length;
       <div class="absolute top-0 right-0 w-64 h-64 bg-entrepreneur/10 rounded-full blur-3xl -z-10">
       </div>
 
-      <div
-        class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-entrepreneur shrink-0 mx-auto md:mx-0 shadow-xl bg-dracula-bg"
-      >
+      <div class="relative shrink-0 mx-auto md:mx-0">
+        <div
+          class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-entrepreneur shadow-xl bg-dracula-bg"
+        >
+          {
+            entrepreneur.photo_url ? (
+              <img
+                src={entrepreneur.photo_url}
+                alt={entrepreneur.store_name}
+                class="w-full h-full object-cover"
+              />
+            ) : (
+              <div class="w-full h-full bg-entrepreneur/20 flex items-center justify-center">
+                <span class="text-4xl font-bold text-entrepreneur">
+                  {entrepreneur.store_name?.charAt(0)}
+                </span>
+              </div>
+            )
+          }
+        </div>
         {
-          entrepreneur.photo_url ? (
+          entrepreneur.logo_url && (
             <img
-              src={entrepreneur.photo_url}
-              alt={entrepreneur.store_name}
-              class="w-full h-full object-cover"
+              src={entrepreneur.logo_url}
+              alt={`Logo de ${entrepreneur.store_name}`}
+              class="absolute -bottom-2 -right-2 w-12 h-12 rounded-full object-cover border-2 border-dracula-bg shadow-lg bg-white"
             />
-          ) : (
-            <div class="w-full h-full bg-entrepreneur/20 flex items-center justify-center">
-              <span class="text-4xl font-bold text-entrepreneur">
-                {entrepreneur.store_name?.charAt(0)}
-              </span>
-            </div>
           )
         }
       </div>
@@ -185,7 +218,9 @@ const totalCausesSupported = causesSupported.length;
 
     <!-- Stats Row -->
     <div class="glass p-6 rounded-2xl mb-12 border border-entrepreneur/30">
-      <div class="grid grid-cols-2 gap-6 text-center">
+      <div
+        class={`grid gap-6 text-center ${entrepreneur.years_in_business ? 'grid-cols-3' : 'grid-cols-2'}`}
+      >
         <div>
           <div class="flex items-center justify-center gap-2 text-entrepreneur mb-1">
             <ShoppingBag size={22} weight="duotone" />
@@ -200,8 +235,100 @@ const totalCausesSupported = causesSupported.length;
           </div>
           <span class="text-2xl font-bold text-white">{totalCausesSupported}</span>
         </div>
+        {
+          entrepreneur.years_in_business && (
+            <div>
+              <div class="flex items-center justify-center gap-2 text-entrepreneur mb-1">
+                <CalendarBlank size={22} weight="duotone" />
+                <span class="text-sm text-dracula-comment">Años en el negocio</span>
+              </div>
+              <span class="text-2xl font-bold text-white">{entrepreneur.years_in_business}</span>
+            </div>
+          )
+        }
       </div>
     </div>
+
+    {/* Nuestra Historia */}
+    {
+      entrepreneur.store_story && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <BookOpen size={28} weight="duotone" className="text-entrepreneur" />
+            Nuestra Historia
+          </h2>
+          <div class="glass p-8 rounded-2xl border border-entrepreneur/20">
+            <p class="text-lg text-dracula-fg/90 leading-relaxed whitespace-pre-line">
+              {entrepreneur.store_story}
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Lo que nos hace especiales */}
+    {
+      entrepreneur.what_makes_special && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Sparkle size={28} weight="duotone" className="text-dracula-yellow" />
+            Lo que nos hace especiales
+          </h2>
+          <div class="glass p-8 rounded-2xl border-l-4 border-dracula-yellow bg-dracula-yellow/5">
+            <p class="text-lg text-dracula-fg/90 leading-relaxed whitespace-pre-line">
+              {entrepreneur.what_makes_special}
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Nuestra conexión social */}
+    {
+      entrepreneur.social_connection && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Handshake size={28} weight="duotone" className="text-dracula-pink" />
+            Nuestra conexión social
+          </h2>
+          <div class="glass p-8 rounded-2xl border border-dracula-pink/20 bg-dracula-pink/5">
+            <p class="text-lg text-dracula-fg/90 leading-relaxed whitespace-pre-line">
+              {entrepreneur.social_connection}
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Políticas de la tienda */}
+    {
+      storePolicies && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Package size={28} weight="duotone" className="text-dracula-cyan" />
+            Políticas de la tienda
+          </h2>
+          <div class="glass p-6 rounded-2xl border border-dracula-cyan/20">
+            <p class="text-dracula-fg/90 leading-relaxed whitespace-pre-line">{storePolicies}</p>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Información de envío */}
+    {
+      shippingInfo && (
+        <div class="mb-12">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <Truck size={28} weight="duotone" className="text-dracula-green" />
+            Información de envío
+          </h2>
+          <div class="glass p-6 rounded-2xl border border-dracula-green/20">
+            <p class="text-dracula-fg/90 leading-relaxed whitespace-pre-line">{shippingInfo}</p>
+          </div>
+        </div>
+      )
+    }
 
     <!-- Productos Section -->
     <div class="mb-16">

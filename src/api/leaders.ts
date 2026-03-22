@@ -52,6 +52,22 @@ leaders.put('/:id', requireAuth, async (c) => {
     contact_info?: Record<string, string>;
     social_links?: Record<string, string>;
     tags?: string[];
+    cover_url?: string;
+    organization_name?: string;
+    who_we_are?: string;
+    our_why?: string;
+    how_to_help?: string;
+    years_active?: number;
+    impact_scope?: string;
+    community?: string;
+    areas_of_influence?: string[];
+    people_impacted?: number;
+    achievements?: unknown;
+    testimonials?: unknown;
+    media_gallery?: unknown;
+    awards?: unknown;
+    email?: string;
+    preferred_contact?: string;
   }>();
 
   const services = c.get('services');
@@ -64,6 +80,22 @@ leaders.put('/:id', requireAuth, async (c) => {
     contact_info: body.contact_info,
     social_links: body.social_links,
     tags: body.tags,
+    cover_url: body.cover_url,
+    organization_name: body.organization_name,
+    who_we_are: body.who_we_are,
+    our_why: body.our_why,
+    how_to_help: body.how_to_help,
+    years_active: body.years_active,
+    impact_scope: body.impact_scope,
+    community: body.community,
+    areas_of_influence: body.areas_of_influence,
+    people_impacted: body.people_impacted,
+    achievements: body.achievements,
+    testimonials: body.testimonials,
+    media_gallery: body.media_gallery,
+    awards: body.awards,
+    email: body.email,
+    preferred_contact: body.preferred_contact,
   });
 
   return c.json(success(leader));
