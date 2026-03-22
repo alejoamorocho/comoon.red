@@ -1,269 +1,324 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import ContactButtons from '../../components/ContactButtons';
 import ShareButtons from '../../components/ShareButtons';
 import { LeaderTagsList } from '../../components/LeaderTagBadge';
-import { MapPin, UsersThree, Star, Image, Phone, EnvelopeSimple, Quotes, Moon, Heart, CheckCircle, ArrowLeft } from '@phosphor-icons/react';
+import { formatCOP as formatCurrency } from '../../utils/format';
+import {
+  MapPin,
+  UsersThree,
+  Star,
+  Image,
+  Quotes,
+  Moon,
+  Heart,
+  CheckCircle,
+  ArrowLeft,
+  ShoppingBag,
+} from '@phosphor-icons/react';
 
 const { id } = Astro.params;
 if (!id) {
-    return Astro.redirect('/404');
+  return Astro.redirect('/404');
 }
 
-// Mock Data - In real app, fetch from API
-const leader = {
-    id: "1",
-    name: "Elena Marin",
-    bio: "Luchadora incansable por los derechos de las comunidades vulnerables del Pacifico colombiano. Lleva 15 anos organizando comedores comunitarios y programas de alimentacion escolar.",
-    story: "Naci en Buenaventura, un puerto donde la riqueza pasa de largo y la pobreza se queda. Desde nina vi como muchos vecinos no tenian que comer. A los 20 anos decidi que eso tenia que cambiar. Empece cocinando en mi casa para los ninos del barrio, y hoy alimentamos a mas de 50 familias cada dia. Mi sueno es que ningun nino se duerma con hambre.",
-    location: "Buenaventura, Valle del Cauca",
-    isVerified: true,
-    tags: ["alimentacion", "social", "comunidad"],
-    photoUrl: "https://images.unsplash.com/photo-1531123414780-f74242c2b052?auto=format&fit=crop&w=400&q=80",
-    gallery: [
-        "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=400&q=80",
-        "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=400&q=80",
-        "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=80"
-    ],
-    contact: {
-        phone: "+57 300 123 4567",
-        email: "elena.marin@comoon.co"
-    },
-    stats: {
-        familiesHelped: 150,
-        mealsServed: "25,000+",
-        yearsActive: 15
-    },
-    cause: {
-        id: "1",
-        title: "Comedor Comunitario La Esperanza",
-        description: "Brindamos almuerzos diarios a 50 ninos del barrio Lleras en Buenaventura. Con los fondos recaudados compramos insumos, pagamos cocineras locales y mantenemos las instalaciones.",
-        goal: 5000000,
-        raised: 1250000
-    },
-    products: [
-        {
-            id: "1",
-            name: "Bolso Tejido en Palma",
-            price: 85000,
-            entrepreneur: "Artesanias del Valle",
-            entrepreneurPhone: "+573151112233",
-            cause: "Comedor Comunitario La Esperanza",
-            causeId: "1",
-            leaderName: "Elena Marin",
-            contributionText: "El 15% de esta compra se dona",
-            photoUrl: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80"
-        },
-        {
-            id: "4",
-            name: "Kit de Degustacion",
-            price: 60000,
-            entrepreneur: "Cafe Origen",
-            entrepreneurPhone: "+573204445566",
-            cause: "Comedor Comunitario La Esperanza",
-            causeId: "1",
-            leaderName: "Elena Marin",
-            contributionText: "El 10% apoya la alimentacion",
-            photoUrl: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80"
-        }
-    ]
-};
+const db = Astro.locals.runtime?.env?.DB;
+let leader: Record<string, any> | null = null;
+let myCauses: Array<Record<string, any>> = [];
+let products: Array<Record<string, any>> = [];
+let contactInfo: Record<string, string> = {};
 
-// Calculate progress percentage
-const progressPercent = Math.round((leader.cause.raised / leader.cause.goal) * 100);
+if (db) {
+  leader = (await db
+    .prepare('SELECT * FROM leaders WHERE id = ?')
+    .bind(parseInt(id))
+    .first()) as Record<string, any> | null;
 
-// Format currency
-function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        maximumFractionDigits: 0
-    }).format(amount);
+  if (leader) {
+    try {
+      contactInfo = JSON.parse(leader.contact_info || '{}');
+    } catch {}
+    const parsedTags = leader.tags ? JSON.parse(leader.tags as string) : [];
+    leader.parsedTags = parsedTags;
+
+    // Fetch causes
+    const { results: causeRows } = await db
+      .prepare(
+        "SELECT * FROM causes WHERE leader_id = ? ORDER BY CASE WHEN status = 'active' THEN 0 ELSE 1 END, created_at DESC",
+      )
+      .bind(parseInt(id))
+      .all();
+    myCauses = (causeRows || []).map((c: any) => ({
+      id: c.id,
+      title: c.title,
+      description: c.description,
+      goal: c.target_goal || 0,
+      raised: c.current_amount || 0,
+      status: c.status,
+      photo_url: c.photo_url,
+    }));
+
+    // Fetch products: leader's own + entrepreneurs linked to their causes
+    const { results: productRows } = await db
+      .prepare(
+        `
+            SELECT p.*,
+                CASE WHEN p.leader_id IS NOT NULL THEN pl.name ELSE e.store_name END as seller_name,
+                CASE WHEN p.leader_id IS NOT NULL THEN pl.contact_info ELSE e.contact_info END as seller_contact_json,
+                c.title as cause_title
+            FROM products p
+            LEFT JOIN entrepreneurs e ON p.entrepreneur_id = e.id
+            LEFT JOIN leaders pl ON p.leader_id = pl.id
+            JOIN causes c ON p.cause_id = c.id
+            WHERE (p.leader_id = ? OR c.leader_id = ?) AND p.is_active = 1
+            ORDER BY p.created_at DESC
+        `,
+      )
+      .bind(parseInt(id), parseInt(id))
+      .all();
+
+    products = (productRows || []).map((p: any) => {
+      let phone = '';
+      try {
+        const c = JSON.parse(p.seller_contact_json || '{}');
+        phone = c.whatsapp || c.phone || '';
+      } catch {}
+      return {
+        id: String(p.id),
+        name: p.name,
+        price: p.price,
+        entrepreneur: p.seller_name || 'Vendedor',
+        entrepreneurPhone: phone,
+        cause: p.cause_title,
+        causeId: String(p.cause_id),
+        leaderName: leader!.name,
+        contributionText:
+          p.contribution_text ||
+          (p.contribution_type === 'percentage'
+            ? `${p.contribution_amount}% de cada compra`
+            : `$${p.contribution_amount?.toLocaleString('es-CO')} por compra`),
+        photoUrl: p.photo_url,
+      };
+    });
+  }
 }
+
+if (!leader) {
+  return Astro.redirect('/404');
+}
+
+const activeCause = myCauses.find((c) => c.status === 'active');
+const progressPercent =
+  activeCause && activeCause.goal > 0
+    ? Math.round((activeCause.raised / activeCause.goal) * 100)
+    : 0;
+const location =
+  [leader.city, leader.department].filter(Boolean).join(', ') || leader.location || '';
 ---
 
-<Layout title={`${leader.name} - Lider`}>
-    <div class="max-w-5xl mx-auto py-8 px-4">
-        <!-- Back Button -->
-        <a href="/leaders" class="inline-flex items-center gap-2 text-dracula-comment hover:text-white mb-8 transition-colors group">
-            <ArrowLeft class="group-hover:-translate-x-1 transition-transform" />
-            Volver a Lideres
-        </a>
+<Layout
+  title={`${leader.name} - Lider`}
+  description={leader.bio || `Conoce a ${leader.name}, lider social en Comoon.`}
+  ogImage={leader.photo_url}
+  ogType="profile"
+>
+  <div class="max-w-5xl mx-auto py-8 px-4">
+    <!-- Back Button -->
+    <a
+      href="/leaders"
+      class="inline-flex items-center gap-2 text-dracula-comment hover:text-white mb-8 transition-colors group"
+    >
+      <ArrowLeft class="group-hover:-translate-x-1 transition-transform" />
+      Volver a Lideres
+    </a>
 
-        <!-- Header Profile Card -->
-        <div class="glass p-8 rounded-2xl mb-12 border border-leader/30 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-leader/10 rounded-full blur-3xl -z-10"></div>
+    <!-- Header Profile Card -->
+    <div class="glass p-8 rounded-2xl mb-12 border border-leader/30 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-leader/10 rounded-full blur-3xl -z-10"></div>
 
-            <div class="md:flex gap-10 items-start">
-                <img
-                    src={leader.photoUrl}
-                    alt={leader.name}
-                    class="w-40 h-40 md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl mx-auto md:mx-0 -mt-20 md:mt-0 border-4 border-dracula-bg"
-                />
-                <div class="mt-8 md:mt-0 flex-1">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-                        <div>
-                            <div class="flex items-center gap-3 mb-2">
-                                <h1 class="text-3xl md:text-4xl font-bold text-white">{leader.name}</h1>
-                                {leader.isVerified && (
-                                    <span class="bg-dracula-green/20 text-dracula-green px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                                        <CheckCircle size={14} weight="fill" />
-                                        Verificado
-                                    </span>
-                                )}
-                            </div>
-                            <div class="flex items-center gap-2 text-leader font-medium mb-2">
-                                <MapPin size={20} weight="duotone" />
-                                <span>{leader.location}</span>
-                            </div>
-                            {leader.tags && leader.tags.length > 0 && (
-                                <LeaderTagsList client:visible tags={leader.tags} size="md" maxVisible={4} />
-                            )}
-                        </div>
-                        <div class="mt-4 md:mt-0 flex gap-2">
-                            <a href={`tel:${leader.contact.phone}`} class="p-3 bg-dracula-current/50 rounded-full hover:bg-dracula-green hover:text-dracula-bg transition-all" title="Llamar">
-                                <Phone size={20} weight="fill" />
-                            </a>
-                            <a href={`mailto:${leader.contact.email}`} class="p-3 bg-dracula-current/50 rounded-full hover:bg-dracula-purple hover:text-dracula-bg transition-all" title="Email">
-                                <EnvelopeSimple size={20} weight="fill" />
-                            </a>
-                        </div>
-                    </div>
-
-                    <p class="text-lg text-dracula-fg/90 mb-6 italic border-l-4 border-leader pl-4">{leader.bio}</p>
-
-                    <!-- Stats Grid -->
-                    <div class="grid grid-cols-3 gap-4 mb-6 text-center bg-dracula-bg/40 p-4 rounded-xl">
-                        <div>
-                            <span class="block text-2xl font-bold text-white">{leader.stats.familiesHelped}</span>
-                            <span class="text-xs text-dracula-comment uppercase font-bold">Familias</span>
-                        </div>
-                        <div>
-                            <span class="block text-2xl font-bold text-white">{leader.stats.mealsServed}</span>
-                            <span class="text-xs text-dracula-comment uppercase font-bold">Almuerzos</span>
-                        </div>
-                        <div>
-                            <span class="block text-2xl font-bold text-white">{leader.stats.yearsActive}</span>
-                            <span class="text-xs text-dracula-comment uppercase font-bold">Anos</span>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-white/10 pt-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm text-dracula-comment flex items-center gap-2">
-                                <Moon size={16} weight="duotone" className="text-comoon-purple" />
-                                Difusion Lunar
-                            </span>
-                            <ShareButtons client:visible title={leader.name} text={`Conoce a ${leader.name}, lider social en ${leader.location}. Apoya su causa en comoon`} />
-                        </div>
-                        <a href="#causa" class="btn-primary flex items-center gap-2 text-sm px-6">
-                            <Heart size={18} weight="fill" />
-                            Ver Causa Activa
-                        </a>
-                    </div>
-                </div>
+      <div class="md:flex gap-10 items-start">
+        {
+          leader.photo_url ? (
+            <img
+              src={leader.photo_url}
+              alt={leader.name}
+              class="w-40 h-40 md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl mx-auto md:mx-0 -mt-20 md:mt-0 border-4 border-dracula-bg"
+            />
+          ) : (
+            <div class="w-40 h-40 md:w-48 md:h-48 rounded-2xl bg-leader/20 flex items-center justify-center mx-auto md:mx-0 -mt-20 md:mt-0 border-4 border-dracula-bg">
+              <span class="text-6xl font-bold text-leader">{leader.name?.charAt(0)}</span>
             </div>
-        </div>
-
-        <!-- Story & Gallery Section -->
-        <div class="grid md:grid-cols-2 gap-12 mb-16">
+          )
+        }
+        <div class="mt-8 md:mt-0 flex-1">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
             <div>
-                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Quotes className="text-leader" />
-                    Mi Historia
-                </h2>
-                <div class="prose prose-invert">
-                    <p class="text-dracula-fg/80 leading-relaxed text-lg">
-                        {leader.story}
-                    </p>
-                </div>
+              <div class="flex items-center gap-3 mb-2">
+                <h1 class="text-3xl md:text-4xl font-bold text-white">{leader.name}</h1>
+                {
+                  leader.is_verified && (
+                    <span class="bg-dracula-green/20 text-dracula-green px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                      <CheckCircle size={14} weight="fill" />
+                      Verificado
+                    </span>
+                  )
+                }
+              </div>
+              {
+                location && (
+                  <div class="flex items-center gap-2 text-leader font-medium mb-2">
+                    <MapPin size={20} weight="duotone" />
+                    <span>{location}</span>
+                  </div>
+                )
+              }
+              {
+                leader.parsedTags && leader.parsedTags.length > 0 && (
+                  <LeaderTagsList
+                    client:visible
+                    tags={leader.parsedTags}
+                    size="md"
+                    maxVisible={4}
+                  />
+                )
+              }
             </div>
-            <div>
-                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Image className="text-leader" />
-                    Galeria de Impacto
-                </h2>
-                <div class="grid grid-cols-2 gap-3">
-                    {leader.gallery.map((img, i) => (
-                        <img
-                            src={img}
-                            alt={`Impacto ${i + 1}`}
-                            class={`rounded-xl object-cover hover:scale-105 transition-transform duration-300 ${i === 0 ? 'col-span-2 h-48' : 'h-32'} w-full`}
-                        />
-                    ))}
-                </div>
+          </div>
+
+          {
+            leader.bio && (
+              <p class="text-lg text-dracula-fg/90 mb-6 italic border-l-4 border-leader pl-4">
+                {leader.bio}
+              </p>
+            )
+          }
+
+          <!-- Contact Buttons -->
+          <div class="mb-6">
+            <ContactButtons client:visible contactInfo={contactInfo} size="md" />
+          </div>
+
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-white/10 pt-4"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-dracula-comment flex items-center gap-2">
+                <Moon size={16} weight="duotone" className="text-comoon-purple" />
+                Difusion Lunar
+              </span>
+              <ShareButtons
+                client:visible
+                title={leader.name}
+                text={`Conoce a ${leader.name}, lider social en ${location}. Apoya su causa en comoon`}
+              />
             </div>
+            {
+              activeCause && (
+                <a href="#causa" class="btn-primary flex items-center gap-2 text-sm px-6">
+                  <Heart size={18} weight="fill" />
+                  Ver Causa Activa
+                </a>
+              )
+            }
+          </div>
         </div>
-
-        <!-- Active Cause -->
-        <div id="causa" class="mb-16 scroll-mt-24">
-            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <UsersThree size={28} className="text-leader" />
-                Causa Activa
-            </h2>
-            <div class="glass p-8 rounded-2xl border border-leader/30">
-                <h3 class="text-2xl font-bold text-leader mb-4">{leader.cause.title}</h3>
-                <p class="text-dracula-fg/80 mb-6 text-lg leading-relaxed">{leader.cause.description}</p>
-
-                <!-- Progress Bar -->
-                <div class="mb-6">
-                    <div class="flex justify-between text-sm font-bold mb-2">
-                        <span class="text-dracula-green">{formatCurrency(leader.cause.raised)} recaudados</span>
-                        <span class="text-dracula-comment">Meta: {formatCurrency(leader.cause.goal)}</span>
-                    </div>
-                    <div class="w-full bg-dracula-bg rounded-full h-4 overflow-hidden">
-                        <div
-                            class="bg-gradient-to-r from-dracula-green to-dracula-cyan h-full rounded-full transition-all duration-1000"
-                            style={`width: ${progressPercent}%`}
-                        ></div>
-                    </div>
-                    <p class="text-center text-dracula-comment text-sm mt-2">{progressPercent}% de la meta alcanzada</p>
-                </div>
-
-                <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
-                    <a
-                        href={`/causes/${leader.cause.id}`}
-                        class="text-leader hover:underline flex items-center gap-2"
-                    >
-                        <Star size={18} />
-                        Ver detalles completos de la causa
-                    </a>
-                    <a
-                        href={`/store?causa=${leader.cause.id}`}
-                        class="btn-primary flex items-center gap-2"
-                    >
-                        <Heart size={18} weight="fill" />
-                        Ver productos que apoyan esta causa
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Products Supporting This Cause -->
-        <div>
-            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <Star className="text-entrepreneur" />
-                Productos que apoyan esta causa
-            </h2>
-            <p class="text-dracula-comment mb-6">
-                Cada compra de estos productos genera una donacion directa a la causa de {leader.name}.
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {leader.products.map(product => (
-                    <ProductCard
-                        id={product.id}
-                        name={product.name}
-                        price={product.price}
-                        entrepreneur={product.entrepreneur}
-                        entrepreneurPhone={product.entrepreneurPhone}
-                        cause={product.cause}
-                        causeId={product.causeId}
-                        leaderName={product.leaderName}
-                        contributionText={product.contributionText}
-                        photoUrl={product.photoUrl}
-                    />
-                ))}
-            </div>
-        </div>
+      </div>
     </div>
+
+    <!-- Active Cause -->
+    {
+      activeCause && (
+        <div id="causa" class="mb-16 scroll-mt-24">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <UsersThree size={28} className="text-leader" />
+            Causa Activa
+          </h2>
+          <div class="glass p-8 rounded-2xl border border-leader/30">
+            <h3 class="text-2xl font-bold text-leader mb-4">{activeCause.title}</h3>
+            {activeCause.description && (
+              <p class="text-dracula-fg/80 mb-6 text-lg leading-relaxed">
+                {activeCause.description}
+              </p>
+            )}
+
+            {activeCause.goal > 0 && (
+              <div class="mb-6">
+                <div class="flex justify-between text-sm font-bold mb-2">
+                  <span class="text-dracula-green">
+                    {formatCurrency(activeCause.raised)} recaudados
+                  </span>
+                  <span class="text-dracula-comment">Meta: {formatCurrency(activeCause.goal)}</span>
+                </div>
+                <div
+                  class="w-full bg-dracula-bg rounded-full h-4 overflow-hidden"
+                  role="progressbar"
+                  aria-valuenow={activeCause.raised}
+                  aria-valuemin={0}
+                  aria-valuemax={activeCause.goal}
+                  aria-label="Progreso de la causa"
+                >
+                  <div
+                    class="bg-gradient-to-r from-dracula-green to-dracula-cyan h-full rounded-full transition-all duration-1000"
+                    style={`width: ${progressPercent}%`}
+                  />
+                </div>
+                <p class="text-center text-dracula-comment text-sm mt-2">
+                  {progressPercent}% de la meta alcanzada
+                </p>
+              </div>
+            )}
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+              <a
+                href={`/causes/${activeCause.id}`}
+                class="text-leader hover:underline flex items-center gap-2"
+              >
+                <Star size={18} />
+                Ver detalles completos de la causa
+              </a>
+              <a
+                href={`/store?causa=${activeCause.id}`}
+                class="btn-primary flex items-center gap-2"
+              >
+                <Heart size={18} weight="fill" />
+                Ver productos que apoyan esta causa
+              </a>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    <!-- Products (Leader's Store) -->
+    {
+      products.length > 0 && (
+        <div>
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <ShoppingBag size={28} className="text-entrepreneur" />
+            Tienda del Lider
+          </h2>
+          <p class="text-dracula-comment mb-6">
+            Productos propios y de emprendedores aliados. Cada compra genera impacto directo.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((product) => (
+              <ProductCard
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                entrepreneur={product.entrepreneur}
+                entrepreneurPhone={product.entrepreneurPhone}
+                cause={product.cause}
+                causeId={product.causeId}
+                leaderName={product.leaderName}
+                contributionText={product.contributionText}
+                photoUrl={product.photoUrl}
+              />
+            ))}
+          </div>
+        </div>
+      )
+    }
+  </div>
 </Layout>

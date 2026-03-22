@@ -1,19 +1,15 @@
 -- Database Schema for 'comoon'
 -- Cloudflare D1 (SQLite compatible)
-
-DROP TABLE IF EXISTS products;
-DROP TABLE IF EXISTS causes;
-DROP TABLE IF EXISTS entrepreneurs;
-DROP TABLE IF EXISTS leaders;
-DROP TABLE IF EXISTS users;
+-- NOTE: Use migrations/ for incremental changes. This file is the canonical
+-- reference schema. Never use DROP TABLE in production migrations.
 
 -- Users table for authentication
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK(role IN ('admin', 'leader', 'entrepreneur', 'conauta')),
-  profile_id INTEGER, -- References leaders.id, entrepreneurs.id or conautas.id based on role
+  role TEXT NOT NULL CHECK(role IN ('admin', 'leader', 'entrepreneur')),
+  profile_id INTEGER, -- References leaders.id or entrepreneurs.id based on role
   is_active BOOLEAN DEFAULT 1,
   is_verified BOOLEAN DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -21,12 +17,14 @@ CREATE TABLE users (
 );
 
 -- Leaders table
-CREATE TABLE leaders (
+CREATE TABLE IF NOT EXISTS leaders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER UNIQUE,
   name TEXT NOT NULL,
   bio TEXT,
   location TEXT,
+  city TEXT,
+  department TEXT,
   photo_url TEXT,
   contact_info JSON, -- { whatsapp, instagram, facebook, etc. }
   social_links JSON,
@@ -39,7 +37,7 @@ CREATE TABLE leaders (
 );
 
 -- Leader Tags reference table (for available tags)
-CREATE TABLE leader_tags (
+CREATE TABLE IF NOT EXISTS leader_tags (
   id TEXT PRIMARY KEY, -- slug: ambiental, social, animales, etc.
   name TEXT NOT NULL,
   color TEXT NOT NULL, -- emerald, blue, orange, etc.
@@ -48,7 +46,7 @@ CREATE TABLE leader_tags (
 );
 
 -- Causes (Social Causes) table
-CREATE TABLE causes (
+CREATE TABLE IF NOT EXISTS causes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   leader_id INTEGER NOT NULL,
   title TEXT NOT NULL,
@@ -65,12 +63,14 @@ CREATE TABLE causes (
 );
 
 -- Entrepreneurs table
-CREATE TABLE entrepreneurs (
+CREATE TABLE IF NOT EXISTS entrepreneurs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER UNIQUE,
   store_name TEXT NOT NULL,
   bio TEXT,
   location TEXT,
+  city TEXT,
+  department TEXT,
   photo_url TEXT,
   contact_info JSON, -- { whatsapp, instagram, website, etc. }
   is_verified BOOLEAN DEFAULT 0,
@@ -80,10 +80,22 @@ CREATE TABLE entrepreneurs (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Products table
-CREATE TABLE products (
+-- Posts table (free-form publications)
+CREATE TABLE IF NOT EXISTS posts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  entrepreneur_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
+  content TEXT NOT NULL,
+  photo_url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Products table
+CREATE TABLE IF NOT EXISTS products (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  entrepreneur_id INTEGER,
+  leader_id INTEGER,
   cause_id INTEGER NOT NULL,
   name TEXT NOT NULL,
   description TEXT,
@@ -96,25 +108,29 @@ CREATE TABLE products (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (entrepreneur_id) REFERENCES entrepreneurs(id),
+  FOREIGN KEY (leader_id) REFERENCES leaders(id),
   FOREIGN KEY (cause_id) REFERENCES causes(id)
 );
 
--- Conautas table (users who want to help without being leaders or entrepreneurs)
-CREATE TABLE conautas (
+-- Cause Updates table (progress updates for causes by leaders)
+CREATE TABLE IF NOT EXISTS cause_updates (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER UNIQUE,
-  name TEXT NOT NULL,
-  bio TEXT,
+  leader_id INTEGER NOT NULL,
+  cause_id INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
   photo_url TEXT,
-  location TEXT,
-  interests JSON, -- Array of interest tags
+  photos JSON, -- Array of additional photo URLs
+  update_type TEXT DEFAULT 'progress' CHECK(update_type IN ('progress', 'milestone', 'gratitude', 'closing')),
+  is_closing BOOLEAN DEFAULT 0, -- If true, this update closes the cause
+  amount_reported REAL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (leader_id) REFERENCES leaders(id),
+  FOREIGN KEY (cause_id) REFERENCES causes(id)
 );
 
 -- Orders/Transactions table (for tracking contributions)
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   product_id INTEGER NOT NULL,
   cause_id INTEGER NOT NULL,
@@ -128,19 +144,26 @@ CREATE TABLE transactions (
 );
 
 -- Indexes for better query performance
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_leaders_user_id ON leaders(user_id);
-CREATE INDEX idx_entrepreneurs_user_id ON entrepreneurs(user_id);
-CREATE INDEX idx_causes_leader_id ON causes(leader_id);
-CREATE INDEX idx_causes_status ON causes(status);
-CREATE INDEX idx_products_entrepreneur_id ON products(entrepreneur_id);
-CREATE INDEX idx_products_cause_id ON products(cause_id);
-CREATE INDEX idx_transactions_cause_id ON transactions(cause_id);
-CREATE INDEX idx_conautas_user_id ON conautas(user_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+CREATE INDEX IF NOT EXISTS idx_leaders_user_id ON leaders(user_id);
+CREATE INDEX IF NOT EXISTS idx_entrepreneurs_user_id ON entrepreneurs(user_id);
+CREATE INDEX IF NOT EXISTS idx_causes_leader_id ON causes(leader_id);
+CREATE INDEX IF NOT EXISTS idx_causes_status ON causes(status);
+CREATE INDEX IF NOT EXISTS idx_products_entrepreneur_id ON products(entrepreneur_id);
+CREATE INDEX IF NOT EXISTS idx_products_cause_id ON products(cause_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_cause_id ON transactions(cause_id);
+CREATE INDEX IF NOT EXISTS idx_cause_updates_leader_id ON cause_updates(leader_id);
+CREATE INDEX IF NOT EXISTS idx_cause_updates_cause_id ON cause_updates(cause_id);
+CREATE INDEX IF NOT EXISTS idx_cause_updates_created_at ON cause_updates(created_at);
+CREATE INDEX IF NOT EXISTS idx_leaders_department ON leaders(department);
+CREATE INDEX IF NOT EXISTS idx_entrepreneurs_department ON entrepreneurs(department);
+CREATE INDEX IF NOT EXISTS idx_products_leader_id ON products(leader_id);
+CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at);
 
 -- Seed leader tags
-INSERT INTO leader_tags (id, name, color, icon, description) VALUES
+INSERT OR IGNORE INTO leader_tags (id, name, color, icon, description) VALUES
 ('ambiental', 'Ambiental', 'emerald', 'Leaf', 'Causas relacionadas con medio ambiente y ecologia'),
 ('social', 'Social', 'blue', 'UsersThree', 'Causas de bienestar comunitario y derechos humanos'),
 ('animales', 'Animales', 'orange', 'PawPrint', 'Proteccion y bienestar animal'),

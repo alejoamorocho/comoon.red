@@ -9,6 +9,7 @@ export default {
                     current: '#44475a',
                     fg: '#f8f8f2',
                     comment: '#6272a4',
+                    'comment-accessible': '#8a9bc4',
                     cyan: '#8be9fd',
                     green: '#50fa7b',
                     orange: '#ffb86c',
@@ -30,7 +31,7 @@ export default {
                     light: '#4ade80',
                     dark: '#16a34a',
                 },
-                conauta: {
+                community: {
                     DEFAULT: '#f59e0b',
                     light: '#fbbf24',
                     dark: '#d97706',

@@ -1,0 +1,63 @@
+---
+import Layout from '../layouts/Layout.astro';
+import OnboardingWizard from '../components/OnboardingWizard';
+
+// Get user from middleware
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login', 302);
+}
+
+// Fetch profile data from DB
+const db = Astro.locals.runtime?.env?.DB;
+let profileData: Record<string, any> = {};
+
+if (db && user.profileId) {
+  if (user.role === 'leader') {
+    const leader = await db
+      .prepare('SELECT * FROM leaders WHERE id = ?')
+      .bind(user.profileId)
+      .first();
+    if (leader) {
+      profileData = {
+        name: leader.name || '',
+        bio: leader.bio || '',
+        photo_url: leader.photo_url || '',
+        department: leader.department || '',
+        city: leader.city || '',
+        contact_info: leader.contact_info ? JSON.parse(leader.contact_info as string) : {},
+        tags: leader.tags ? JSON.parse(leader.tags as string) : [],
+      };
+    }
+  } else if (user.role === 'entrepreneur') {
+    const entrepreneur = await db
+      .prepare('SELECT * FROM entrepreneurs WHERE id = ?')
+      .bind(user.profileId)
+      .first();
+    if (entrepreneur) {
+      profileData = {
+        name: entrepreneur.store_name || '',
+        bio: entrepreneur.bio || '',
+        photo_url: entrepreneur.photo_url || '',
+        department: entrepreneur.department || '',
+        city: entrepreneur.city || '',
+        contact_info: entrepreneur.contact_info
+          ? JSON.parse(entrepreneur.contact_info as string)
+          : {},
+      };
+    }
+  }
+}
+---
+
+<Layout title="Completar Perfil">
+  <div class="max-w-2xl mx-auto py-8">
+    <OnboardingWizard
+      client:load
+      role={user.role as 'leader' | 'entrepreneur'}
+      profileId={user.profileId!}
+      initialData={profileData}
+    />
+  </div>
+</Layout>

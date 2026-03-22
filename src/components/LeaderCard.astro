@@ -16,26 +16,46 @@ const { id, name, bio, location, cause, photoUrl, tags = [] } = Astro.props;
 
 <div class="glass rounded-xl overflow-hidden hover:scale-[1.02] transition-transform duration-300">
   <div class="h-48 overflow-hidden relative group">
-    <img src={photoUrl} alt={name} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-    <div class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-transparent to-transparent opacity-80"></div>
+    <img
+      src={photoUrl}
+      alt={name}
+      width={400}
+      height={192}
+      loading="lazy"
+      decoding="async"
+      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+    />
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-transparent to-transparent opacity-80"
+    >
+    </div>
     <div class="absolute bottom-4 left-4">
       <h3 class="text-xl font-bold text-white">{name}</h3>
       <p class="text-leader text-sm font-medium flex items-center gap-1">
-        <span class="icon-map-pin">📍</span> {location}
+        <span class="icon-map-pin">📍</span>
+        {location}
       </p>
     </div>
   </div>
   <div class="p-4">
-    {tags.length > 0 && (
-      <div class="mb-3">
-        <LeaderTagsList client:visible tags={tags} size="sm" maxVisible={3} />
-      </div>
-    )}
+    {
+      tags.length > 0 && (
+        <div class="mb-3">
+          <LeaderTagsList client:visible tags={tags} size="sm" maxVisible={3} />
+        </div>
+      )
+    }
     <div class="mb-4">
-      <span class="text-xs uppercase tracking-wider text-dracula-comment font-bold">Causa Principal</span>
+      <span class="text-xs uppercase tracking-wider text-dracula-comment font-bold"
+        >Causa Principal</span
+      >
       <h4 class="text-leader font-bold leading-tight mt-1">{cause}</h4>
     </div>
     <p class="text-dracula-fg/80 text-sm line-clamp-2">{bio}</p>
-    <a href={`/leaders/${id}`} class="block text-center mt-4 text-leader hover:text-white transition-colors text-sm font-bold">Ver Perfil Completo &rarr;</a>
+    <a
+      href={`/leaders/${id}`}
+      class="block text-center mt-4 text-leader hover:text-white transition-colors text-sm font-bold"
+      >Ver Perfil Completo &rarr;</a
+    >
   </div>
 </div>

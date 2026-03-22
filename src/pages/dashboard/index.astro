@@ -1,0 +1,18 @@
+---
+/**
+ * Dashboard Index - Redirects to role-specific dashboard
+ */
+import { getDashboardPath } from '../../lib/auth';
+
+// Get user from locals (set by middleware)
+const user = Astro.locals.user;
+
+// If not authenticated, redirect to login
+if (!user) {
+  return Astro.redirect('/login?redirect=/dashboard');
+}
+
+// Redirect to role-specific dashboard
+const dashboardPath = getDashboardPath(user.role);
+return Astro.redirect(dashboardPath);
+---

@@ -1,23 +1,32 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "comoon"
-compatibility_date = "2024-09-23"
-compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2025-12-01"
+compatibility_flags = ["nodejs_compat_v2"]
 
-# [site]
-# bucket = "./dist"
+# Pages configuration
+pages_build_output_dir = "./dist"
 
+# D1 Database
 [[d1_databases]]
 binding = "DB"
 database_name = "comoon-db"
-database_id = "xxxx-xxxx-xxxx-xxxx" # Placeholder: Run 'npx wrangler d1 create comoon-db' to get ID
+database_id = "880e235d-e6dc-482b-9a98-aaead97f6195"
 
-# [vars]
-# MY_VAR = "my-variable"
+# Environment Variables
+# JWT_SECRET must be set via `wrangler secret put JWT_SECRET` (never in plaintext)
+[vars]
 
-# [[kv_namespaces]]
-# binding = "MY_KV_NAMESPACE"
-# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+# R2 for image storage
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "comoon-images"
 
-# [[r2_buckets]]
-# binding = "MY_BUCKET"
-# bucket_name = "my-bucket"
+# KV for caching (leader tags, departments, profiles)
+[[kv_namespaces]]
+binding = "CACHE"
+id = "190c531982d04d49a5a7618385ea757e"
+
+# KV for Astro sessions
+[[kv_namespaces]]
+binding = "SESSION"
+id = "2b188fb8e24047e1a28e71c074c7f3de"

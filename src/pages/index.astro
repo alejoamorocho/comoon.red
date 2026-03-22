@@ -1,492 +1,770 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { LeaderTagsList } from '../components/LeaderTagBadge';
-import { UsersThree, Storefront, Compass, ArrowDown, Heart, Handshake, TrendUp, CheckCircle, Share, ShoppingBag, Star, Leaf, BookOpen, FirstAid, Quotes, ArrowRight, Rocket } from '@phosphor-icons/react';
+import {
+  UsersThree,
+  Storefront,
+  ArrowDown,
+  Heart,
+  Handshake,
+  TrendUp,
+  CheckCircle,
+  Share,
+  ShoppingBag,
+  Star,
+  Leaf,
+  BookOpen,
+  FirstAid,
+  Quotes,
+  ArrowRight,
+  Rocket,
+} from '@phosphor-icons/react';
+
+// Fetch real stats from DB
+const db = Astro.locals.runtime?.env?.DB;
+let stats = { leaders: 0, entrepreneurs: 0, products: 0, raised: 0 };
+if (db) {
+  const [leaderCount, entrepreneurCount, productCount, raisedSum] = await Promise.all([
+    db.prepare('SELECT COUNT(*) as c FROM leaders').first<{ c: number }>(),
+    db.prepare('SELECT COUNT(*) as c FROM entrepreneurs').first<{ c: number }>(),
+    db.prepare('SELECT COUNT(*) as c FROM products WHERE is_active = 1').first<{ c: number }>(),
+    db.prepare('SELECT COALESCE(SUM(current_amount), 0) as c FROM causes').first<{ c: number }>(),
+  ]);
+  stats = {
+    leaders: leaderCount?.c || 0,
+    entrepreneurs: entrepreneurCount?.c || 0,
+    products: productCount?.c || 0,
+    raised: raisedSum?.c || 0,
+  };
+}
+const formatCompact = (n: number) => {
+  if (n >= 1000000) return `$${Math.round(n / 1000000)}M`;
+  if (n >= 1000) return `${Math.round(n / 1000)}K`;
+  return String(n);
+};
 ---
 
 <Layout title="Inicio">
   <!-- Hero Section -->
-  <section class="min-h-[90vh] flex flex-col items-center justify-center text-center relative px-4 py-16">
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-comoon-purple/20 rounded-full blur-[120px] -z-10 animate-pulse"></div>
-      <div class="absolute bottom-20 right-10 w-[400px] h-[400px] bg-leader/10 rounded-full blur-[100px] -z-10"></div>
-      <div class="absolute top-40 left-10 w-[300px] h-[300px] bg-entrepreneur/10 rounded-full blur-[80px] -z-10"></div>
+  <section
+    aria-labelledby="hero-heading"
+    class="min-h-[90vh] flex flex-col items-center justify-center text-center relative px-4 py-16"
+  >
+    <div
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-comoon-purple/20 rounded-full blur-[120px] -z-10 animate-pulse"
+    >
+    </div>
+    <div
+      class="absolute bottom-20 right-10 w-[400px] h-[400px] bg-leader/10 rounded-full blur-[100px] -z-10"
+    >
+    </div>
+    <div
+      class="absolute top-40 left-10 w-[300px] h-[300px] bg-entrepreneur/10 rounded-full blur-[80px] -z-10"
+    >
+    </div>
 
-      <!-- Logo Grande -->
-      <div class="mb-8">
-          <h1 class="text-6xl md:text-8xl font-bold tracking-tight">
-              <span class="text-white">co</span><span class="text-comoon-purple">moon</span>
-          </h1>
-          <p class="text-dracula-comment text-lg mt-2">Economia Solidaria con Proposito</p>
-      </div>
+    <!-- Logo Grande -->
+    <div class="mb-8">
+      <h1
+        id="hero-heading"
+        class="text-6xl md:text-8xl font-bold tracking-tight animate-comoon-logo"
+      >
+        <span class="text-white">co</span><span class="text-comoon-purple animate-moon-text"
+          >moon</span
+        >
+      </h1>
+      <p class="text-dracula-comment-accessible text-lg mt-2">Economia Solidaria con Proposito</p>
+    </div>
 
-      <h2 class="text-3xl md:text-5xl font-bold mb-6 tracking-tight leading-tight max-w-4xl">
-          Tu compra ilumina <br/>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-leader to-entrepreneur">una causa real.</span>
-      </h2>
+    <h2 class="text-3xl md:text-5xl font-bold mb-6 tracking-tight leading-tight max-w-4xl">
+      Tu compra ilumina <br />
+      <span class="text-transparent bg-clip-text bg-gradient-to-r from-leader to-entrepreneur"
+        >una causa real.</span
+      >
+    </h2>
 
-      <p class="text-xl text-dracula-fg/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Conectamos <span class="text-leader font-medium">Lideres</span> que transforman comunidades,
-          <span class="text-entrepreneur font-medium">Emprendedores</span> que venden con proposito
-          y <span class="text-conauta font-medium">Conautas</span> que multiplican el impacto.
-      </p>
+    <p class="text-xl text-dracula-fg/70 max-w-2xl mx-auto mb-10 leading-relaxed">
+      Conectamos <span class="text-leader font-medium">Lideres</span> que transforman comunidades y <span
+        class="text-entrepreneur font-medium">Emprendedores</span
+      > que venden con proposito. Juntos, multiplicamos el impacto.
+    </p>
 
-      <div class="flex flex-col sm:flex-row gap-4 mb-16">
-          <a href="/store" class="px-8 py-4 bg-white text-dracula-bg font-bold text-lg rounded-full hover:scale-105 transition-transform shadow-xl flex items-center gap-2">
-              <ShoppingBag size={20} />
-              Explorar la Tienda
-          </a>
-          <a href="#como-funciona" class="px-8 py-4 border-2 border-comoon-purple text-comoon-purple font-bold text-lg rounded-full hover:bg-comoon-purple/10 transition-colors flex items-center gap-2">
-              Conocer mas
-              <ArrowDown size={20} />
-          </a>
-      </div>
-
-      <a href="#porque-comoon" class="animate-bounce text-dracula-comment hover:text-white transition-colors flex flex-col items-center gap-2">
-          <span class="text-sm font-bold uppercase tracking-widest">Descubre por que existimos</span>
-          <ArrowDown size={24} />
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a
+        href="/store"
+        class="px-8 py-4 bg-white text-dracula-bg font-bold text-lg rounded-full hover:scale-105 transition-transform shadow-xl flex items-center gap-2"
+      >
+        <ShoppingBag size={20} />
+        Explorar la Tienda
       </a>
+      <a
+        href="#como-funciona"
+        class="px-8 py-4 border-2 border-comoon-purple text-comoon-purple font-bold text-lg rounded-full hover:bg-comoon-purple/10 transition-colors flex items-center gap-2"
+      >
+        Conocer mas
+        <ArrowDown size={20} />
+      </a>
+    </div>
+
+    <a
+      href="#porque-comoon"
+      class="animate-bounce text-dracula-comment hover:text-white transition-colors flex flex-col items-center gap-2"
+    >
+      <span class="text-sm font-bold uppercase tracking-widest">Descubre por que existimos</span>
+      <ArrowDown size={24} />
+    </a>
   </section>
 
   <!-- Por que Comoon -->
-  <section id="porque-comoon" class="py-24 px-4 bg-dracula-current/10">
-      <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-16">
-              <span class="text-comoon-purple text-sm font-bold uppercase tracking-widest mb-4 block">Nuestra Razon de Ser</span>
-              <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Por que <span class="text-white">co</span><span class="text-comoon-purple">moon</span>?</h2>
-              <p class="text-xl text-dracula-fg/70 max-w-3xl mx-auto">
-                  En Colombia hay miles de lideres sociales haciendo un trabajo increible, pero invisibilizado.
-                  Y miles de emprendedores que quieren vender con proposito pero no saben como.
-              </p>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-8">
-              <div class="glass p-8 rounded-2xl text-center">
-                  <div class="bg-dracula-red/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Heart size={40} className="text-dracula-red" weight="fill" />
-                  </div>
-                  <h3 class="text-xl font-bold text-white mb-4">El Problema</h3>
-                  <p class="text-dracula-fg/70">
-                      Los lideres sociales necesitan recursos pero no tienen acceso a financiacion.
-                      Los consumidores quieren ayudar pero no saben como.
-                  </p>
-              </div>
-
-              <div class="glass p-8 rounded-2xl text-center">
-                  <div class="bg-comoon-purple/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Handshake size={40} className="text-comoon-purple" weight="fill" />
-                  </div>
-                  <h3 class="text-xl font-bold text-white mb-4">La Conexion</h3>
-                  <p class="text-dracula-fg/70">
-                      Comoon conecta la necesidad con la solucion.
-                      Cada venta de un emprendedor genera una donacion a una causa de un lider.
-                  </p>
-              </div>
-
-              <div class="glass p-8 rounded-2xl text-center">
-                  <div class="bg-dracula-green/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <TrendUp size={40} className="text-dracula-green" weight="fill" />
-                  </div>
-                  <h3 class="text-xl font-bold text-white mb-4">El Impacto</h3>
-                  <p class="text-dracula-fg/70">
-                      Creamos un ecosistema donde comprar es ayudar.
-                      Donde emprender es transformar. Donde liderar es inspirar.
-                  </p>
-              </div>
-          </div>
+  <section
+    id="porque-comoon"
+    aria-labelledby="porque-comoon-heading"
+    class="py-24 px-4 bg-dracula-current/10"
+  >
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="text-comoon-purple text-sm font-bold uppercase tracking-widest mb-4 block"
+          >Nuestra Razon de Ser</span
+        >
+        <h2 id="porque-comoon-heading" class="text-4xl md:text-5xl font-bold text-white mb-6">
+          ¿Por que <span class="text-white">co</span><span class="text-comoon-purple">moon</span>?
+        </h2>
+        <p class="text-xl text-dracula-fg/70 max-w-3xl mx-auto">
+          En Colombia hay miles de lideres sociales haciendo un trabajo increible, pero
+          invisibilizado. Y miles de emprendedores que quieren vender con proposito pero no saben
+          como.
+        </p>
       </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="glass p-8 rounded-2xl text-center">
+          <div
+            class="bg-dracula-red/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <Heart size={40} className="text-dracula-red" weight="fill" />
+          </div>
+          <h3 class="text-xl font-bold text-white mb-4">El Problema</h3>
+          <p class="text-dracula-fg/70">
+            Los lideres sociales necesitan recursos pero no tienen acceso a financiacion. Los
+            consumidores quieren ayudar pero no saben como.
+          </p>
+        </div>
+
+        <div class="glass p-8 rounded-2xl text-center">
+          <div
+            class="bg-comoon-purple/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <Handshake size={40} className="text-comoon-purple" weight="fill" />
+          </div>
+          <h3 class="text-xl font-bold text-white mb-4">La Conexion</h3>
+          <p class="text-dracula-fg/70">
+            Comoon conecta la necesidad con la solucion. Cada venta de un emprendedor genera una
+            donacion a una causa de un lider.
+          </p>
+        </div>
+
+        <div class="glass p-8 rounded-2xl text-center">
+          <div
+            class="bg-dracula-green/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <TrendUp size={40} className="text-dracula-green" weight="fill" />
+          </div>
+          <h3 class="text-xl font-bold text-white mb-4">El Impacto</h3>
+          <p class="text-dracula-fg/70">
+            Creamos un ecosistema donde comprar es ayudar. Donde emprender es transformar. Donde
+            liderar es inspirar.
+          </p>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Como Funciona -->
-  <section id="como-funciona" class="py-24 px-4">
-      <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-16">
-              <span class="text-leader text-sm font-bold uppercase tracking-widest mb-4 block">El Ciclo del Impacto</span>
-              <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Como Funciona</h2>
-              <p class="text-xl text-dracula-fg/70 max-w-2xl mx-auto">
-                  Un flujo simple que genera impacto real y medible.
-              </p>
-          </div>
-
-          <div class="grid md:grid-cols-4 gap-6 mb-12">
-              <div class="text-center relative">
-                  <div class="bg-leader w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-dracula-bg font-bold text-xl">1</div>
-                  <h4 class="font-bold text-white mb-2">Lider Publica</h4>
-                  <p class="text-sm text-dracula-fg/70">Un lider crea su causa con metas claras y evidencia de su trabajo.</p>
-                  <ArrowRight size={24} className="absolute right-0 top-6 text-dracula-comment hidden md:block" />
-              </div>
-              <div class="text-center relative">
-                  <div class="bg-entrepreneur w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-dracula-bg font-bold text-xl">2</div>
-                  <h4 class="font-bold text-white mb-2">Emprendedor Vincula</h4>
-                  <p class="text-sm text-dracula-fg/70">Un emprendedor vincula sus productos a la causa y define su aporte.</p>
-                  <ArrowRight size={24} className="absolute right-0 top-6 text-dracula-comment hidden md:block" />
-              </div>
-              <div class="text-center relative">
-                  <div class="bg-conauta w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-dracula-bg font-bold text-xl">3</div>
-                  <h4 class="font-bold text-white mb-2">Conauta Comparte</h4>
-                  <p class="text-sm text-dracula-fg/70">Los conautas difunden y compran productos, multiplicando el alcance.</p>
-                  <ArrowRight size={24} className="absolute right-0 top-6 text-dracula-comment hidden md:block" />
-              </div>
-              <div class="text-center">
-                  <div class="bg-dracula-green w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-dracula-bg font-bold text-xl">4</div>
-                  <h4 class="font-bold text-white mb-2">Causa Crece</h4>
-                  <p class="text-sm text-dracula-fg/70">La causa recibe fondos y el lider transforma su comunidad.</p>
-              </div>
-          </div>
-
-          <div class="glass p-8 rounded-2xl text-center border border-comoon-purple/30">
-              <p class="text-xl text-dracula-fg/90">
-                  <span class="text-comoon-purple font-bold">El resultado:</span> Un ecosistema donde todos ganan.
-                  El lider recibe recursos, el emprendedor vende mas, el conauta genera impacto.
-              </p>
-          </div>
+  <section id="como-funciona" aria-labelledby="como-funciona-heading" class="py-24 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="text-leader text-sm font-bold uppercase tracking-widest mb-4 block"
+          >El Ciclo del Impacto</span
+        >
+        <h2 id="como-funciona-heading" class="text-4xl md:text-5xl font-bold text-white mb-6">
+          ¿Como Funciona?
+        </h2>
+        <p class="text-xl text-dracula-fg/70 max-w-2xl mx-auto">
+          Un flujo simple que genera impacto real y medible.
+        </p>
       </div>
+
+      <div class="grid md:grid-cols-4 gap-6 mb-12">
+        <div class="text-center relative">
+          <div
+            class="bg-leader w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-dracula-bg font-bold text-xl"
+          >
+            1
+          </div>
+          <h4 class="font-bold text-white mb-2">Lider Publica</h4>
+          <p class="text-sm text-dracula-fg/70">
+            Un lider crea su causa con metas claras y evidencia de su trabajo.
+          </p>
+          <ArrowRight
+            size={24}
+            className="absolute right-0 top-6 text-dracula-comment hidden md:block"
+          />
+        </div>
+        <div class="text-center relative">
+          <div
+            class="bg-entrepreneur w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-dracula-bg font-bold text-xl"
+          >
+            2
+          </div>
+          <h4 class="font-bold text-white mb-2">Emprendedor Vincula</h4>
+          <p class="text-sm text-dracula-fg/70">
+            Un emprendedor vincula sus productos a la causa y define su aporte.
+          </p>
+          <ArrowRight
+            size={24}
+            className="absolute right-0 top-6 text-dracula-comment hidden md:block"
+          />
+        </div>
+        <div class="text-center relative">
+          <div
+            class="bg-community w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-dracula-bg font-bold text-xl"
+          >
+            3
+          </div>
+          <h4 class="font-bold text-white mb-2">Comunidad Comparte</h4>
+          <p class="text-sm text-dracula-fg/70">
+            La comunidad difunde y compra productos, multiplicando el alcance.
+          </p>
+          <ArrowRight
+            size={24}
+            className="absolute right-0 top-6 text-dracula-comment hidden md:block"
+          />
+        </div>
+        <div class="text-center">
+          <div
+            class="bg-dracula-green w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-dracula-bg font-bold text-xl"
+          >
+            4
+          </div>
+          <h4 class="font-bold text-white mb-2">Causa Crece</h4>
+          <p class="text-sm text-dracula-fg/70">
+            La causa recibe fondos y el lider transforma su comunidad.
+          </p>
+        </div>
+      </div>
+
+      <div class="glass p-8 rounded-2xl text-center border border-comoon-purple/30">
+        <p class="text-xl text-dracula-fg/90">
+          <span class="text-comoon-purple font-bold">El resultado:</span> Un ecosistema donde todos ganan.
+          El lider recibe recursos, el emprendedor vende mas, la comunidad genera impacto.
+        </p>
+      </div>
+    </div>
   </section>
 
   <!-- Que Queremos Lograr -->
-  <section class="py-24 px-4 bg-gradient-to-b from-transparent to-dracula-current/20">
-      <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-16">
-              <span class="text-entrepreneur text-sm font-bold uppercase tracking-widest mb-4 block">Nuestra Vision</span>
-              <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Que Queremos Lograr</h2>
-          </div>
-
-          <div class="grid md:grid-cols-2 gap-12 items-center">
-              <div class="space-y-6">
-                  <div class="flex items-start gap-4">
-                      <CheckCircle size={28} className="text-dracula-green shrink-0 mt-1" weight="fill" />
-                      <div>
-                          <h4 class="font-bold text-white text-lg mb-1">Visibilizar a los lideres</h4>
-                          <p class="text-dracula-fg/70">Que cada lider tenga una plataforma para mostrar su trabajo y conectar con recursos.</p>
-                      </div>
-                  </div>
-                  <div class="flex items-start gap-4">
-                      <CheckCircle size={28} className="text-dracula-green shrink-0 mt-1" weight="fill" />
-                      <div>
-                          <h4 class="font-bold text-white text-lg mb-1">Democratizar el impacto</h4>
-                          <p class="text-dracula-fg/70">Que cualquier persona pueda generar cambio social con una simple compra.</p>
-                      </div>
-                  </div>
-                  <div class="flex items-start gap-4">
-                      <CheckCircle size={28} className="text-dracula-green shrink-0 mt-1" weight="fill" />
-                      <div>
-                          <h4 class="font-bold text-white text-lg mb-1">Fortalecer el emprendimiento</h4>
-                          <p class="text-dracula-fg/70">Que vender con proposito sea una ventaja competitiva, no un sacrificio.</p>
-                      </div>
-                  </div>
-                  <div class="flex items-start gap-4">
-                      <CheckCircle size={28} className="text-dracula-green shrink-0 mt-1" weight="fill" />
-                      <div>
-                          <h4 class="font-bold text-white text-lg mb-1">Crear comunidad</h4>
-                          <p class="text-dracula-fg/70">Que los conautas sean embajadores del cambio en sus circulos.</p>
-                      </div>
-                  </div>
-              </div>
-              <div class="glass p-8 rounded-2xl border border-dracula-green/30">
-                  <h3 class="text-2xl font-bold text-white mb-6 text-center">Nuestras Metas 2025</h3>
-                  <div class="grid grid-cols-2 gap-6 text-center">
-                      <div>
-                          <p class="text-4xl font-bold text-leader">1,000</p>
-                          <p class="text-sm text-dracula-comment">Lideres activos</p>
-                      </div>
-                      <div>
-                          <p class="text-4xl font-bold text-entrepreneur">500</p>
-                          <p class="text-sm text-dracula-comment">Emprendedores</p>
-                      </div>
-                      <div>
-                          <p class="text-4xl font-bold text-conauta">10,000</p>
-                          <p class="text-sm text-dracula-comment">Conautas</p>
-                      </div>
-                      <div>
-                          <p class="text-4xl font-bold text-dracula-green">$500M</p>
-                          <p class="text-sm text-dracula-comment">Recaudados</p>
-                      </div>
-                  </div>
-              </div>
-          </div>
+  <section
+    aria-labelledby="vision-heading"
+    class="py-24 px-4 bg-gradient-to-b from-transparent to-dracula-current/20"
+  >
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="text-entrepreneur text-sm font-bold uppercase tracking-widest mb-4 block"
+          >Nuestra Vision</span
+        >
+        <h2 id="vision-heading" class="text-4xl md:text-5xl font-bold text-white mb-6">
+          Que Queremos Lograr
+        </h2>
       </div>
+
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="space-y-6">
+          <div class="flex items-start gap-4">
+            <CheckCircle size={28} className="text-dracula-green shrink-0 mt-1" weight="fill" />
+            <div>
+              <h4 class="font-bold text-white text-lg mb-1">Visibilizar a los lideres</h4>
+              <p class="text-dracula-fg/70">
+                Que cada lider tenga una plataforma para mostrar su trabajo y conectar con recursos.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <CheckCircle size={28} className="text-dracula-green shrink-0 mt-1" weight="fill" />
+            <div>
+              <h4 class="font-bold text-white text-lg mb-1">Democratizar el impacto</h4>
+              <p class="text-dracula-fg/70">
+                Que cualquier persona pueda generar cambio social con una simple compra.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <CheckCircle size={28} className="text-dracula-green shrink-0 mt-1" weight="fill" />
+            <div>
+              <h4 class="font-bold text-white text-lg mb-1">Fortalecer el emprendimiento</h4>
+              <p class="text-dracula-fg/70">
+                Que vender con proposito sea una ventaja competitiva, no un sacrificio.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <CheckCircle size={28} className="text-dracula-green shrink-0 mt-1" weight="fill" />
+            <div>
+              <h4 class="font-bold text-white text-lg mb-1">Crear comunidad</h4>
+              <p class="text-dracula-fg/70">
+                Que todos sean embajadores del cambio en sus circulos.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="glass p-8 rounded-2xl border border-dracula-green/30">
+          <h3 class="text-2xl font-bold text-white mb-6 text-center">Nuestras Metas 2025</h3>
+          <div class="grid grid-cols-2 gap-6 text-center">
+            <div>
+              <p class="text-4xl font-bold text-leader">1,000</p>
+              <p class="text-sm text-dracula-comment-accessible">Lideres activos</p>
+            </div>
+            <div>
+              <p class="text-4xl font-bold text-entrepreneur">500</p>
+              <p class="text-sm text-dracula-comment-accessible">Emprendedores</p>
+            </div>
+            <div>
+              <p class="text-4xl font-bold text-community">10,000</p>
+              <p class="text-sm text-dracula-comment-accessible">Aliados</p>
+            </div>
+            <div>
+              <p class="text-4xl font-bold text-dracula-green">$500M</p>
+              <p class="text-sm text-dracula-comment-accessible">Recaudados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Quienes son los Lideres -->
-  <section id="lideres" class="py-24 px-4">
-      <div class="max-w-6xl mx-auto">
-          <div class="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                  <span class="text-leader text-sm font-bold uppercase tracking-widest mb-4 block">Transformadores</span>
-                  <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Quienes son los <span class="text-leader">Lideres</span>?</h2>
-                  <p class="text-xl text-dracula-fg/70 mb-8">
-                      Son personas que dedican su vida a transformar sus comunidades.
-                      Organizan comedores, construyen escuelas, protegen el medio ambiente, preservan la cultura.
-                  </p>
+  <section id="lideres" aria-labelledby="lideres-heading" class="py-24 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <span class="text-leader text-sm font-bold uppercase tracking-widest mb-4 block"
+            >Transformadores</span
+          >
+          <h2 id="lideres-heading" class="text-4xl md:text-5xl font-bold text-white mb-6">
+            ¿Quienes son los <span class="text-leader">Lideres</span>?
+          </h2>
+          <p class="text-xl text-dracula-fg/70 mb-8">
+            Son personas que dedican su vida a transformar sus comunidades. Organizan comedores,
+            construyen escuelas, protegen el medio ambiente, preservan la cultura.
+          </p>
 
-                  <h4 class="font-bold text-white mb-4">Tipos de causas:</h4>
-                  <div class="flex flex-wrap gap-2 mb-8">
-                      <LeaderTagsList client:visible tags={["ambiental", "social", "educacion", "alimentacion", "salud", "cultura", "comunidad", "animales"]} size="md" maxVisible={8} />
-                  </div>
-
-                  <ul class="space-y-3 mb-8">
-                      <li class="flex items-center gap-3 text-dracula-fg/80">
-                          <CheckCircle size={20} className="text-leader" weight="fill" />
-                          Publica causas verificadas con metas claras
-                      </li>
-                      <li class="flex items-center gap-3 text-dracula-fg/80">
-                          <CheckCircle size={20} className="text-leader" weight="fill" />
-                          Recibe apoyo de ventas de productos
-                      </li>
-                      <li class="flex items-center gap-3 text-dracula-fg/80">
-                          <CheckCircle size={20} className="text-leader" weight="fill" />
-                          Gestiona tu perfil y muestra transparencia
-                      </li>
-                  </ul>
-
-                  <a href="/register" class="inline-flex items-center gap-2 px-8 py-4 bg-leader text-dracula-bg font-bold text-lg rounded-xl hover:brightness-110 transition-all">
-                      <UsersThree size={24} />
-                      Soy Lider, quiero unirme
-                  </a>
-              </div>
-              <div class="glass p-6 rounded-2xl border border-leader/30">
-                  <img src="https://images.unsplash.com/photo-1531123414780-f74242c2b052?auto=format&fit=crop&w=600&q=80" alt="Lider comunitaria" class="w-full h-64 object-cover rounded-xl mb-6" />
-                  <div class="flex items-center gap-4 mb-4">
-                      <div class="flex-1">
-                          <h4 class="font-bold text-white">Elena Marin</h4>
-                          <p class="text-sm text-dracula-comment">Buenaventura, Valle</p>
-                      </div>
-                      <LeaderTagsList client:visible tags={["alimentacion", "comunidad"]} size="sm" maxVisible={2} />
-                  </div>
-                  <p class="text-dracula-fg/80 italic border-l-4 border-leader pl-4">
-                      "Gracias a Comoon, nuestro comedor comunitario ha recaudado mas de $1.2 millones en 6 meses."
-                  </p>
-              </div>
+          <h4 class="font-bold text-white mb-4">Tipos de causas:</h4>
+          <div class="flex flex-wrap gap-2 mb-8">
+            <LeaderTagsList
+              client:visible
+              tags={[
+                'ambiental',
+                'social',
+                'educacion',
+                'alimentacion',
+                'salud',
+                'cultura',
+                'comunidad',
+                'animales',
+              ]}
+              size="md"
+              maxVisible={8}
+            />
           </div>
+
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-3 text-dracula-fg/80">
+              <CheckCircle size={20} className="text-leader" weight="fill" />
+              Publica causas verificadas con metas claras
+            </li>
+            <li class="flex items-center gap-3 text-dracula-fg/80">
+              <CheckCircle size={20} className="text-leader" weight="fill" />
+              Recibe apoyo de ventas de productos
+            </li>
+            <li class="flex items-center gap-3 text-dracula-fg/80">
+              <CheckCircle size={20} className="text-leader" weight="fill" />
+              Gestiona tu perfil y muestra transparencia
+            </li>
+          </ul>
+
+          <a
+            href="/register"
+            class="inline-flex items-center gap-2 px-8 py-4 bg-leader text-dracula-bg font-bold text-lg rounded-xl hover:brightness-110 transition-all"
+          >
+            <UsersThree size={24} />
+            Soy Lider, quiero unirme
+          </a>
+        </div>
+        <div class="glass p-6 rounded-2xl border border-leader/30">
+          <img
+            src="https://images.unsplash.com/photo-1531123414780-f74242c2b052?auto=format&fit=crop&w=600&q=80"
+            alt="Lider comunitaria"
+            width="600"
+            height="256"
+            loading="lazy"
+            decoding="async"
+            class="w-full h-64 object-cover rounded-xl mb-6"
+          />
+          <div class="flex items-center gap-4 mb-4">
+            <div class="flex-1">
+              <h4 class="font-bold text-white">Elena Marin</h4>
+              <p class="text-sm text-dracula-comment-accessible">Buenaventura, Valle</p>
+            </div>
+            <LeaderTagsList
+              client:visible
+              tags={['alimentacion', 'comunidad']}
+              size="sm"
+              maxVisible={2}
+            />
+          </div>
+          <p class="text-dracula-fg/80 italic border-l-4 border-leader pl-4">
+            "Gracias a Comoon, nuestro comedor comunitario ha recaudado mas de $1.2 millones en 6
+            meses."
+          </p>
+        </div>
       </div>
+    </div>
   </section>
 
   <!-- Quienes son los Emprendedores -->
-  <section id="emprendedores" class="py-24 px-4 bg-dracula-current/10">
-      <div class="max-w-6xl mx-auto">
-          <div class="grid md:grid-cols-2 gap-12 items-center">
-              <div class="order-2 md:order-1 glass p-6 rounded-2xl border border-entrepreneur/30">
-                  <img src="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=600&q=80" alt="Emprendedor" class="w-full h-64 object-cover rounded-xl mb-6" />
-                  <div class="flex items-center gap-4 mb-4">
-                      <div class="flex-1">
-                          <h4 class="font-bold text-white">Cafe Origen</h4>
-                          <p class="text-sm text-dracula-comment">Manizales, Caldas</p>
-                      </div>
-                      <span class="bg-entrepreneur/20 text-entrepreneur px-3 py-1 rounded-full text-sm font-medium">Alimentos</span>
-                  </div>
-                  <p class="text-dracula-fg/80 italic border-l-4 border-entrepreneur pl-4">
-                      "Vender en Comoon nos diferencia. Nuestros clientes saben que cada cafe apoya una causa real."
-                  </p>
-              </div>
-              <div class="order-1 md:order-2">
-                  <span class="text-entrepreneur text-sm font-bold uppercase tracking-widest mb-4 block">Vendedores con Proposito</span>
-                  <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Quienes son los <span class="text-entrepreneur">Emprendedores</span>?</h2>
-                  <p class="text-xl text-dracula-fg/70 mb-8">
-                      Son creadores, artesanos, productores que quieren que sus ventas generen impacto social.
-                      Vinculan sus productos a causas reales y transparentes.
-                  </p>
-
-                  <ul class="space-y-3 mb-8">
-                      <li class="flex items-center gap-3 text-dracula-fg/80">
-                          <CheckCircle size={20} className="text-entrepreneur" weight="fill" />
-                          Crea tu tienda digital en minutos
-                      </li>
-                      <li class="flex items-center gap-3 text-dracula-fg/80">
-                          <CheckCircle size={20} className="text-entrepreneur" weight="fill" />
-                          Vincula cada producto a una causa
-                      </li>
-                      <li class="flex items-center gap-3 text-dracula-fg/80">
-                          <CheckCircle size={20} className="text-entrepreneur" weight="fill" />
-                          Define tu aporte (% o monto fijo)
-                      </li>
-                      <li class="flex items-center gap-3 text-dracula-fg/80">
-                          <CheckCircle size={20} className="text-entrepreneur" weight="fill" />
-                          Fideliza clientes con proposito
-                      </li>
-                  </ul>
-
-                  <a href="/register" class="inline-flex items-center gap-2 px-8 py-4 bg-entrepreneur text-dracula-bg font-bold text-lg rounded-xl hover:brightness-110 transition-all">
-                      <Storefront size={24} />
-                      Soy Emprendedor, quiero vender
-                  </a>
-              </div>
+  <section
+    id="emprendedores"
+    aria-labelledby="emprendedores-heading"
+    class="py-24 px-4 bg-dracula-current/10"
+  >
+    <div class="max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="order-2 md:order-1 glass p-6 rounded-2xl border border-entrepreneur/30">
+          <img
+            src="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=600&q=80"
+            alt="Emprendedor"
+            width="600"
+            height="256"
+            loading="lazy"
+            decoding="async"
+            class="w-full h-64 object-cover rounded-xl mb-6"
+          />
+          <div class="flex items-center gap-4 mb-4">
+            <div class="flex-1">
+              <h4 class="font-bold text-white">Cafe Origen</h4>
+              <p class="text-sm text-dracula-comment-accessible">Manizales, Caldas</p>
+            </div>
+            <span
+              class="bg-entrepreneur/20 text-entrepreneur px-3 py-1 rounded-full text-sm font-medium"
+              >Alimentos</span
+            >
           </div>
+          <p class="text-dracula-fg/80 italic border-l-4 border-entrepreneur pl-4">
+            "Vender en Comoon nos diferencia. Nuestros clientes saben que cada cafe apoya una causa
+            real."
+          </p>
+        </div>
+        <div class="order-1 md:order-2">
+          <span class="text-entrepreneur text-sm font-bold uppercase tracking-widest mb-4 block"
+            >Vendedores con Proposito</span
+          >
+          <h2 id="emprendedores-heading" class="text-4xl md:text-5xl font-bold text-white mb-6">
+            ¿Quienes son los <span class="text-entrepreneur">Emprendedores</span>?
+          </h2>
+          <p class="text-xl text-dracula-fg/70 mb-8">
+            Son creadores, artesanos, productores que quieren que sus ventas generen impacto social.
+            Vinculan sus productos a causas reales y transparentes.
+          </p>
+
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-3 text-dracula-fg/80">
+              <CheckCircle size={20} className="text-entrepreneur" weight="fill" />
+              Crea tu tienda digital en minutos
+            </li>
+            <li class="flex items-center gap-3 text-dracula-fg/80">
+              <CheckCircle size={20} className="text-entrepreneur" weight="fill" />
+              Vincula cada producto a una causa
+            </li>
+            <li class="flex items-center gap-3 text-dracula-fg/80">
+              <CheckCircle size={20} className="text-entrepreneur" weight="fill" />
+              Define tu aporte (% o monto fijo)
+            </li>
+            <li class="flex items-center gap-3 text-dracula-fg/80">
+              <CheckCircle size={20} className="text-entrepreneur" weight="fill" />
+              Fideliza clientes con proposito
+            </li>
+          </ul>
+
+          <a
+            href="/register"
+            class="inline-flex items-center gap-2 px-8 py-4 bg-entrepreneur text-dracula-bg font-bold text-lg rounded-xl hover:brightness-110 transition-all"
+          >
+            <Storefront size={24} />
+            Soy Emprendedor, quiero vender
+          </a>
+        </div>
       </div>
+    </div>
   </section>
 
-  <!-- Quienes son los Conautas -->
-  <section id="conautas" class="py-24 px-4">
-      <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-16">
-              <span class="text-conauta text-sm font-bold uppercase tracking-widest mb-4 block">Navegantes del Cambio</span>
-              <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Quienes son los <span class="text-conauta">Conautas</span>?</h2>
-              <p class="text-xl text-dracula-fg/70 max-w-3xl mx-auto">
-                  El nombre viene de <span class="text-white font-medium">"co"</span> (Comoon) + <span class="text-white font-medium">"nauta"</span> (navegante).
-                  Son personas que quieren generar impacto sin ser lideres ni emprendedores.
-              </p>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-8 mb-12">
-              <div class="glass p-8 rounded-2xl text-center border border-conauta/20 hover:border-conauta/50 transition-colors">
-                  <div class="bg-conauta/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Share size={40} className="text-conauta" />
-                  </div>
-                  <h3 class="text-xl font-bold text-white mb-4">Comparte</h3>
-                  <p class="text-dracula-fg/70">
-                      Difunde causas y productos en tus redes sociales.
-                      Cada compartida amplifica el alcance del impacto.
-                  </p>
-              </div>
-
-              <div class="glass p-8 rounded-2xl text-center border border-conauta/20 hover:border-conauta/50 transition-colors">
-                  <div class="bg-conauta/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <ShoppingBag size={40} className="text-conauta" />
-                  </div>
-                  <h3 class="text-xl font-bold text-white mb-4">Compra</h3>
-                  <p class="text-dracula-fg/70">
-                      Cada producto que compras genera una donacion.
-                      Consumo consciente con impacto real.
-                  </p>
-              </div>
-
-              <div class="glass p-8 rounded-2xl text-center border border-conauta/20 hover:border-conauta/50 transition-colors">
-                  <div class="bg-conauta/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Rocket size={40} className="text-conauta" />
-                  </div>
-                  <h3 class="text-xl font-bold text-white mb-4">Conecta</h3>
-                  <p class="text-dracula-fg/70">
-                      Recomienda lideres y emprendedores.
-                      Se el puente entre quienes necesitan y quienes pueden ayudar.
-                  </p>
-              </div>
-          </div>
-
-          <div class="text-center">
-              <a href="/register" class="inline-flex items-center gap-2 px-8 py-4 bg-conauta text-dracula-bg font-bold text-lg rounded-xl hover:brightness-110 transition-all">
-                  <Compass size={24} />
-                  Quiero ser Conauta
-              </a>
-          </div>
+  <!-- Se Parte del Cambio (Comunidad) -->
+  <section id="comunidad" aria-labelledby="comunidad-heading" class="py-24 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="text-community text-sm font-bold uppercase tracking-widest mb-4 block"
+          >Se Parte del Cambio</span
+        >
+        <h2 id="comunidad-heading" class="text-4xl md:text-5xl font-bold text-white mb-6">
+          Todos Podemos <span class="text-community">Generar Impacto</span>
+        </h2>
+        <p class="text-xl text-dracula-fg/70 max-w-3xl mx-auto">
+          No necesitas ser lider ni emprendedor para transformar el mundo. Cada accion cuenta:
+          comparte, compra y conecta.
+        </p>
       </div>
+
+      <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div
+          class="glass p-8 rounded-2xl text-center border border-community/20 hover:border-community/50 transition-colors"
+        >
+          <div
+            class="bg-community/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <Share size={40} className="text-community" />
+          </div>
+          <h3 class="text-xl font-bold text-white mb-4">Comparte</h3>
+          <p class="text-dracula-fg/70">
+            Difunde causas y productos en tus redes sociales. Cada compartida amplifica el alcance
+            del impacto.
+          </p>
+        </div>
+
+        <div
+          class="glass p-8 rounded-2xl text-center border border-community/20 hover:border-community/50 transition-colors"
+        >
+          <div
+            class="bg-community/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <ShoppingBag size={40} className="text-community" />
+          </div>
+          <h3 class="text-xl font-bold text-white mb-4">Compra</h3>
+          <p class="text-dracula-fg/70">
+            Cada producto que compras genera una donacion. Consumo consciente con impacto real.
+          </p>
+        </div>
+
+        <div
+          class="glass p-8 rounded-2xl text-center border border-community/20 hover:border-community/50 transition-colors"
+        >
+          <div
+            class="bg-community/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <Rocket size={40} className="text-community" />
+          </div>
+          <h3 class="text-xl font-bold text-white mb-4">Conecta</h3>
+          <p class="text-dracula-fg/70">
+            Recomienda lideres y emprendedores. Se el puente entre quienes necesitan y quienes
+            pueden ayudar.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          href="/store"
+          class="inline-flex items-center gap-2 px-8 py-4 bg-community text-dracula-bg font-bold text-lg rounded-xl hover:brightness-110 transition-all"
+        >
+          <ShoppingBag size={24} />
+          Explorar Tienda
+        </a>
+        <a
+          href="/leaders"
+          class="inline-flex items-center gap-2 px-8 py-4 border-2 border-community text-community font-bold text-lg rounded-xl hover:bg-community/10 transition-colors"
+        >
+          <UsersThree size={24} />
+          Conocer Causas
+        </a>
+      </div>
+    </div>
   </section>
 
   <!-- Testimonios / Numeros -->
-  <section class="py-24 px-4 bg-dracula-current/10">
-      <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-16">
-              <span class="text-dracula-green text-sm font-bold uppercase tracking-widest mb-4 block">Impacto Real</span>
-              <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Numeros que Inspiran</h2>
-          </div>
-
-          <div class="grid md:grid-cols-4 gap-8 mb-16">
-              <div class="glass p-6 rounded-xl text-center">
-                  <p class="text-5xl font-bold text-leader mb-2">500+</p>
-                  <p class="text-dracula-comment">Lideres registrados</p>
-              </div>
-              <div class="glass p-6 rounded-xl text-center">
-                  <p class="text-5xl font-bold text-entrepreneur mb-2">200+</p>
-                  <p class="text-dracula-comment">Emprendedores activos</p>
-              </div>
-              <div class="glass p-6 rounded-xl text-center">
-                  <p class="text-5xl font-bold text-conauta mb-2">5,000+</p>
-                  <p class="text-dracula-comment">Conautas</p>
-              </div>
-              <div class="glass p-6 rounded-xl text-center">
-                  <p class="text-5xl font-bold text-dracula-green mb-2">$120M</p>
-                  <p class="text-dracula-comment">Recaudados</p>
-              </div>
-          </div>
-
-          <!-- Testimonios -->
-          <div class="grid md:grid-cols-2 gap-8">
-              <div class="glass p-8 rounded-2xl">
-                  <Quotes size={32} className="text-leader mb-4" />
-                  <p class="text-lg text-dracula-fg/90 mb-6 italic">
-                      "Antes tenia que ir de puerta en puerta pidiendo donaciones. Ahora, los recursos llegan mientras duermo. Comoon cambio todo."
-                  </p>
-                  <div class="flex items-center gap-4">
-                      <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=80&q=80" alt="Maria" class="w-12 h-12 rounded-full object-cover" />
-                      <div>
-                          <p class="font-bold text-white">Maria Gonzalez</p>
-                          <p class="text-sm text-leader">Lider - Quibdo</p>
-                      </div>
-                  </div>
-              </div>
-
-              <div class="glass p-8 rounded-2xl">
-                  <Quotes size={32} className="text-entrepreneur mb-4" />
-                  <p class="text-lg text-dracula-fg/90 mb-6 italic">
-                      "Mis clientes ya no solo compran cafe. Compran la historia de Carlos y su escuela de musica. Las ventas subieron 40%."
-                  </p>
-                  <div class="flex items-center gap-4">
-                      <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80" alt="Pedro" class="w-12 h-12 rounded-full object-cover" />
-                      <div>
-                          <p class="font-bold text-white">Pedro Ramirez</p>
-                          <p class="text-sm text-entrepreneur">Emprendedor - Cafe Origen</p>
-                      </div>
-                  </div>
-              </div>
-          </div>
+  <section aria-labelledby="impacto-heading" class="py-24 px-4 bg-dracula-current/10">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="text-dracula-green text-sm font-bold uppercase tracking-widest mb-4 block"
+          >Impacto Real</span
+        >
+        <h2 id="impacto-heading" class="text-4xl md:text-5xl font-bold text-white mb-6">
+          Numeros que Inspiran
+        </h2>
       </div>
+
+      <div class="grid md:grid-cols-4 gap-8 mb-16">
+        <div class="glass p-6 rounded-xl text-center">
+          <p class="text-5xl font-bold text-leader mb-2">{stats.leaders || '0'}</p>
+          <p class="text-dracula-comment-accessible">Lideres registrados</p>
+        </div>
+        <div class="glass p-6 rounded-xl text-center">
+          <p class="text-5xl font-bold text-entrepreneur mb-2">{stats.entrepreneurs || '0'}</p>
+          <p class="text-dracula-comment-accessible">Emprendedores activos</p>
+        </div>
+        <div class="glass p-6 rounded-xl text-center">
+          <p class="text-5xl font-bold text-community mb-2">{stats.products || '0'}</p>
+          <p class="text-dracula-comment-accessible">Productos</p>
+        </div>
+        <div class="glass p-6 rounded-xl text-center">
+          <p class="text-5xl font-bold text-dracula-green mb-2">{formatCompact(stats.raised)}</p>
+          <p class="text-dracula-comment-accessible">Recaudados</p>
+        </div>
+      </div>
+
+      <!-- Testimonios -->
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="glass p-8 rounded-2xl">
+          <Quotes size={32} className="text-leader mb-4" />
+          <p class="text-lg text-dracula-fg/90 mb-6 italic">
+            "Antes tenia que ir de puerta en puerta pidiendo donaciones. Ahora, los recursos llegan
+            mientras duermo. Comoon cambio todo."
+          </p>
+          <div class="flex items-center gap-4">
+            <img
+              src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=80&q=80"
+              alt="Maria"
+              width="48"
+              height="48"
+              loading="lazy"
+              decoding="async"
+              class="w-12 h-12 rounded-full object-cover"
+            />
+            <div>
+              <p class="font-bold text-white">Maria Gonzalez</p>
+              <p class="text-sm text-leader">Lider - Quibdo</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass p-8 rounded-2xl">
+          <Quotes size={32} className="text-entrepreneur mb-4" />
+          <p class="text-lg text-dracula-fg/90 mb-6 italic">
+            "Mis clientes ya no solo compran cafe. Compran la historia de Carlos y su escuela de
+            musica. Las ventas subieron 40%."
+          </p>
+          <div class="flex items-center gap-4">
+            <img
+              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80"
+              alt="Pedro"
+              width="48"
+              height="48"
+              loading="lazy"
+              decoding="async"
+              class="w-12 h-12 rounded-full object-cover"
+            />
+            <div>
+              <p class="font-bold text-white">Pedro Ramirez</p>
+              <p class="text-sm text-entrepreneur">Emprendedor - Cafe Origen</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- CTA Final - 3 Cards de Registro -->
-  <section class="py-24 px-4 relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-t from-comoon-purple/10 to-transparent pointer-events-none"></div>
+  <!-- CTA Final - 2 Cards de Registro -->
+  <section aria-labelledby="cta-heading" class="py-24 px-4 relative overflow-hidden">
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-comoon-purple/10 to-transparent pointer-events-none"
+    >
+    </div>
 
-      <div class="max-w-6xl mx-auto relative">
-          <div class="text-center mb-16">
-              <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
-                  Unete a la revolucion de la <br/>
-                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-leader via-entrepreneur to-conauta">Economia Solidaria</span>
-              </h2>
-              <p class="text-xl text-dracula-fg/70 max-w-2xl mx-auto">
-                  Elige tu rol y empieza a generar impacto hoy.
-              </p>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-8">
-              <!-- Lider Card -->
-              <div class="glass p-8 rounded-2xl border-t-4 border-leader hover:shadow-[0_0_30px_rgba(45,212,191,0.2)] transition-all">
-                  <div class="bg-leader/20 w-16 h-16 rounded-full flex items-center justify-center mb-6 text-leader">
-                      <UsersThree size={32} weight="fill" />
-                  </div>
-                  <h3 class="text-2xl font-bold text-white mb-4">Soy Lider</h3>
-                  <p class="text-dracula-fg/80 mb-6">
-                      Tengo una causa y quiero recibir apoyo de emprendedores que venden con proposito.
-                  </p>
-                  <a href="/register" class="w-full block text-center bg-leader text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all">
-                      Registrarme como Lider
-                  </a>
-              </div>
-
-              <!-- Emprendedor Card -->
-              <div class="glass p-8 rounded-2xl border-t-4 border-entrepreneur hover:shadow-[0_0_30px_rgba(34,197,94,0.2)] transition-all">
-                  <div class="bg-entrepreneur/20 w-16 h-16 rounded-full flex items-center justify-center mb-6 text-entrepreneur">
-                      <Storefront size={32} weight="fill" />
-                  </div>
-                  <h3 class="text-2xl font-bold text-white mb-4">Soy Emprendedor</h3>
-                  <p class="text-dracula-fg/80 mb-6">
-                      Tengo productos y quiero que mis ventas generen impacto social real y medible.
-                  </p>
-                  <a href="/register" class="w-full block text-center bg-entrepreneur text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all">
-                      Registrarme como Emprendedor
-                  </a>
-              </div>
-
-              <!-- Conauta Card -->
-              <div class="glass p-8 rounded-2xl border-t-4 border-conauta hover:shadow-[0_0_30px_rgba(245,158,11,0.2)] transition-all">
-                  <div class="bg-conauta/20 w-16 h-16 rounded-full flex items-center justify-center mb-6 text-conauta">
-                      <Compass size={32} weight="fill" />
-                  </div>
-                  <h3 class="text-2xl font-bold text-white mb-4">Soy Conauta</h3>
-                  <p class="text-dracula-fg/80 mb-6">
-                      Quiero apoyar comprando, compartiendo y conectando a quienes generan cambio.
-                  </p>
-                  <a href="/register" class="w-full block text-center bg-conauta text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all">
-                      Registrarme como Conauta
-                  </a>
-              </div>
-          </div>
+    <div class="max-w-4xl mx-auto relative">
+      <div class="text-center mb-16">
+        <h2 id="cta-heading" class="text-4xl md:text-5xl font-bold text-white mb-6">
+          Unete a la revolucion de la <br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-leader to-entrepreneur"
+            >Economia Solidaria</span
+          >
+        </h2>
+        <p class="text-xl text-dracula-fg/70 max-w-2xl mx-auto">
+          Elige tu rol y empieza a generar impacto hoy.
+        </p>
       </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Lider Card -->
+        <div
+          class="glass p-8 rounded-2xl border-t-4 border-leader hover:shadow-[0_0_30px_rgba(45,212,191,0.2)] transition-all"
+        >
+          <div
+            class="bg-leader/20 w-16 h-16 rounded-full flex items-center justify-center mb-6 text-leader"
+          >
+            <UsersThree size={32} weight="fill" />
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-4">Soy Lider</h3>
+          <p class="text-dracula-fg/80 mb-6">
+            Tengo una causa y quiero recibir apoyo de emprendedores que venden con proposito.
+          </p>
+          <a
+            href="/register"
+            class="w-full block text-center bg-leader text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all"
+          >
+            Registrarme como Lider
+          </a>
+        </div>
+
+        <!-- Emprendedor Card -->
+        <div
+          class="glass p-8 rounded-2xl border-t-4 border-entrepreneur hover:shadow-[0_0_30px_rgba(34,197,94,0.2)] transition-all"
+        >
+          <div
+            class="bg-entrepreneur/20 w-16 h-16 rounded-full flex items-center justify-center mb-6 text-entrepreneur"
+          >
+            <Storefront size={32} weight="fill" />
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-4">Soy Emprendedor</h3>
+          <p class="text-dracula-fg/80 mb-6">
+            Tengo productos y quiero que mis ventas generen impacto social real y medible.
+          </p>
+          <a
+            href="/register"
+            class="w-full block text-center bg-entrepreneur text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all"
+          >
+            Registrarme como Emprendedor
+          </a>
+        </div>
+      </div>
+    </div>
   </section>
 </Layout>
+
+<style>
+  @keyframes comoon-glow {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 10px rgba(153, 134, 191, 0.3));
+      transform: translateY(0);
+    }
+    50% {
+      filter: drop-shadow(0 0 25px rgba(153, 134, 191, 0.6));
+      transform: translateY(-5px);
+    }
+  }
+
+  @keyframes moon-shimmer {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+      text-shadow: 0 0 20px rgba(153, 134, 191, 0.8);
+    }
+  }
+
+  .animate-comoon-logo {
+    animation: comoon-glow 3s ease-in-out infinite;
+  }
+
+  .animate-moon-text {
+    animation: moon-shimmer 2s ease-in-out infinite;
+  }
+</style>

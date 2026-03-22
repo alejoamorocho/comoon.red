@@ -4,43 +4,53 @@ import LeaderCard from '../../components/LeaderCard.astro';
 import ProfileCompleteBadge from '../../components/ProfileCompleteBadge';
 import { isLeaderProfileComplete } from '../../utils/profileCompletion';
 
-// Dummy Data with profile completeness info
-const leadersData = [
-  {
-    id: "1",
-    name: "Maria Gonzalez",
-    bio: "Luchadora incansable por los derechos del agua en el Choco. Lleva 10 anos organizando a su comunidad para garantizar acceso al agua potable.",
-    location: "Quibdo, Choco",
-    cause: "Agua Potable para Todos",
-    photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=400&q=80",
-    tags: ["ambiental", "comunidad", "salud"],
-    activeCausesCount: 1
-  },
-  {
-    id: "2",
-    name: "Carlos Rodriguez",
-    bio: "Educador popular que busca construir la primera biblioteca comunitaria en su barrio para ninos y jovenes.",
-    location: "Aguablanca, Cali",
-    cause: "Biblioteca Popular El Saber",
-    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-    tags: ["educacion", "cultura", "comunidad"],
-    activeCausesCount: 1
-  },
-  {
-    id: "3",
-    name: "Ana Perea",
-    bio: "Defensora de la soberania alimentaria.",
-    location: "Ciudad Bolivar, Bogota",
-    cause: "Huertas por la Paz",
-    photoUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80",
-    tags: [],
-    activeCausesCount: 0
+// Fetch leaders from database
+const db = Astro.locals.runtime?.env?.DB;
+
+let leadersData: Array<{
+  id: string;
+  name: string;
+  bio: string;
+  location: string;
+  cause: string;
+  photoUrl: string;
+  tags: string[];
+  activeCausesCount: number;
+}> = [];
+
+if (db) {
+  try {
+    const { results } = await db
+      .prepare(
+        `
+      SELECT l.*,
+        (SELECT title FROM causes WHERE leader_id = l.id AND status = 'active' LIMIT 1) as active_cause_title,
+        (SELECT COUNT(*) FROM causes WHERE leader_id = l.id AND status = 'active') as active_causes_count
+      FROM leaders l
+      ORDER BY l.is_verified DESC, l.created_at DESC
+    `,
+      )
+      .all();
+
+    leadersData = (results || []).map((l: any) => ({
+      id: String(l.id),
+      name: l.name,
+      bio: l.bio,
+      location: [l.city, l.department].filter(Boolean).join(', ') || l.location || '',
+      cause: l.active_cause_title || '',
+      photoUrl: l.photo_url || '',
+      tags: JSON.parse(l.tags || '[]'),
+      activeCausesCount: l.active_causes_count || 0,
+    }));
+  } catch (e) {
+    console.error('Failed to fetch leaders:', e);
+    leadersData = [];
   }
-];
+}
 
 // Sort by profile completeness (complete profiles first)
 const leaders = leadersData
-  .map(leader => ({
+  .map((leader) => ({
     ...leader,
     isComplete: isLeaderProfileComplete({
       name: leader.name,
@@ -48,8 +58,8 @@ const leaders = leadersData
       photo_url: leader.photoUrl,
       location: leader.location,
       tags: leader.tags,
-      activeCausesCount: leader.activeCausesCount
-    })
+      activeCausesCount: leader.activeCausesCount,
+    }),
   }))
   .sort((a, b) => (b.isComplete ? 1 : 0) - (a.isComplete ? 1 : 0));
 ---
@@ -59,21 +69,24 @@ const leaders = leadersData
     <div class="text-center mb-16">
       <h1 class="text-4xl font-bold mb-4 text-leader">Nuestros Lideres</h1>
       <p class="text-lg text-dracula-fg/70 max-w-2xl mx-auto">
-        Rostros reales de transformación. Cada uno de ellos lidera una causa verificada que necesita tu apoyo.
+        Rostros reales de transformación. Cada uno de ellos lidera una causa verificada que necesita
+        tu apoyo.
       </p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {leaders.map(leader => (
-        <div class="relative">
-          {leader.isComplete && (
-            <div class="absolute top-2 right-2 z-10">
-              <ProfileCompleteBadge client:visible isComplete={true} size="sm" />
-            </div>
-          )}
-          <LeaderCard {...leader} />
-        </div>
-      ))}
+      {
+        leaders.map((leader) => (
+          <div class="relative">
+            {leader.isComplete && (
+              <div class="absolute top-2 right-2 z-10">
+                <ProfileCompleteBadge client:visible isComplete={true} size="sm" />
+              </div>
+            )}
+            <LeaderCard {...leader} />
+          </div>
+        ))
+      }
     </div>
   </div>
 </Layout>

@@ -1,0 +1,58 @@
+---
+interface Props {
+  percentage: number;
+  missingFields: string[];
+  accentColor?: string;
+}
+
+const { percentage, missingFields, accentColor = 'leader' } = Astro.props;
+const isComplete = percentage === 100;
+---
+
+<div class="glass p-5 rounded-xl">
+  <div class="flex justify-between items-center mb-3">
+    <h3 class="text-sm font-bold text-white">
+      {isComplete ? 'Perfil Completo' : 'Completar Perfil'}
+    </h3>
+    <span
+      class={`text-sm font-bold ${isComplete ? 'text-dracula-yellow' : 'text-dracula-comment'}`}
+    >
+      {percentage}%
+    </span>
+  </div>
+
+  <div
+    class="w-full bg-dracula-current h-2 rounded-full overflow-hidden mb-3"
+    role="progressbar"
+    aria-valuenow={percentage}
+    aria-valuemin={0}
+    aria-valuemax={100}
+    aria-label="Progreso del perfil"
+  >
+    <div
+      class={`h-full rounded-full transition-all duration-500 ${
+        isComplete
+          ? 'bg-gradient-to-r from-dracula-yellow to-dracula-orange'
+          : `bg-gradient-to-r from-${accentColor} to-dracula-purple`
+      }`}
+      style={`width: ${percentage}%`}
+    >
+    </div>
+  </div>
+
+  {
+    !isComplete && missingFields.length > 0 && (
+      <div>
+        <p class="text-xs text-dracula-comment mb-2">Falta completar:</p>
+        <ul class="space-y-1">
+          {missingFields.map((field) => (
+            <li class="text-xs text-dracula-fg/70 flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-dracula-comment shrink-0" />
+              {field}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+</div>

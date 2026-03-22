@@ -1,0 +1,45 @@
+---
+interface Tab {
+  id: string;
+  label: string;
+  icon?: string;
+}
+
+interface Props {
+  tabs: Tab[];
+  activeTab: string;
+  baseUrl: string;
+  accentColor?: string;
+}
+
+const { tabs, activeTab, baseUrl, accentColor = 'leader' } = Astro.props;
+---
+
+<nav
+  class="flex gap-1 overflow-x-auto pb-1 mb-8 border-b border-dracula-current/50"
+  aria-label="Dashboard tabs"
+>
+  {
+    tabs.map((tab) => {
+      const isActive = tab.id === activeTab;
+      const href = `${baseUrl}?tab=${tab.id}`;
+      return (
+        <a
+          href={href}
+          class:list={[
+            'px-4 py-3 rounded-t-lg font-medium text-sm whitespace-nowrap transition-all relative',
+            isActive
+              ? `text-white bg-${accentColor}/10`
+              : 'text-dracula-comment hover:text-white hover:bg-dracula-current/30',
+          ]}
+          aria-current={isActive ? 'page' : undefined}
+        >
+          {tab.label}
+          {isActive && (
+            <span class={`absolute bottom-0 left-0 right-0 h-0.5 bg-${accentColor} rounded-full`} />
+          )}
+        </a>
+      );
+    })
+  }
+</nav>

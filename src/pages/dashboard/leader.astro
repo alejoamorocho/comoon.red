@@ -1,298 +1,804 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { TagSelector, LeaderTagsList } from '../../components/LeaderTagBadge';
-import { PlusCircle, Image, Trophy, Users, CurrencyDollar, SignOut, Eye, PencilSimple, ChartLineUp, Tag } from '@phosphor-icons/react';
+import DashboardTabs from '../../components/dashboard/DashboardTabs.astro';
+import StatCard from '../../components/dashboard/StatCard.astro';
+import QuickActions from '../../components/dashboard/QuickActions.astro';
+import ProfileCompletionCard from '../../components/dashboard/ProfileCompletionCard.astro';
+import CreateCauseForm from '../../components/dashboard/CreateCauseForm';
+import CreateProductForm from '../../components/dashboard/CreateProductForm';
+import EditLeaderProfileForm from '../../components/dashboard/EditLeaderProfileForm';
+import { LeaderTagsList } from '../../components/LeaderTagBadge';
+import {
+  PlusCircle,
+  Trophy,
+  Users,
+  CurrencyDollar,
+  Eye,
+  PencilSimple,
+  ChartLineUp,
+  Newspaper,
+  Heart,
+  CheckCircle,
+  ShoppingBag,
+} from '@phosphor-icons/react';
+import { formatCOP as formatCurrency } from '../../utils/format';
+import {
+  getLeaderCompletionPercentage,
+  getLeaderMissingFields,
+} from '../../utils/profileCompletion';
 
-// Mock data - In real app, fetch from API based on logged-in user
-const leaderProfile = {
-    id: 1,
-    name: "Elena Marin",
-    location: "Buenaventura, Valle del Cauca",
-    photo: "https://images.unsplash.com/photo-1531123414780-f74242c2b052?q=80&w=400&auto=format&fit=crop",
-    isVerified: true,
-    tags: ["alimentacion", "social", "comunidad"]
+// Read tab from query params
+const url = new URL(Astro.request.url);
+const activeTab = url.searchParams.get('tab') || 'overview';
+
+const tabs = [
+  { id: 'overview', label: 'Resumen' },
+  { id: 'causas', label: 'Mis Causas' },
+  { id: 'productos', label: 'Mi Tienda' },
+  { id: 'crear', label: 'Crear Causa' },
+  { id: 'updates', label: 'Actualizaciones' },
+  { id: 'perfil', label: 'Mi Perfil' },
+];
+
+// Fetch real data from DB
+const user = Astro.locals.user;
+const db = Astro.locals.runtime?.env?.DB;
+
+let leaderProfile: Record<string, any> = {
+  id: 0,
+  name: '',
+  location: '',
+  photo: '',
+  bio: '',
+  isVerified: false,
+  tags: [],
 };
-
-const stats = {
-    totalRaised: 1250000,
-    totalGoal: 5000000,
-    entrepreneursAllied: 3,
-    activeCauses: 1,
-    totalProducts: 4
+let myCauses: Array<Record<string, any>> = [];
+let alliedEntrepreneurs: Array<Record<string, any>> = [];
+let leaderProducts: Array<Record<string, any>> = [];
+let stats = {
+  totalRaised: 0,
+  totalGoal: 0,
+  entrepreneursAllied: 0,
+  activeCauses: 0,
+  totalProducts: 0,
 };
+let recentUpdates: Array<Record<string, any>> = [];
 
-const myCauses = [
-    {
-        id: 1,
-        title: "Comedor Comunitario La Esperanza",
-        description: "Brindamos almuerzos diarios a 50 ninos del barrio Lleras.",
-        raised: 1250000,
-        goal: 5000000,
-        status: "active",
-        productsLinked: 2,
-        createdAt: "2024-01-15"
+if (db && user?.profileId) {
+  // Fetch leader profile
+  const leader = await db
+    .prepare('SELECT * FROM leaders WHERE id = ?')
+    .bind(user.profileId)
+    .first();
+  if (leader) {
+    const parsedTags = leader.tags ? JSON.parse(leader.tags as string) : [];
+    leaderProfile = {
+      id: leader.id,
+      name: leader.name || '',
+      location:
+        leader.city && leader.department
+          ? `${leader.city}, ${leader.department}`
+          : leader.location || '',
+      photo: leader.photo_url || '',
+      bio: leader.bio || '',
+      isVerified: Boolean(leader.is_verified),
+      tags: parsedTags,
+      department: leader.department || '',
+      city: leader.city || '',
+      contact_info: leader.contact_info || '{}',
+      photo_url: leader.photo_url || '',
+      tags_raw: leader.tags || '[]',
+    };
+
+    // Fetch causes
+    const { results: causesData } = await db
+      .prepare('SELECT * FROM causes WHERE leader_id = ? ORDER BY created_at DESC')
+      .bind(user.profileId)
+      .all();
+    myCauses = (causesData || []).map((c: any) => ({
+      id: c.id,
+      title: c.title,
+      description: c.description,
+      raised: c.current_amount || 0,
+      goal: c.target_goal || 0,
+      status: c.status,
+      productsLinked: 0,
+      createdAt: c.created_at,
+    }));
+
+    // Count products linked to each cause
+    for (const cause of myCauses) {
+      const countResult = await db
+        .prepare('SELECT COUNT(*) as count FROM products WHERE cause_id = ? AND is_active = 1')
+        .bind(cause.id)
+        .first<{ count: number }>();
+      cause.productsLinked = countResult?.count || 0;
     }
-];
 
-const alliedEntrepreneurs = [
-    { id: 1, name: "Artesanias del Valle", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop", products: 2 },
-    { id: 2, name: "Cafe Origen", photo: "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?q=80&w=100&auto=format&fit=crop", products: 1 },
-];
+    // Calculate stats
+    const activeCauses = myCauses.filter((c) => c.status === 'active');
+    stats.activeCauses = activeCauses.length;
+    stats.totalRaised = myCauses.reduce((sum, c) => sum + c.raised, 0);
+    stats.totalGoal = myCauses.reduce((sum, c) => sum + c.goal, 0);
+    stats.totalProducts = myCauses.reduce((sum, c) => sum + c.productsLinked, 0);
 
-function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount);
+    // Get allied entrepreneurs
+    const { results: entrepreneurs } = await db
+      .prepare(
+        `
+            SELECT DISTINCT e.id, e.store_name, e.photo_url, COUNT(p.id) as product_count
+            FROM entrepreneurs e
+            JOIN products p ON e.id = p.entrepreneur_id
+            JOIN causes c ON p.cause_id = c.id
+            WHERE c.leader_id = ?
+            GROUP BY e.id
+        `,
+      )
+      .bind(user.profileId)
+      .all();
+    alliedEntrepreneurs = (entrepreneurs || []).map((e: any) => ({
+      id: e.id,
+      name: e.store_name,
+      photo: e.photo_url,
+      products: e.product_count,
+    }));
+    stats.entrepreneursAllied = alliedEntrepreneurs.length;
+
+    // Get leader's products (own + allied)
+    const { results: leaderProductRows } = await db
+      .prepare(
+        `
+            SELECT p.*,
+                CASE WHEN p.leader_id IS NOT NULL THEN pl.name ELSE e.store_name END as seller_name,
+                c.title as cause_title
+            FROM products p
+            LEFT JOIN entrepreneurs e ON p.entrepreneur_id = e.id
+            LEFT JOIN leaders pl ON p.leader_id = pl.id
+            JOIN causes c ON p.cause_id = c.id
+            WHERE (p.leader_id = ? OR c.leader_id = ?) AND p.is_active = 1
+            ORDER BY p.created_at DESC
+        `,
+      )
+      .bind(user.profileId, user.profileId)
+      .all();
+    leaderProducts = (leaderProductRows || []).map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      sellerName: p.seller_name,
+      causeName: p.cause_title,
+      isOwn: p.leader_id === user!.profileId,
+      photoUrl: p.photo_url,
+      createdAt: p.created_at,
+    }));
+
+    // Get recent cause updates
+    const { results: updates } = await db
+      .prepare(
+        `
+            SELECT cu.* FROM cause_updates cu
+            JOIN causes c ON cu.cause_id = c.id
+            WHERE c.leader_id = ?
+            ORDER BY cu.created_at DESC LIMIT 5
+        `,
+      )
+      .bind(user.profileId)
+      .all();
+    recentUpdates = (updates || []).map((u: any) => ({
+      id: u.id,
+      title: u.title,
+      cause: '',
+      type: u.update_type,
+      date: u.created_at,
+    }));
+  }
 }
+
+const profileCompletion = getLeaderCompletionPercentage({
+  name: leaderProfile.name,
+  bio: leaderProfile.bio,
+  photo_url: leaderProfile.photo,
+  location: leaderProfile.location,
+  tags: leaderProfile.tags,
+  activeCausesCount: stats.activeCauses,
+});
+
+const missingFields = getLeaderMissingFields({
+  name: leaderProfile.name,
+  bio: leaderProfile.bio,
+  photo_url: leaderProfile.photo,
+  location: leaderProfile.location,
+  tags: leaderProfile.tags,
+  activeCausesCount: stats.activeCauses,
+});
 ---
 
 <Layout title="Dashboard Lider">
-    <div class="max-w-6xl mx-auto py-8 px-4">
-        <!-- Header with Profile -->
-        <div class="glass p-6 rounded-xl mb-8 flex flex-col md:flex-row items-center gap-6">
-            <img src={leaderProfile.photo} alt={leaderProfile.name} class="w-24 h-24 rounded-full object-cover border-4 border-leader" />
-            <div class="flex-1 text-center md:text-left">
-                <div class="flex items-center gap-2 justify-center md:justify-start">
-                    <h1 class="text-2xl font-bold text-white">{leaderProfile.name}</h1>
-                    {leaderProfile.isVerified && (
-                        <span class="bg-dracula-green/20 text-dracula-green text-xs px-2 py-1 rounded-full font-bold">Verificado</span>
-                    )}
-                </div>
-                <p class="text-dracula-comment">{leaderProfile.location}</p>
-                <p class="text-leader font-medium mt-1">Lider</p>
-                {leaderProfile.tags && leaderProfile.tags.length > 0 && (
-                    <div class="mt-2">
-                        <LeaderTagsList client:visible tags={leaderProfile.tags} size="sm" maxVisible={4} />
-                    </div>
-                )}
-            </div>
-            <div class="flex gap-2">
-                <a href={`/leaders/${leaderProfile.id}`} class="px-4 py-2 bg-dracula-current text-white rounded-lg hover:bg-dracula-comment transition-colors flex items-center gap-2 text-sm">
-                    <Eye size={18} />
-                    Ver Perfil Publico
-                </a>
-                <button
-                    onclick="localStorage.removeItem('user'); window.location.href = '/login';"
-                    class="px-4 py-2 bg-dracula-red/20 text-dracula-red rounded-lg hover:bg-dracula-red/30 transition-colors flex items-center gap-2 text-sm"
-                >
-                    <SignOut size={18} />
-                    Salir
-                </button>
-            </div>
+  <div class="max-w-6xl mx-auto py-8 px-4">
+    <!-- Header with Profile -->
+    <div class="glass p-6 rounded-xl mb-6 flex flex-col md:flex-row items-center gap-6">
+      {
+        leaderProfile.photo ? (
+          <img
+            src={leaderProfile.photo}
+            alt={leaderProfile.name}
+            class="w-20 h-20 rounded-full object-cover border-4 border-leader"
+          />
+        ) : (
+          <div class="w-20 h-20 rounded-full bg-leader/20 flex items-center justify-center border-4 border-leader">
+            <span class="text-2xl font-bold text-leader">
+              {leaderProfile.name?.charAt(0) || 'L'}
+            </span>
+          </div>
+        )
+      }
+      <div class="flex-1 text-center md:text-left">
+        <div class="flex items-center gap-2 justify-center md:justify-start">
+          <h1 class="text-2xl font-bold text-white">{leaderProfile.name || 'Mi Perfil'}</h1>
+          {
+            leaderProfile.isVerified && (
+              <span class="bg-dracula-green/20 text-dracula-green text-xs px-2 py-1 rounded-full font-bold">
+                Verificado
+              </span>
+            )
+          }
         </div>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="glass p-4 rounded-xl text-center">
-                <CurrencyDollar size={32} className="mx-auto mb-2 text-dracula-green" />
-                <p class="text-2xl font-bold text-white">{formatCurrency(stats.totalRaised)}</p>
-                <p class="text-xs text-dracula-comment">Total Recaudado</p>
+        <p class="text-dracula-comment text-sm">{leaderProfile.location}</p>
+        {
+          leaderProfile.tags && leaderProfile.tags.length > 0 && (
+            <div class="mt-2">
+              <LeaderTagsList client:visible tags={leaderProfile.tags} size="sm" maxVisible={4} />
             </div>
-            <div class="glass p-4 rounded-xl text-center">
-                <Trophy size={32} className="mx-auto mb-2 text-dracula-yellow" />
-                <p class="text-2xl font-bold text-white">{stats.activeCauses}</p>
-                <p class="text-xs text-dracula-comment">Causas Activas</p>
-            </div>
-            <div class="glass p-4 rounded-xl text-center">
-                <Users size={32} className="mx-auto mb-2 text-entrepreneur" />
-                <p class="text-2xl font-bold text-white">{stats.entrepreneursAllied}</p>
-                <p class="text-xs text-dracula-comment">Emprendedores Aliados</p>
-            </div>
-            <div class="glass p-4 rounded-xl text-center">
-                <ChartLineUp size={32} className="mx-auto mb-2 text-dracula-pink" />
-                <p class="text-2xl font-bold text-white">{Math.round((stats.totalRaised / stats.totalGoal) * 100)}%</p>
-                <p class="text-xs text-dracula-comment">Meta Cumplida</p>
-            </div>
-        </div>
-
-        <div class="grid lg:grid-cols-3 gap-8">
-            <!-- Left Column -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Create New Cause -->
-                <div class="glass p-6 rounded-xl">
-                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <PlusCircle className="text-dracula-green" size={24} />
-                        Crear Nueva Causa
-                    </h2>
-                    <form class="space-y-4" id="createCauseForm">
-                        <div>
-                            <label class="block text-sm font-bold text-dracula-fg mb-2">Titulo de la Causa</label>
-                            <input
-                                type="text"
-                                name="title"
-                                placeholder="Ej. Biblioteca Comunitaria para Ninos..."
-                                class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-purple outline-none"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-dracula-fg mb-2">Descripcion</label>
-                            <textarea
-                                name="description"
-                                rows="4"
-                                placeholder="Describe el impacto que tendra esta causa, a quienes beneficiara y como se usaran los fondos..."
-                                class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-purple outline-none"
-                                required
-                            ></textarea>
-                        </div>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-bold text-dracula-fg mb-2">Meta Financiera (COP)</label>
-                                <input
-                                    type="number"
-                                    name="goal"
-                                    placeholder="5000000"
-                                    min="100000"
-                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-purple outline-none"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-dracula-fg mb-2">Categoria</label>
-                                <select
-                                    name="category"
-                                    class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-purple outline-none"
-                                >
-                                    <option value="alimentacion">Alimentacion</option>
-                                    <option value="educacion">Educacion</option>
-                                    <option value="salud">Salud</option>
-                                    <option value="cultura">Cultura</option>
-                                    <option value="ambiente">Medio Ambiente</option>
-                                    <option value="otros">Otros</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-dracula-fg mb-2">Fotos de Evidencia</label>
-                            <div class="border-2 border-dashed border-dracula-comment rounded-lg p-8 text-center hover:border-dracula-purple cursor-pointer transition-colors">
-                                <Image size={40} className="mx-auto mb-2 text-dracula-comment" />
-                                <p class="text-dracula-fg/60">Arrastra fotos aqui o haz clic para subir</p>
-                                <p class="text-xs text-dracula-comment mt-1">Sube imagenes que muestren tu trabajo en la comunidad</p>
-                            </div>
-                        </div>
-                        <button
-                            type="submit"
-                            class="w-full bg-dracula-purple text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all shadow-[0_0_20px_rgba(189,147,249,0.2)]"
-                        >
-                            Publicar Causa
-                        </button>
-                    </form>
-                </div>
-
-                <!-- My Causes -->
-                <div class="glass p-6 rounded-xl">
-                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <Trophy className="text-dracula-yellow" size={24} />
-                        Mis Causas Activas
-                    </h2>
-                    {myCauses.length > 0 ? (
-                        <div class="space-y-4">
-                            {myCauses.map(cause => (
-                                <div class="bg-dracula-bg/50 p-5 rounded-xl border border-dracula-current">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <div>
-                                            <h3 class="font-bold text-white text-lg">{cause.title}</h3>
-                                            <p class="text-sm text-dracula-comment mt-1">{cause.description}</p>
-                                        </div>
-                                        <div class="flex gap-2">
-                                            <button class="p-2 text-dracula-fg/60 hover:text-white transition-colors" title="Editar">
-                                                <PencilSimple size={20} />
-                                            </button>
-                                            <a href={`/causes/${cause.id}`} class="p-2 text-dracula-fg/60 hover:text-dracula-cyan transition-colors" title="Ver">
-                                                <Eye size={20} />
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <div class="flex justify-between text-sm mb-1">
-                                            <span class="text-dracula-green font-bold">{formatCurrency(cause.raised)}</span>
-                                            <span class="text-dracula-comment">de {formatCurrency(cause.goal)}</span>
-                                        </div>
-                                        <div class="w-full bg-dracula-current h-3 rounded-full overflow-hidden">
-                                            <div
-                                                class="bg-gradient-to-r from-dracula-green to-dracula-cyan h-full rounded-full transition-all"
-                                                style={`width: ${Math.min((cause.raised / cause.goal) * 100, 100)}%`}
-                                            ></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center justify-between text-xs">
-                                        <span class="text-entrepreneur">{cause.productsLinked} productos vinculados</span>
-                                        <span class="bg-dracula-green/20 text-dracula-green px-2 py-1 rounded-full font-bold">Activa</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p class="text-center text-dracula-comment py-8">No tienes causas activas. Crea tu primera causa arriba.</p>
-                    )}
-                </div>
-            </div>
-
-            <!-- Right Column - Entrepreneurs -->
-            <div class="space-y-6">
-                <div class="glass p-6 rounded-xl">
-                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                        <Users className="text-entrepreneur" size={24} />
-                        Emprendedores Aliados
-                    </h2>
-                    <p class="text-sm text-dracula-comment mb-4">Estos emprendedores tienen productos que apoyan tus causas</p>
-                    <div class="space-y-3">
-                        {alliedEntrepreneurs.map(ent => (
-                            <a href={`/entrepreneurs/${ent.id}`} class="flex items-center gap-3 p-3 bg-dracula-bg/50 rounded-lg hover:bg-dracula-current/50 transition-colors">
-                                <img src={ent.photo} alt={ent.name} class="w-12 h-12 rounded-full object-cover" />
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-white text-sm">{ent.name}</h4>
-                                    <p class="text-xs text-entrepreneur">{ent.products} productos vinculados</p>
-                                </div>
-                            </a>
-                        ))}
-                    </div>
-                </div>
-
-                <!-- Tag Selection -->
-                <div class="glass p-6 rounded-xl border border-leader/30 mb-6">
-                    <h3 class="font-bold text-white mb-4 flex items-center gap-2">
-                        <Tag className="text-leader" size={20} />
-                        Mis Etiquetas
-                    </h3>
-                    <p class="text-sm text-dracula-comment mb-4">Selecciona las etiquetas que describen tu enfoque:</p>
-                    <TagSelector client:visible selectedTags={leaderProfile.tags} onChange={(tags) => console.log('Tags updated:', tags)} />
-                    <button class="w-full mt-4 px-4 py-2 border border-leader text-leader rounded-lg hover:bg-leader/10 transition-colors text-sm font-medium">
-                        Guardar Etiquetas
-                    </button>
-                </div>
-
-                <!-- Tips -->
-                <div class="glass p-6 rounded-xl border border-leader/30">
-                    <h3 class="font-bold text-leader mb-3">Consejos para Lideres</h3>
-                    <ul class="space-y-2 text-sm text-dracula-fg/80">
-                        <li class="flex gap-2">
-                            <span class="text-dracula-green">1.</span>
-                            Sube fotos reales de tu trabajo comunitario
-                        </li>
-                        <li class="flex gap-2">
-                            <span class="text-dracula-green">2.</span>
-                            Actualiza el progreso de tu causa regularmente
-                        </li>
-                        <li class="flex gap-2">
-                            <span class="text-dracula-green">3.</span>
-                            Comparte tu perfil en redes sociales
-                        </li>
-                        <li class="flex gap-2">
-                            <span class="text-dracula-green">4.</span>
-                            Contacta emprendedores de tu region
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+          )
+        }
+      </div>
+      <a
+        href={`/leaders/${leaderProfile.id}`}
+        class="px-4 py-2 bg-dracula-current text-white rounded-lg hover:bg-dracula-comment transition-colors flex items-center gap-2 text-sm"
+      >
+        <Eye size={18} />
+        Ver Perfil Publico
+      </a>
     </div>
+
+    <!-- Tabs Navigation -->
+    <DashboardTabs
+      tabs={tabs}
+      activeTab={activeTab}
+      baseUrl="/dashboard/leader"
+      accentColor="leader"
+    />
+
+    <!-- Tab: Overview -->
+    {
+      activeTab === 'overview' && (
+        <div class="space-y-6">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard value={formatCurrency(stats.totalRaised)} label="Total Recaudado">
+              <CurrencyDollar slot="icon" size={28} className="mx-auto text-dracula-green" />
+            </StatCard>
+            <StatCard value={stats.activeCauses} label="Causas Activas">
+              <Trophy slot="icon" size={28} className="mx-auto text-dracula-yellow" />
+            </StatCard>
+            <StatCard value={stats.entrepreneursAllied} label="Emprendedores Aliados">
+              <Users slot="icon" size={28} className="mx-auto text-entrepreneur" />
+            </StatCard>
+            <StatCard
+              value={
+                stats.totalGoal > 0
+                  ? `${Math.round((stats.totalRaised / stats.totalGoal) * 100)}%`
+                  : '0%'
+              }
+              label="Meta Cumplida"
+            >
+              <ChartLineUp slot="icon" size={28} className="mx-auto text-dracula-pink" />
+            </StatCard>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <ProfileCompletionCard
+              percentage={profileCompletion}
+              missingFields={missingFields}
+              accentColor="leader"
+            />
+            <QuickActions
+              actions={[
+                { label: 'Crear Causa', href: '/dashboard/leader?tab=crear', color: 'leader' },
+                {
+                  label: 'Publicar Update',
+                  href: '/dashboard/leader?tab=updates',
+                  color: 'dracula-cyan',
+                },
+                {
+                  label: 'Ver Perfil Publico',
+                  href: `/leaders/${leaderProfile.id}`,
+                  color: 'dracula-purple',
+                },
+              ]}
+            />
+          </div>
+
+          {myCauses.length > 0 && myCauses[0].status === 'active' && (
+            <div class="glass p-4 rounded-xl border border-leader/30 flex items-center gap-4">
+              <div class="bg-leader/20 p-2 rounded-lg">
+                <ChartLineUp size={24} className="text-leader" />
+              </div>
+              <div class="flex-1">
+                <p class="text-white text-sm font-medium">
+                  Tu causa "{myCauses[0].title}" esta al{' '}
+                  {myCauses[0].goal > 0
+                    ? Math.round((myCauses[0].raised / myCauses[0].goal) * 100)
+                    : 0}
+                  % de la meta
+                </p>
+                <p class="text-dracula-comment text-xs">
+                  {formatCurrency(myCauses[0].raised)} de {formatCurrency(myCauses[0].goal)}
+                </p>
+              </div>
+              <a href={`/causes/${myCauses[0].id}`} class="text-leader text-sm hover:underline">
+                Ver causa
+              </a>
+            </div>
+          )}
+
+          <div class="grid lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 glass p-6 rounded-xl">
+              <h3 class="font-bold text-white mb-4">Actividad Reciente</h3>
+              {recentUpdates.length > 0 ? (
+                <div class="space-y-3">
+                  {recentUpdates.map((update) => (
+                    <div class="flex items-center gap-3 p-3 bg-dracula-bg/50 rounded-lg">
+                      <div
+                        class={`w-2 h-2 rounded-full shrink-0 ${
+                          update.type === 'milestone'
+                            ? 'bg-dracula-yellow'
+                            : update.type === 'gratitude'
+                              ? 'bg-dracula-pink'
+                              : 'bg-dracula-cyan'
+                        }`}
+                      />
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm text-white font-medium truncate">{update.title}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p class="text-dracula-comment text-sm">
+                  No hay actividad reciente. Crea tu primera causa para empezar!
+                </p>
+              )}
+            </div>
+
+            <div class="glass p-6 rounded-xl">
+              <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+                <Users className="text-entrepreneur" size={20} />
+                Emprendedores Aliados
+              </h3>
+              {alliedEntrepreneurs.length > 0 ? (
+                <div class="space-y-3">
+                  {alliedEntrepreneurs.map((ent) => (
+                    <a
+                      href={`/entrepreneurs/${ent.id}`}
+                      class="flex items-center gap-3 p-3 bg-dracula-bg/50 rounded-lg hover:bg-dracula-current/50 transition-colors"
+                    >
+                      {ent.photo ? (
+                        <img
+                          src={ent.photo}
+                          alt={ent.name}
+                          class="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div class="w-10 h-10 rounded-full bg-entrepreneur/20 flex items-center justify-center">
+                          <span class="text-sm font-bold text-entrepreneur">
+                            {ent.name?.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                      <div class="flex-1">
+                        <h4 class="font-bold text-white text-sm">{ent.name}</h4>
+                        <p class="text-xs text-entrepreneur">{ent.products} productos</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p class="text-dracula-comment text-sm">
+                  Aun no hay emprendedores vinculados a tus causas.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    <!-- Tab: Causas -->
+    {
+      activeTab === 'causas' && (
+        <div class="space-y-4">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <Trophy className="text-dracula-yellow" size={24} />
+              Mis Causas
+            </h2>
+            <a
+              href="/dashboard/leader?tab=crear"
+              class="px-4 py-2 bg-leader text-dracula-bg rounded-lg font-bold text-sm hover:brightness-110 transition-all flex items-center gap-2"
+            >
+              <PlusCircle size={18} />
+              Nueva Causa
+            </a>
+          </div>
+          {myCauses.length > 0 ? (
+            <div class="space-y-4">
+              {myCauses.map((cause) => (
+                <div class="glass p-6 rounded-xl">
+                  <div class="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 class="font-bold text-white text-lg">{cause.title}</h3>
+                      <p class="text-sm text-dracula-comment mt-1">{cause.description}</p>
+                    </div>
+                    <div class="flex gap-2">
+                      <a
+                        href={`/causes/${cause.id}`}
+                        class="p-2 text-dracula-fg/60 hover:text-dracula-cyan transition-colors"
+                        title="Ver"
+                      >
+                        <Eye size={20} />
+                      </a>
+                    </div>
+                  </div>
+                  {cause.goal > 0 && (
+                    <div class="mb-4">
+                      <div class="flex justify-between text-sm mb-1">
+                        <span class="text-dracula-green font-bold">
+                          {formatCurrency(cause.raised)}
+                        </span>
+                        <span class="text-dracula-comment">de {formatCurrency(cause.goal)}</span>
+                      </div>
+                      <div class="w-full bg-dracula-current h-3 rounded-full overflow-hidden">
+                        <div
+                          class="bg-gradient-to-r from-dracula-green to-dracula-cyan h-full rounded-full transition-all"
+                          style={`width: ${Math.min((cause.raised / cause.goal) * 100, 100)}%`}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-entrepreneur">
+                      {cause.productsLinked} productos vinculados
+                    </span>
+                    <span
+                      class={`px-2 py-1 rounded-full font-bold ${
+                        cause.status === 'active'
+                          ? 'bg-dracula-green/20 text-dracula-green'
+                          : 'bg-dracula-comment/20 text-dracula-comment'
+                      }`}
+                    >
+                      {cause.status === 'active' ? 'Activa' : cause.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div class="glass p-12 rounded-xl text-center">
+              <Trophy size={48} className="mx-auto mb-4 text-dracula-comment" />
+              <p class="text-dracula-comment mb-4">No tienes causas aun.</p>
+              <a
+                href="/dashboard/leader?tab=crear"
+                class="inline-flex items-center gap-2 px-6 py-3 bg-leader text-dracula-bg font-bold rounded-xl hover:brightness-110 transition-all"
+              >
+                <PlusCircle size={20} />
+                Crear tu primera causa
+              </a>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    <!-- Tab: Productos (Mi Tienda) -->
+    {
+      activeTab === 'productos' && (
+        <div class="space-y-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <ShoppingBag className="text-entrepreneur" size={24} />
+              Mi Tienda
+            </h2>
+          </div>
+
+          {/* Create Product Form */}
+          <div class="glass p-6 rounded-xl">
+            <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+              <PlusCircle className="text-dracula-green" size={20} />
+              Crear Producto
+            </h3>
+            <CreateProductForm client:visible userRole="leader" />
+          </div>
+
+          {/* Products List */}
+          {leaderProducts.length > 0 ? (
+            <div class="space-y-3">
+              {leaderProducts.map((product) => (
+                <div class="glass p-4 rounded-xl flex items-center gap-4">
+                  {product.photoUrl ? (
+                    <img
+                      src={product.photoUrl}
+                      alt={product.name}
+                      class="w-16 h-16 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div class="w-16 h-16 rounded-lg bg-entrepreneur/20 flex items-center justify-center">
+                      <ShoppingBag size={24} className="text-entrepreneur" />
+                    </div>
+                  )}
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-white text-sm truncate">{product.name}</h4>
+                    <p class="text-xs text-dracula-comment">{product.causeName}</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-dracula-green font-bold text-sm">
+                        {new Intl.NumberFormat('es-CO', {
+                          style: 'currency',
+                          currency: 'COP',
+                          maximumFractionDigits: 0,
+                        }).format(product.price)}
+                      </span>
+                      <span
+                        class={`text-xs px-2 py-0.5 rounded-full ${product.isOwn ? 'bg-leader/20 text-leader' : 'bg-entrepreneur/20 text-entrepreneur'}`}
+                      >
+                        {product.isOwn ? 'Propio' : product.sellerName}
+                      </span>
+                    </div>
+                  </div>
+                  <a
+                    href={`/store/${product.id}`}
+                    class="text-dracula-comment hover:text-white transition-colors"
+                  >
+                    <Eye size={20} />
+                  </a>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div class="glass p-8 rounded-xl text-center">
+              <ShoppingBag size={48} className="mx-auto mb-4 text-dracula-comment" />
+              <p class="text-dracula-comment">
+                No hay productos aun. Crea tu primer producto arriba!
+              </p>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    <!-- Tab: Crear Causa (React Form) -->
+    {
+      activeTab === 'crear' && (
+        <div class="max-w-3xl mx-auto">
+          <div class="glass p-6 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <PlusCircle className="text-dracula-green" size={24} />
+              Crear Nueva Causa
+            </h2>
+            <CreateCauseForm client:visible />
+          </div>
+        </div>
+      )
+    }
+
+    <!-- Tab: Updates -->
+    {
+      activeTab === 'updates' && (
+        <div class="max-w-3xl mx-auto">
+          <div class="glass p-6 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <Newspaper className="text-dracula-cyan" size={24} />
+              Publicar Actualizacion de Causa
+            </h2>
+            <p class="text-sm text-dracula-comment mb-4">
+              Comparte el progreso de tu causa con la comunidad
+            </p>
+            <form class="space-y-4" id="createCauseUpdateForm">
+              <div>
+                <label class="block text-sm font-bold text-dracula-fg mb-2">
+                  Causa a actualizar
+                </label>
+                <select
+                  name="cause_id"
+                  class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                  required
+                >
+                  <option value="">Selecciona una causa...</option>
+                  {myCauses
+                    .filter((c) => c.status === 'active')
+                    .map((cause) => (
+                      <option value={cause.id}>{cause.title}</option>
+                    ))}
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-dracula-fg mb-2">Tipo</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <label class="cursor-pointer">
+                    <input
+                      type="radio"
+                      name="update_type"
+                      value="progress"
+                      class="sr-only peer"
+                      checked
+                    />
+                    <div class="p-3 rounded-lg border border-dracula-current text-center peer-checked:border-dracula-cyan peer-checked:bg-dracula-cyan/10 transition-colors">
+                      <Newspaper size={20} className="mx-auto mb-1 text-dracula-cyan" />
+                      <span class="text-xs text-dracula-fg">Progreso</span>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="update_type" value="milestone" class="sr-only peer" />
+                    <div class="p-3 rounded-lg border border-dracula-current text-center peer-checked:border-dracula-yellow peer-checked:bg-dracula-yellow/10 transition-colors">
+                      <Trophy size={20} className="mx-auto mb-1 text-dracula-yellow" />
+                      <span class="text-xs text-dracula-fg">Logro</span>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="update_type" value="gratitude" class="sr-only peer" />
+                    <div class="p-3 rounded-lg border border-dracula-current text-center peer-checked:border-dracula-pink peer-checked:bg-dracula-pink/10 transition-colors">
+                      <Heart size={20} className="mx-auto mb-1 text-dracula-pink" />
+                      <span class="text-xs text-dracula-fg">Agradecimiento</span>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="update_type" value="closing" class="sr-only peer" />
+                    <div class="p-3 rounded-lg border border-dracula-current text-center peer-checked:border-dracula-green peer-checked:bg-dracula-green/10 transition-colors">
+                      <CheckCircle size={20} className="mx-auto mb-1 text-dracula-green" />
+                      <span class="text-xs text-dracula-fg">Cerrar</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-dracula-fg mb-2">Titulo</label>
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="Ej. Llegamos al 50% de nuestra meta!"
+                  class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-dracula-fg mb-2">Contenido</label>
+                <textarea
+                  name="content"
+                  rows="4"
+                  placeholder="Cuenta a la comunidad sobre tu progreso..."
+                  class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-dracula-fg mb-2">Foto (opcional)</label>
+                <input
+                  type="url"
+                  name="photo_url"
+                  placeholder="URL de la imagen"
+                  class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-dracula-fg mb-2">
+                  Monto recaudado actualizado (opcional)
+                </label>
+                <input
+                  type="number"
+                  name="amount_received"
+                  min="0"
+                  step="1000"
+                  placeholder="Ej. 500000"
+                  class="w-full bg-dracula-bg border border-dracula-current rounded-lg px-4 py-3 text-white focus:border-dracula-cyan outline-none"
+                />
+                <p class="text-xs text-dracula-comment mt-1">
+                  Ingresa el total recaudado hasta ahora. Las donaciones son directas, por eso tu
+                  actualizas este valor.
+                </p>
+              </div>
+              <button
+                type="submit"
+                class="w-full bg-dracula-cyan text-dracula-bg font-bold py-3 rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2"
+              >
+                <Newspaper size={20} />
+                Publicar Actualizacion
+              </button>
+            </form>
+          </div>
+        </div>
+      )
+    }
+
+    <!-- Tab: Perfil (React Form) -->
+    {
+      activeTab === 'perfil' && (
+        <div class="max-w-3xl mx-auto space-y-6">
+          <div class="glass p-6 rounded-xl">
+            <h2 class="text-xl font-bold text-white mb-6">Editar Perfil</h2>
+            <EditLeaderProfileForm
+              client:visible
+              profileId={user?.profileId || 0}
+              initialData={{
+                name: leaderProfile.name,
+                bio: leaderProfile.bio,
+                photo_url: leaderProfile.photo_url || leaderProfile.photo,
+                department: leaderProfile.department || '',
+                city: leaderProfile.city || '',
+                contact_info: leaderProfile.contact_info || '{}',
+                tags: leaderProfile.tags_raw || '[]',
+              }}
+            />
+          </div>
+          <div class="glass p-6 rounded-xl">
+            <h3 class="font-bold text-white mb-2">Seguridad</h3>
+            <a href="#" class="text-sm text-dracula-purple hover:underline">
+              Cambiar contrasena
+            </a>
+          </div>
+        </div>
+      )
+    }
+  </div>
 </Layout>
 
 <script>
-    // Handle form submission (mock)
-    document.getElementById('createCauseForm')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        alert('Causa creada exitosamente! (Demo - en produccion se guardaria en la base de datos)');
-    });
+  // Handle cause update form submission
+  document.getElementById('createCauseUpdateForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const causeId = formData.get('cause_id');
+    if (!causeId) {
+      alert('Por favor selecciona una causa para actualizar');
+      return;
+    }
+
+    const updateType = formData.get('update_type') as string;
+    const updateData = {
+      cause_id: parseInt(causeId as string),
+      title: formData.get('title'),
+      content: formData.get('content'),
+      update_type: updateType,
+      photo_url: formData.get('photo_url') || null,
+      is_closing: updateType === 'closing',
+      amount_received: formData.get('amount_received')
+        ? parseFloat(formData.get('amount_received') as string)
+        : null,
+    };
+
+    try {
+      const response = await fetch('/api/cause-updates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData),
+      });
+
+      if (response.ok) {
+        const message =
+          updateType === 'closing'
+            ? 'Causa cerrada exitosamente!'
+            : 'Actualizacion publicada exitosamente!';
+        alert(message);
+        form.reset();
+        if (updateType === 'closing') {
+          window.location.reload();
+        }
+      } else {
+        const error = await response.json();
+        alert('Error al publicar: ' + (error.error || 'Error desconocido'));
+      }
+    } catch (err) {
+      alert('Error de conexion');
+    }
+  });
 </script>

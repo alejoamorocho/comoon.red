@@ -1,0 +1,767 @@
+openapi: 3.0.3
+info:
+  title: Comoon API
+  description: Social commerce platform connecting leaders, entrepreneurs, and causes in Colombia.
+  version: 1.0.0
+  contact:
+    name: Comoon Team
+
+servers:
+  - url: https://comoon.pages.dev/api
+    description: Production
+  - url: http://localhost:4321/api
+    description: Local development
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    UserSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [admin, leader, entrepreneur]
+        profileId:
+          type: integer
+        name:
+          type: string
+        isVerified:
+          type: boolean
+        isActive:
+          type: boolean
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        rememberMe:
+          type: boolean
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        token:
+          type: string
+        refreshToken:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserSession"
+        redirectTo:
+          type: string
+        error:
+          type: string
+
+    RegisterRequest:
+      type: object
+      required: [email, password, confirmPassword, role, name]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        confirmPassword:
+          type: string
+        role:
+          type: string
+          enum: [leader, entrepreneur]
+        name:
+          type: string
+        storeName:
+          type: string
+          description: Required when role is entrepreneur
+        location:
+          type: string
+        bio:
+          type: string
+
+    RegisterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        userId:
+          type: integer
+        error:
+          type: string
+
+    Leader:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        bio:
+          type: string
+        location:
+          type: string
+        city:
+          type: string
+        department:
+          type: string
+        photo_url:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        is_verified:
+          type: boolean
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        entrepreneur_id:
+          type: integer
+        cause_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        contribution_text:
+          type: string
+        contribution_amount:
+          type: number
+        contribution_type:
+          type: string
+          enum: [percentage, fixed]
+        photo_url:
+          type: string
+        is_active:
+          type: boolean
+        store_name:
+          type: string
+        cause_title:
+          type: string
+        leader_name:
+          type: string
+
+    CauseUpdate:
+      type: object
+      properties:
+        id:
+          type: integer
+        leader_id:
+          type: integer
+        cause_id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        photo_url:
+          type: string
+        photos:
+          type: array
+          items:
+            type: string
+          nullable: true
+        update_type:
+          type: string
+          enum: [progress, milestone, gratitude, closing]
+        is_closing:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        leader:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            photo_url:
+              type: string
+            city:
+              type: string
+            department:
+              type: string
+        cause:
+          type: object
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+            status:
+              type: string
+
+    CreateCauseUpdateRequest:
+      type: object
+      required: [cause_id, title, content]
+      properties:
+        cause_id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        photo_url:
+          type: string
+        photos:
+          type: array
+          items:
+            type: string
+        update_type:
+          type: string
+          enum: [progress, milestone, gratitude, closing]
+        is_closing:
+          type: boolean
+
+    FeedItem:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        data:
+          type: object
+
+    FeedResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeedItem"
+        nextCursor:
+          type: string
+          nullable: true
+
+paths:
+  /:
+    get:
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: API is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  version:
+                    type: string
+
+  /auth/register:
+    post:
+      summary: Register a new user
+      security: []
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+
+  /auth/login:
+    post:
+      summary: Log in with email and password
+      security: []
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful (sets HttpOnly cookie)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+
+  /auth/logout:
+    post:
+      summary: Log out (clears auth cookie)
+      tags: [Auth]
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      summary: Get current authenticated user profile
+      tags: [Auth]
+      responses:
+        "200":
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  role:
+                    type: string
+                  profileId:
+                    type: integer
+                  name:
+                    type: string
+                  photoUrl:
+                    type: string
+                  bio:
+                    type: string
+                  location:
+                    type: string
+                  isVerified:
+                    type: boolean
+                  isActive:
+                    type: boolean
+                  dashboardPath:
+                    type: string
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: New token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  token:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/UserSession"
+        "401":
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/change-password:
+    post:
+      summary: Change password for authenticated user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword, confirmPassword]
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+                confirmPassword:
+                  type: string
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Current password incorrect
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /leaders:
+    get:
+      summary: List leaders with optional filters
+      security: []
+      tags: [Leaders]
+      parameters:
+        - name: department
+          in: query
+          schema:
+            type: string
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of leaders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Leader"
+
+  /leaders/{id}:
+    get:
+      summary: Get leader by ID
+      security: []
+      tags: [Leaders]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Leader details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: "#/components/schemas/Leader"
+        "404":
+          description: Leader not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /products:
+    get:
+      summary: List products with optional cause filter
+      security: []
+      tags: [Products]
+      parameters:
+        - name: cause_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /feed:
+    get:
+      summary: Get activity feed with cursor-based pagination
+      security: []
+      tags: [Feed]
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: string
+        - name: types
+          in: query
+          description: Comma-separated feed item types
+          schema:
+            type: string
+        - name: department
+          in: query
+          schema:
+            type: string
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: categories
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Feed items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedResponse"
+
+  /feed/departments:
+    get:
+      summary: Get departments available for feed filtering
+      security: []
+      tags: [Feed]
+      responses:
+        "200":
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /cause-updates:
+    get:
+      summary: List cause updates with pagination and filters
+      security: []
+      tags: [Cause Updates]
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 50
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: leader_id
+          in: query
+          schema:
+            type: integer
+        - name: cause_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of cause updates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CauseUpdate"
+    post:
+      summary: Create a cause update (leaders only)
+      tags: [Cause Updates]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCauseUpdateRequest"
+      responses:
+        "201":
+          description: Cause update created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CauseUpdate"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Cause not found or not owned by leader
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /cause-updates/{id}:
+    get:
+      summary: Get a single cause update
+      security: []
+      tags: [Cause Updates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Cause update details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CauseUpdate"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update a cause update (owner leader or admin)
+      tags: [Cause Updates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                photo_url:
+                  type: string
+                photos:
+                  type: array
+                  items:
+                    type: string
+                update_type:
+                  type: string
+                  enum: [progress, milestone, gratitude, closing]
+      responses:
+        "200":
+          description: Cause update modified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CauseUpdate"
+        "403":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a cause update (owner leader or admin)
+      tags: [Cause Updates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "403":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"

@@ -1,0 +1,17 @@
+---
+interface Props {
+  value: string | number;
+  label: string;
+  color?: string;
+}
+
+const { value, label, color = 'dracula-green' } = Astro.props;
+---
+
+<div
+  class="glass p-4 rounded-xl text-center hover:shadow-lg hover:shadow-dracula-bg/30 transition-shadow"
+>
+  <slot name="icon" />
+  <p class={`text-2xl font-bold text-white mt-2`}>{value}</p>
+  <p class="text-xs text-dracula-comment mt-1">{label}</p>
+</div>

@@ -1,127 +1,327 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import ContactButtons from '../../components/ContactButtons';
 import ShareButtons from '../../components/ShareButtons';
-import { Storefront, MapPin, Globe, InstagramLogo, WhatsappLogo, Leaf } from '@phosphor-icons/react';
+import { formatCOP as formatCurrency } from '../../utils/format';
+import { Storefront, MapPin, Heart, ShoppingBag, UsersThree, Moon } from '@phosphor-icons/react';
 
 const { id } = Astro.params;
-if (!id) {
-    return Astro.redirect('/404');
+if (!id) return Astro.redirect('/404');
+
+const db = Astro.locals.runtime?.env?.DB;
+let entrepreneur: Record<string, any> | null = null;
+let products: Array<Record<string, any>> = [];
+let contactInfo: Record<string, string> = {};
+let causesSupported: Array<Record<string, any>> = [];
+
+if (db) {
+  entrepreneur = (await db
+    .prepare('SELECT * FROM entrepreneurs WHERE id = ?')
+    .bind(parseInt(id))
+    .first()) as Record<string, any> | null;
+
+  if (entrepreneur) {
+    try {
+      contactInfo = JSON.parse(entrepreneur.contact_info || '{}');
+    } catch {}
+
+    // Fetch products
+    const { results: productRows } = await db
+      .prepare(
+        `
+            SELECT p.*, c.title as cause_title, l.name as leader_name
+            FROM products p
+            JOIN causes c ON p.cause_id = c.id
+            JOIN leaders l ON c.leader_id = l.id
+            WHERE p.entrepreneur_id = ? AND p.is_active = 1
+            ORDER BY p.created_at DESC
+        `,
+      )
+      .bind(parseInt(id))
+      .all();
+    products = (productRows || []).map((p: any) => ({
+      id: String(p.id),
+      name: p.name,
+      price: p.price,
+      entrepreneur: entrepreneur!.store_name,
+      cause: p.cause_title,
+      leaderName: p.leader_name,
+      contributionText:
+        p.contribution_text ||
+        (p.contribution_type === 'percentage'
+          ? `${p.contribution_amount}% de cada compra`
+          : `$${p.contribution_amount?.toLocaleString('es-CO')} por compra`),
+      photoUrl: p.photo_url,
+    }));
+
+    // Fetch causes supported (distinct causes from products)
+    const { results: causeRows } = await db
+      .prepare(
+        `
+            SELECT DISTINCT c.id, c.title, c.current_amount, c.target_goal, c.status, c.photo_url,
+                l.name as leader_name, l.id as leader_id
+            FROM causes c
+            JOIN products p ON p.cause_id = c.id
+            JOIN leaders l ON c.leader_id = l.id
+            WHERE p.entrepreneur_id = ?
+            ORDER BY c.created_at DESC
+        `,
+      )
+      .bind(parseInt(id))
+      .all();
+    causesSupported = (causeRows || []) as Array<Record<string, any>>;
+  }
 }
 
-// Mock Data
-const entrepreneur = {
-  id: "1",
-  store_name: "Café Renacer",
-  bio: "Somos una cooperativa de jóvenes caficultores comprometidos con la paz y la calidad. Tostamos nuestro propio café en las montañas de Antioquia.",
-  story: "Empezamos hace 3 años con la idea de que el café podía ser el motor de cambio en nuestra región, históricamente golpeada por la violencia. Hoy, 15 familias viven dignamente gracias a este proyecto.",
-  location: "Andes, Antioquia",
-  photoUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80",
-  social: {
-      instagram: "@caferenacer",
-      website: "www.caferenacer.co",
-      whatsapp: "+5730000000"
-  },
-  impactStats: {
-      productsSold: 500,
-      donatedAmount: "$2,500,000",
-      causesSupported: 2
-  },
-  products: [
-      {
-        id: "1",
-        name: "Café de Origen - Edición Paz",
-        price: 35000,
-        entrepreneur: "Café Renacer",
-        cause: "Agua Potable para Todos",
-        leaderName: "Maria González",
-        contributionText: "Donamos $5.000",
-        photoUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80"
-      }
-  ]
-};
+if (!entrepreneur) return Astro.redirect('/404');
+
+const location =
+  [entrepreneur.city, entrepreneur.department].filter(Boolean).join(', ') ||
+  entrepreneur.location ||
+  '';
+const totalProducts = products.length;
+const totalCausesSupported = causesSupported.length;
 ---
 
-<Layout title={entrepreneur.store_name}>
-    <!-- Store Header Image -->
-    <div class="h-64 w-full relative">
-        <img src={entrepreneur.photoUrl} class="w-full h-full object-cover opacity-60" />
-        <div class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-transparent to-transparent"></div>
+<Layout
+  title={`${entrepreneur.store_name} - Emprendedor`}
+  description={entrepreneur.bio || `Conoce a ${entrepreneur.store_name}, emprendedor en Comoon.`}
+  ogImage={entrepreneur.photo_url}
+  ogType="profile"
+>
+  <!-- Header Banner -->
+  <div class="h-64 w-full relative">
+    {
+      entrepreneur.photo_url ? (
+        <img
+          src={entrepreneur.photo_url}
+          alt={entrepreneur.store_name}
+          class="w-full h-full object-cover opacity-60"
+        />
+      ) : (
+        <div class="w-full h-full bg-entrepreneur/20" />
+      )
+    }
+    <div class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-transparent to-transparent">
     </div>
+  </div>
 
   <div class="max-w-5xl mx-auto px-4 -mt-32 relative z-10">
-    <div class="glass p-8 rounded-2xl md:flex gap-8 items-start mb-12 border-t-4 border-entrepreneur">
-       <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-entrepreneur shrink-0 mx-auto md:mx-0 shadow-xl bg-dracula-bg">
-          <img src={entrepreneur.photoUrl} alt={entrepreneur.store_name} class="w-full h-full object-cover" />
-       </div>
-       <div class="mt-4 md:mt-0 text-center md:text-left flex-1">
-          <h1 class="text-4xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-2">
-            <Storefront weight="duotone" /> {entrepreneur.store_name}
-          </h1>
-          <div class="flex items-center justify-center md:justify-start gap-2 text-dracula-pink mb-4 font-medium">
-            <MapPin size={24} weight="duotone" />
-            <span>{entrepreneur.location}</span>
-          </div>
-          
-          <div class="flex justify-center md:justify-start gap-4 mb-6">
-             {entrepreneur.social.instagram && (
-                 <a href="#" class="flex items-center gap-1 text-sm text-dracula-comment hover:text-comoon-purple transition-colors">
-                     <InstagramLogo size={18} /> {entrepreneur.social.instagram}
-                 </a>
-             )}
-              {entrepreneur.social.website && (
-                 <a href="#" class="flex items-center gap-1 text-sm text-dracula-comment hover:text-entrepreneur transition-colors">
-                     <Globe size={18} /> Web
-                 </a>
-             )}
-          </div>
-
-          <div class="flex flex-col md:flex-row justify-between items-center border-t border-white/10 pt-4 gap-4">
-              <ShareButtons client:visible title={entrepreneur.store_name} text={`Descubre la tienda ${entrepreneur.store_name} en comoon`} />
-              <a href={`https://wa.me/${entrepreneur.social.whatsapp}`} target="_blank" class="px-6 py-2 bg-dracula-green text-dracula-bg font-bold rounded-lg hover:brightness-110 transition-colors flex items-center gap-2">
-                  <WhatsappLogo size={20} weight="fill" /> Contáctanos
-              </a>
-          </div>
-       </div>
-    </div>
-    
-    <div class="grid md:grid-cols-3 gap-8 mb-12">
-        <!-- Story -->
-        <div class="md:col-span-2">
-            <h2 class="text-2xl font-bold text-white mb-4">Nuestra Historia</h2>
-            <p class="text-dracula-fg/80 leading-relaxed text-lg border-l-4 border-entrepreneur pl-6 bg-dracula-current/10 py-4 rounded-r-xl">
-                {entrepreneur.story}
-            </p>
-        </div>
-
-        <!-- Impact Badge -->
-        <div class="glass p-6 rounded-xl border border-dracula-green/30">
-            <h3 class="text-xl font-bold text-dracula-green mb-4 flex items-center gap-2">
-                <Leaf weight="fill" /> Impacto Generado
-            </h3>
-            <ul class="space-y-4">
-                <li class="flex justify-between items-center border-b border-white/5 pb-2">
-                    <span class="text-sm text-dracula-comment text-left">Donaciones Entregadas</span>
-                    <span class="font-bold text-white text-right">{entrepreneur.impactStats.donatedAmount}</span>
-                </li>
-                <li class="flex justify-between items-center border-b border-white/5 pb-2">
-                    <span class="text-sm text-dracula-comment text-left">Causas Apoyadas</span>
-                    <span class="font-bold text-white text-right">{entrepreneur.impactStats.causesSupported}</span>
-                </li>
-                 <li class="flex justify-between items-center">
-                    <span class="text-sm text-dracula-comment text-left">Productos Vendidos</span>
-                    <span class="font-bold text-white text-right">{entrepreneur.impactStats.productsSold}+</span>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-
-    <div class="mb-12">
-      <h2 class="text-2xl font-bold text-entrepreneur mb-6">Nuestros Productos</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {entrepreneur.products.map(p => <ProductCard {...p} />)}
+    <!-- Profile Card -->
+    <div
+      class="glass p-8 rounded-2xl md:flex gap-8 items-start mb-12 border-t-4 border-entrepreneur relative overflow-hidden"
+    >
+      <div class="absolute top-0 right-0 w-64 h-64 bg-entrepreneur/10 rounded-full blur-3xl -z-10">
       </div>
+
+      <div
+        class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-entrepreneur shrink-0 mx-auto md:mx-0 shadow-xl bg-dracula-bg"
+      >
+        {
+          entrepreneur.photo_url ? (
+            <img
+              src={entrepreneur.photo_url}
+              alt={entrepreneur.store_name}
+              class="w-full h-full object-cover"
+            />
+          ) : (
+            <div class="w-full h-full bg-entrepreneur/20 flex items-center justify-center">
+              <span class="text-4xl font-bold text-entrepreneur">
+                {entrepreneur.store_name?.charAt(0)}
+              </span>
+            </div>
+          )
+        }
+      </div>
+
+      <div class="mt-4 md:mt-0 text-center md:text-left flex-1">
+        <h1
+          class="text-4xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-2"
+        >
+          <Storefront weight="duotone" className="text-entrepreneur" />
+          {entrepreneur.store_name}
+        </h1>
+
+        {
+          location && (
+            <div class="flex items-center justify-center md:justify-start gap-2 text-entrepreneur mb-4 font-medium">
+              <MapPin size={24} weight="duotone" />
+              <span>{location}</span>
+            </div>
+          )
+        }
+
+        {
+          entrepreneur.bio && (
+            <p class="text-lg text-dracula-fg/90 mb-6 italic border-l-4 border-entrepreneur pl-4">
+              {entrepreneur.bio}
+            </p>
+          )
+        }
+
+        <!-- Contact Buttons -->
+        <div class="mb-6">
+          <ContactButtons client:idle contactInfo={contactInfo} size="md" />
+        </div>
+
+        <div
+          class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-white/10 pt-4"
+        >
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-dracula-comment flex items-center gap-2">
+              <Moon size={16} weight="duotone" className="text-comoon-purple" />
+              Difusion Lunar
+            </span>
+            <ShareButtons
+              client:visible
+              title={entrepreneur.store_name}
+              text={`Descubre la tienda ${entrepreneur.store_name} en comoon`}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="glass p-6 rounded-2xl mb-12 border border-entrepreneur/30">
+      <div class="grid grid-cols-2 gap-6 text-center">
+        <div>
+          <div class="flex items-center justify-center gap-2 text-entrepreneur mb-1">
+            <ShoppingBag size={22} weight="duotone" />
+            <span class="text-sm text-dracula-comment">Total productos</span>
+          </div>
+          <span class="text-2xl font-bold text-white">{totalProducts}</span>
+        </div>
+        <div>
+          <div class="flex items-center justify-center gap-2 text-entrepreneur mb-1">
+            <Heart size={22} weight="duotone" />
+            <span class="text-sm text-dracula-comment">Causas apoyadas</span>
+          </div>
+          <span class="text-2xl font-bold text-white">{totalCausesSupported}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Productos Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-entrepreneur mb-6 flex items-center gap-2">
+        <ShoppingBag size={28} weight="duotone" />
+        Productos
+      </h2>
+      {
+        products.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((product) => (
+              <ProductCard
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                entrepreneur={product.entrepreneur}
+                cause={product.cause}
+                leaderName={product.leaderName}
+                contributionText={product.contributionText}
+                photoUrl={product.photoUrl}
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="glass p-8 rounded-2xl text-center border border-entrepreneur/20">
+            <ShoppingBag size={48} className="text-entrepreneur/40 mx-auto mb-4" />
+            <p class="text-dracula-comment text-lg">
+              Este emprendedor aun no tiene productos publicados.
+            </p>
+          </div>
+        )
+      }
+    </div>
+
+    <!-- Causas que Apoya Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-entrepreneur mb-6 flex items-center gap-2">
+        <UsersThree size={28} weight="duotone" />
+        Causas que Apoya
+      </h2>
+      {
+        causesSupported.length > 0 ? (
+          <div class="space-y-6">
+            {causesSupported.map((cause) => {
+              const progress =
+                cause.target_goal > 0
+                  ? Math.round((cause.current_amount / cause.target_goal) * 100)
+                  : 0;
+              return (
+                <div class="glass p-6 rounded-2xl border border-entrepreneur/20">
+                  <div class="flex flex-col sm:flex-row gap-6 items-start">
+                    {cause.photo_url && (
+                      <img
+                        src={cause.photo_url}
+                        alt={cause.title}
+                        class="w-24 h-24 rounded-xl object-cover shrink-0"
+                      />
+                    )}
+                    <div class="flex-1 w-full">
+                      <a
+                        href={`/causes/${cause.id}`}
+                        class="text-xl font-bold text-white hover:text-entrepreneur transition-colors"
+                      >
+                        {cause.title}
+                      </a>
+                      <p class="text-sm text-dracula-comment mt-1">
+                        Liderada por{' '}
+                        <a href={`/leaders/${cause.leader_id}`} class="text-leader hover:underline">
+                          {cause.leader_name}
+                        </a>
+                      </p>
+                      {cause.status && (
+                        <span
+                          class={`inline-block mt-2 text-xs font-bold px-2 py-1 rounded-full ${cause.status === 'active' ? 'bg-dracula-green/20 text-dracula-green' : 'bg-dracula-comment/20 text-dracula-comment'}`}
+                        >
+                          {cause.status === 'active' ? 'Activa' : 'Finalizada'}
+                        </span>
+                      )}
+
+                      {cause.target_goal > 0 && (
+                        <div class="mt-4">
+                          <div class="flex justify-between text-sm font-bold mb-2">
+                            <span class="text-dracula-green">
+                              {formatCurrency(cause.current_amount || 0)} recaudados
+                            </span>
+                            <span class="text-dracula-comment">
+                              Meta: {formatCurrency(cause.target_goal)}
+                            </span>
+                          </div>
+                          <div
+                            class="w-full bg-dracula-bg rounded-full h-3 overflow-hidden"
+                            role="progressbar"
+                            aria-valuenow={cause.current_amount || 0}
+                            aria-valuemin={0}
+                            aria-valuemax={cause.target_goal}
+                            aria-label={`Progreso de ${cause.title}`}
+                          >
+                            <div
+                              class="bg-gradient-to-r from-entrepreneur to-dracula-green h-full rounded-full transition-all duration-1000"
+                              style={`width: ${Math.min(progress, 100)}%`}
+                            />
+                          </div>
+                          <p class="text-center text-dracula-comment text-xs mt-1">
+                            {progress}% de la meta alcanzada
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div class="glass p-8 rounded-2xl text-center border border-entrepreneur/20">
+            <Heart size={48} className="text-entrepreneur/40 mx-auto mb-4" />
+            <p class="text-dracula-comment text-lg">Este emprendedor aun no apoya ninguna causa.</p>
+          </div>
+        )
+      }
     </div>
   </div>
 </Layout>

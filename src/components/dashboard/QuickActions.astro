@@ -1,0 +1,26 @@
+---
+interface Action {
+  label: string;
+  href: string;
+  color?: string;
+}
+
+interface Props {
+  actions: Action[];
+}
+
+const { actions } = Astro.props;
+---
+
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+  {
+    actions.map((action) => (
+      <a
+        href={action.href}
+        class={`p-3 rounded-xl border border-${action.color || 'dracula-current'}/30 bg-${action.color || 'dracula-current'}/5 hover:bg-${action.color || 'dracula-current'}/15 transition-colors text-center text-sm font-medium text-white`}
+      >
+        {action.label}
+      </a>
+    ))
+  }
+</div>

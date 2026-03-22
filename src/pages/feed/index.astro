@@ -1,0 +1,86 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { FeedContainer } from '../../components/Feed';
+import CreatePostForm from '../../components/Feed/CreatePostForm';
+
+const isAuthenticated = Astro.locals.isAuthenticated || false;
+const user = Astro.locals.user;
+const userRole = user?.role;
+const userName = user?.name;
+
+// Get user photo from DB if authenticated
+let userPhoto: string | undefined;
+if (isAuthenticated && user?.profileId) {
+  const db = Astro.locals.runtime?.env?.DB;
+  if (db) {
+    if (userRole === 'leader') {
+      const leader = await db
+        .prepare('SELECT photo_url FROM leaders WHERE id = ?')
+        .bind(user.profileId)
+        .first<{ photo_url: string | null }>();
+      userPhoto = leader?.photo_url || undefined;
+    } else if (userRole === 'entrepreneur') {
+      const ent = await db
+        .prepare('SELECT photo_url FROM entrepreneurs WHERE id = ?')
+        .bind(user.profileId)
+        .first<{ photo_url: string | null }>();
+      userPhoto = ent?.photo_url || undefined;
+    }
+  }
+}
+---
+
+<Layout title="Feed - Comoon">
+  <!-- Compact Header -->
+  <section class="relative py-8 px-4 text-center">
+    <div
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-comoon-purple/10 rounded-full blur-[80px] -z-10"
+    >
+    </div>
+
+    <h1 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight">
+      <span class="text-white">co</span><span class="text-comoon-purple">moon</span>
+      <span class="text-dracula-fg/60 font-normal ml-2">Feed</span>
+    </h1>
+
+    <p class="text-dracula-comment max-w-lg mx-auto">
+      Descubre productos, causas y actualizaciones que transforman comunidades.
+    </p>
+  </section>
+
+  <!-- Create Post Form (only for authenticated users) -->
+  <div class="container mx-auto px-4">
+    {
+      isAuthenticated && (userRole === 'leader' || userRole === 'entrepreneur') && (
+        <CreatePostForm client:load userRole={userRole} userName={userName} userPhoto={userPhoto} />
+      )
+    }
+
+    {
+      !isAuthenticated && (
+        <div class="glass rounded-2xl p-5 border border-white/10 mb-6 text-center">
+          <p class="text-dracula-comment text-sm mb-3">
+            Quieres publicar? Crea tu cuenta como lider o emprendedor.
+          </p>
+          <div class="flex gap-3 justify-center">
+            <a
+              href="/login"
+              class="px-4 py-2 rounded-full border border-white text-white text-sm font-medium hover:bg-white/10 transition-colors"
+            >
+              Ingresar
+            </a>
+            <a
+              href="/register"
+              class="px-4 py-2 rounded-full bg-comoon-purple text-white text-sm font-bold hover:brightness-110 transition-all"
+            >
+              Unete
+            </a>
+          </div>
+        </div>
+      )
+    }
+  </div>
+
+  <!-- Feed Container -->
+  <FeedContainer client:load />
+</Layout>

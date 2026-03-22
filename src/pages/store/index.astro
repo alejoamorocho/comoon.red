@@ -9,176 +9,190 @@ const url = new URL(Astro.request.url);
 const filterCause = url.searchParams.get('causa');
 const filterLeader = url.searchParams.get('lider');
 
-// Mock Data - In real app, fetch from API with filters
-const allProducts = [
-    {
-        id: "1",
-        name: "Bolso Tejido en Palma",
-        price: 85000,
-        entrepreneur: "Artesanias del Valle",
-        entrepreneurPhone: "+573151112233",
-        cause: "Comedor Comunitario La Esperanza",
-        causeId: "1",
-        leaderName: "Elena Marin",
-        leaderId: "1",
-        contributionText: "El 15% de esta compra se dona",
-        photoUrl: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80"
-    },
-    {
-        id: "2",
-        name: "Sombrero Vueltiao Tradicional",
-        price: 120000,
-        entrepreneur: "Artesanias del Valle",
-        entrepreneurPhone: "+573151112233",
-        cause: "Escuela de Musica del Pacifico",
-        causeId: "2",
-        leaderName: "Carlos Rodriguez",
-        leaderId: "2",
-        contributionText: "Donamos $20.000",
-        photoUrl: "https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?auto=format&fit=crop&w=400&q=80"
-    },
-    {
-        id: "3",
-        name: "Cafe de Altura 500g",
-        price: 35000,
-        entrepreneur: "Cafe Origen",
-        entrepreneurPhone: "+573204445566",
-        cause: "Escuela de Musica del Pacifico",
-        causeId: "2",
-        leaderName: "Carlos Rodriguez",
-        leaderId: "2",
-        contributionText: "$5.000 van para instrumentos",
-        photoUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80"
-    },
-    {
-        id: "4",
-        name: "Kit de Degustacion",
-        price: 60000,
-        entrepreneur: "Cafe Origen",
-        entrepreneurPhone: "+573204445566",
-        cause: "Comedor Comunitario La Esperanza",
-        causeId: "1",
-        leaderName: "Elena Marin",
-        leaderId: "1",
-        contributionText: "El 10% apoya la alimentacion",
-        photoUrl: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80"
-    },
-    {
-        id: "5",
-        name: "Miel Organica Silvestre",
-        price: 25000,
-        entrepreneur: "ApiColombia",
-        entrepreneurPhone: "+573001234567",
-        cause: "Comedor Comunitario La Esperanza",
-        causeId: "1",
-        leaderName: "Elena Marin",
-        leaderId: "1",
-        contributionText: "Donamos $3.000 por frasco",
-        photoUrl: "https://images.unsplash.com/photo-1587049359681-36765827054d?auto=format&fit=crop&w=400&q=80"
-    }
-];
+const db = Astro.locals.runtime?.env?.DB;
 
-// Available filters
-const causes = [
-    { id: "1", title: "Comedor Comunitario La Esperanza", leaderName: "Elena Marin" },
-    { id: "2", title: "Escuela de Musica del Pacifico", leaderName: "Carlos Rodriguez" }
-];
+let allProducts: Array<Record<string, any>> = [];
+let causes: Array<Record<string, any>> = [];
+let leaders: Array<Record<string, any>> = [];
 
-const leaders = [
-    { id: "1", name: "Elena Marin", location: "Buenaventura" },
-    { id: "2", name: "Carlos Rodriguez", location: "Quibdo" }
-];
+if (db) {
+  // Fetch real products with LEFT JOIN for leader-owned products
+  let productQuery = `
+        SELECT p.*,
+            CASE WHEN p.leader_id IS NOT NULL THEN pl.name ELSE e.store_name END as seller_name,
+            CASE WHEN p.leader_id IS NOT NULL THEN pl.contact_info ELSE e.contact_info END as seller_contact,
+            c.title as cause_title, c.leader_id as cause_leader_id,
+            l.name as leader_name
+        FROM products p
+        LEFT JOIN entrepreneurs e ON p.entrepreneur_id = e.id
+        LEFT JOIN leaders pl ON p.leader_id = pl.id
+        JOIN causes c ON p.cause_id = c.id
+        JOIN leaders l ON c.leader_id = l.id
+        WHERE p.is_active = 1
+    `;
+  const params: (string | number)[] = [];
 
-// Apply filters
-let filteredProducts = allProducts;
-let activeFilter = null;
+  if (filterCause) {
+    productQuery += ' AND p.cause_id = ?';
+    params.push(parseInt(filterCause));
+  }
+  if (filterLeader) {
+    productQuery += ' AND (c.leader_id = ? OR p.leader_id = ?)';
+    params.push(parseInt(filterLeader), parseInt(filterLeader));
+  }
 
-if (filterCause) {
-    filteredProducts = allProducts.filter(p => p.causeId === filterCause);
-    activeFilter = { type: 'causa', value: causes.find(c => c.id === filterCause)?.title };
+  productQuery += ' ORDER BY p.created_at DESC LIMIT 50';
+
+  const { results: productRows } = await db
+    .prepare(productQuery)
+    .bind(...params)
+    .all();
+  allProducts = (productRows || []).map((p: any) => {
+    let contactPhone = '';
+    try {
+      const contact = JSON.parse(p.seller_contact || '{}');
+      contactPhone = contact.whatsapp || contact.phone || '';
+    } catch {}
+    return {
+      id: String(p.id),
+      name: p.name,
+      price: p.price,
+      entrepreneur: p.seller_name || 'Vendedor',
+      entrepreneurPhone: contactPhone,
+      cause: p.cause_title,
+      causeId: String(p.cause_id),
+      leaderName: p.leader_name,
+      leaderId: String(p.cause_leader_id),
+      contributionText:
+        p.contribution_text ||
+        (p.contribution_type === 'percentage'
+          ? `${p.contribution_amount}% de cada compra`
+          : `$${p.contribution_amount?.toLocaleString('es-CO')} por compra`),
+      photoUrl: p.photo_url,
+    };
+  });
+
+  // Fetch causes for filters
+  const { results: causeRows } = await db
+    .prepare(
+      "SELECT c.id, c.title, l.name as leader_name FROM causes c JOIN leaders l ON c.leader_id = l.id WHERE c.status = 'active' ORDER BY c.title",
+    )
+    .all();
+  causes = (causeRows || []).map((c: any) => ({
+    id: String(c.id),
+    title: c.title,
+    leaderName: c.leader_name,
+  }));
+
+  // Fetch leaders for filters
+  const { results: leaderRows } = await db
+    .prepare('SELECT id, name, city as location FROM leaders ORDER BY name')
+    .all();
+  leaders = (leaderRows || []).map((l: any) => ({
+    id: String(l.id),
+    name: l.name,
+    location: l.location || '',
+  }));
 }
 
+// Active filter info
+let activeFilter: { type: string; value?: string } | null = null;
+if (filterCause) {
+  activeFilter = { type: 'causa', value: causes.find((c) => c.id === filterCause)?.title };
+}
 if (filterLeader) {
-    filteredProducts = allProducts.filter(p => p.leaderId === filterLeader);
-    activeFilter = { type: 'lider', value: leaders.find(l => l.id === filterLeader)?.name };
+  activeFilter = { type: 'lider', value: leaders.find((l) => l.id === filterLeader)?.name };
 }
 ---
 
 <Layout title="Tienda con Proposito">
-    <div class="py-8">
-        <!-- Header -->
-        <div class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                <span class="text-entrepreneur">Tienda</span> con <span class="text-comoon-purple">Proposito</span>
-            </h1>
-            <p class="text-lg text-dracula-fg/70 max-w-2xl mx-auto">
-                Productos unicos de emprendedores colombianos. <span class="text-dracula-green font-medium">Cada compra ilumina una causa social.</span>
-            </p>
-        </div>
-
-        <!-- Filters Component -->
-        <StoreFilters
-            client:load
-            causes={causes}
-            leaders={leaders}
-            activeCauseId={filterCause}
-            activeLeaderId={filterLeader}
-        />
-
-        <!-- Active Filter Badge -->
-        {activeFilter && (
-            <div class="flex items-center justify-center gap-2 mb-6">
-                <span class="text-dracula-comment text-sm">Filtrando por {activeFilter.type}:</span>
-                <span class="bg-leader/20 text-leader px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2">
-                    {activeFilter.type === 'causa' ? <Heart size={14} /> : null}
-                    {activeFilter.value}
-                    <a href="/store" class="ml-2 hover:text-white">&times;</a>
-                </span>
-            </div>
-        )}
-
-        <!-- Results Count -->
-        <div class="flex items-center justify-between mb-6 px-2">
-            <p class="text-sm text-dracula-comment flex items-center gap-2">
-                <ShoppingBag size={18} />
-                Mostrando <span class="text-white font-bold">{filteredProducts.length}</span> productos
-            </p>
-        </div>
-
-        <!-- Products Grid -->
-        {filteredProducts.length > 0 ? (
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts.map(product => (
-                    <ProductCard
-                        id={product.id}
-                        name={product.name}
-                        price={product.price}
-                        entrepreneur={product.entrepreneur}
-                        entrepreneurPhone={product.entrepreneurPhone}
-                        cause={product.cause}
-                        causeId={product.causeId}
-                        leaderName={product.leaderName}
-                        contributionText={product.contributionText}
-                        photoUrl={product.photoUrl}
-                    />
-                ))}
-            </div>
-        ) : (
-            <div class="text-center py-16 glass rounded-2xl">
-                <ShoppingBag size={64} className="mx-auto mb-4 text-dracula-comment" />
-                <h3 class="text-xl font-bold text-white mb-2">No hay productos</h3>
-                <p class="text-dracula-comment mb-4">No encontramos productos con estos filtros.</p>
-                <a href="/store" class="btn-primary inline-block">Ver todos los productos</a>
-            </div>
-        )}
-
-        <!-- CTA Section -->
-        <div class="mt-16 text-center glass p-8 rounded-2xl border border-entrepreneur/30">
-            <h2 class="text-2xl font-bold text-white mb-4">Eres emprendedor?</h2>
-            <p class="text-dracula-fg/70 mb-6 max-w-xl mx-auto">
-                Publica tus productos y vinculalos a causas sociales. Vende con proposito y genera impacto real.
-            </p>
-            <a href="/register" class="btn-primary inline-block">Crear mi Tienda</a>
-        </div>
+  <div class="py-8">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        <span class="text-entrepreneur">Tienda</span> con <span class="text-comoon-purple"
+          >Proposito</span
+        >
+      </h1>
+      <p class="text-lg text-dracula-fg/70 max-w-2xl mx-auto">
+        Productos unicos de emprendedores y lideres colombianos. <span
+          class="text-dracula-green font-medium">Cada compra ilumina una causa social.</span
+        >
+      </p>
     </div>
+
+    <!-- Filters Component -->
+    <StoreFilters
+      client:idle
+      causes={causes}
+      leaders={leaders}
+      activeCauseId={filterCause}
+      activeLeaderId={filterLeader}
+    />
+
+    <!-- Active Filter Badge -->
+    {
+      activeFilter && (
+        <div class="flex items-center justify-center gap-2 mb-6">
+          <span class="text-dracula-comment text-sm">Filtrando por {activeFilter.type}:</span>
+          <span class="bg-leader/20 text-leader px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2">
+            {activeFilter.type === 'causa' ? <Heart size={14} /> : null}
+            {activeFilter.value}
+            <a href="/store" class="ml-2 hover:text-white">
+              &times;
+            </a>
+          </span>
+        </div>
+      )
+    }
+
+    <!-- Results Count -->
+    <div class="flex items-center justify-between mb-6 px-2">
+      <p class="text-sm text-dracula-comment flex items-center gap-2">
+        <ShoppingBag size={18} />
+        Mostrando <span class="text-white font-bold">{allProducts.length}</span> productos
+      </p>
+    </div>
+
+    <!-- Products Grid -->
+    {
+      allProducts.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {allProducts.map((product) => (
+            <ProductCard
+              id={product.id}
+              name={product.name}
+              price={product.price}
+              entrepreneur={product.entrepreneur}
+              entrepreneurPhone={product.entrepreneurPhone}
+              cause={product.cause}
+              causeId={product.causeId}
+              leaderName={product.leaderName}
+              contributionText={product.contributionText}
+              photoUrl={product.photoUrl}
+            />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-16 glass rounded-2xl">
+          <ShoppingBag size={64} className="mx-auto mb-4 text-dracula-comment" />
+          <h3 class="text-xl font-bold text-white mb-2">No hay productos</h3>
+          <p class="text-dracula-comment mb-4">No encontramos productos con estos filtros.</p>
+          <a href="/store" class="btn-primary inline-block">
+            Ver todos los productos
+          </a>
+        </div>
+      )
+    }
+
+    <!-- CTA Section -->
+    <div class="mt-16 text-center glass p-8 rounded-2xl border border-entrepreneur/30">
+      <h2 class="text-2xl font-bold text-white mb-4">Eres emprendedor o lider?</h2>
+      <p class="text-dracula-fg/70 mb-6 max-w-xl mx-auto">
+        Publica tus productos y vinculalos a causas sociales. Vende con proposito y genera impacto
+        real.
+      </p>
+      <a href="/register" class="btn-primary inline-block">Crear mi Tienda</a>
+    </div>
+  </div>
 </Layout>

@@ -1,189 +1,253 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import WhatsAppButton from '../../components/WhatsAppButton';
+import ContactButtons from '../../components/ContactButtons';
 import ShareButtons from '../../components/ShareButtons';
-import { ArrowLeft, Tag, Heart, Storefront, MapPin, Moon } from '@phosphor-icons/react';
+import { ArrowLeft, Tag, Heart, Storefront, MapPin, Moon, UsersThree } from '@phosphor-icons/react';
 
 const { id } = Astro.params;
 if (!id) {
-    return Astro.redirect('/404');
+  return Astro.redirect('/404');
 }
 
-// Mock Data - In real app, fetch from API
-const product = {
-    id: "1",
-    name: "Bolso Tejido en Palma",
-    price: 85000,
-    description: "Bolso artesanal hecho a mano con fibras de palma de iraca. Cada pieza es unica, tejida por artesanas del Pacifico colombiano siguiendo tecnicas ancestrales transmitidas por generaciones. Resistente, ecologico y con un diseno que fusiona tradicion y modernidad.",
-    entrepreneur: "Artesanias del Valle",
-    entrepreneurId: "1",
-    entrepreneurPhone: "+573151112233",
-    entrepreneurLocation: "Cali, Valle del Cauca",
-    cause: "Comedor Comunitario La Esperanza",
-    causeId: "1",
-    leaderName: "Elena Marin",
-    leaderId: "1",
-    contributionText: "El 15% de esta compra se dona",
-    contributionAmount: 12750,
-    photoUrl: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80",
-    gallery: [
-        "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80",
-        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=400&q=80",
-        "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=400&q=80"
-    ]
-};
+const db = Astro.locals.runtime?.env?.DB;
+let product: Record<string, any> | null = null;
+let sellerContact: Record<string, string> = {};
+let sellerName = '';
+let sellerLocation = '';
+let sellerType = '';
+let sellerId = '';
 
-// Format price
+if (db) {
+  const row = await db
+    .prepare(
+      `
+        SELECT p.*,
+            e.store_name, e.photo_url as entrepreneur_photo, e.contact_info as entrepreneur_contact,
+            e.city as entrepreneur_city, e.department as entrepreneur_department,
+            pl.name as product_leader_name, pl.photo_url as product_leader_photo,
+            pl.contact_info as product_leader_contact, pl.city as product_leader_city, pl.department as product_leader_department,
+            c.title as cause_title, c.leader_id as cause_leader_id,
+            l.name as leader_name
+        FROM products p
+        LEFT JOIN entrepreneurs e ON p.entrepreneur_id = e.id
+        LEFT JOIN leaders pl ON p.leader_id = pl.id
+        JOIN causes c ON p.cause_id = c.id
+        JOIN leaders l ON c.leader_id = l.id
+        WHERE p.id = ?
+    `,
+    )
+    .bind(parseInt(id))
+    .first();
+
+  if (row) {
+    product = row as Record<string, any>;
+
+    if (product.leader_id) {
+      sellerType = 'leader';
+      sellerName = product.product_leader_name || '';
+      sellerLocation = [product.product_leader_city, product.product_leader_department]
+        .filter(Boolean)
+        .join(', ');
+      sellerId = String(product.leader_id);
+      try {
+        sellerContact = JSON.parse(product.product_leader_contact || '{}');
+      } catch {}
+    } else {
+      sellerType = 'entrepreneur';
+      sellerName = product.store_name || '';
+      sellerLocation = [product.entrepreneur_city, product.entrepreneur_department]
+        .filter(Boolean)
+        .join(', ');
+      sellerId = String(product.entrepreneur_id);
+      try {
+        sellerContact = JSON.parse(product.entrepreneur_contact || '{}');
+      } catch {}
+    }
+  }
+}
+
+if (!product) {
+  return Astro.redirect('/404');
+}
+
 const formattedPrice = new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    maximumFractionDigits: 0
+  style: 'currency',
+  currency: 'COP',
+  maximumFractionDigits: 0,
 }).format(product.price);
 
-const formattedContribution = new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    maximumFractionDigits: 0
-}).format(product.contributionAmount);
+const contributionDisplay =
+  product.contribution_text ||
+  (product.contribution_type === 'percentage'
+    ? `${product.contribution_amount}% de cada compra se dona`
+    : `$${product.contribution_amount?.toLocaleString('es-CO')} por compra se donan`);
+
+const sellerProfileUrl =
+  sellerType === 'leader' ? `/leaders/${sellerId}` : `/entrepreneurs/${sellerId}`;
 ---
 
-<Layout title={product.name}>
-    <div class="max-w-6xl mx-auto py-8 px-4">
-        <!-- Back Button -->
-        <a href="/store" class="inline-flex items-center gap-2 text-dracula-comment hover:text-white mb-8 transition-colors group">
-            <ArrowLeft class="group-hover:-translate-x-1 transition-transform" />
-            Volver a la Tienda
-        </a>
+<Layout
+  title={product.name}
+  description={`${product.name} - ${contributionDisplay} a "${product.cause_title}". Compra con proposito en Comoon.`}
+  ogImage={product.photo_url}
+  ogType="product"
+>
+  <div class="max-w-6xl mx-auto py-8 px-4">
+    <!-- Back Button -->
+    <a
+      href="/store"
+      class="inline-flex items-center gap-2 text-dracula-comment hover:text-white mb-8 transition-colors group"
+    >
+      <ArrowLeft class="group-hover:-translate-x-1 transition-transform" />
+      Volver a la Tienda
+    </a>
 
-        <div class="grid lg:grid-cols-2 gap-10">
-            <!-- Product Images -->
-            <div class="space-y-4">
-                <div class="glass p-3 rounded-2xl">
-                    <img
-                        src={product.photoUrl}
-                        alt={product.name}
-                        class="w-full h-auto rounded-xl shadow-2xl"
-                        id="mainImage"
-                    />
-                </div>
-                <!-- Thumbnail Gallery -->
-                <div class="flex gap-2">
-                    {product.gallery.map((img, i) => (
-                        <button
-                            class="w-20 h-20 rounded-lg overflow-hidden border-2 border-transparent hover:border-dracula-purple transition-colors"
-                            onclick={`document.getElementById('mainImage').src = '${img.replace('w=400', 'w=800')}'`}
-                        >
-                            <img src={img} alt={`Vista ${i + 1}`} class="w-full h-full object-cover" />
-                        </button>
-                    ))}
-                </div>
-            </div>
+    <div class="grid lg:grid-cols-2 gap-10">
+      <!-- Product Image -->
+      <div class="space-y-4">
+        <div class="glass p-3 rounded-2xl">
+          {
+            product.photo_url ? (
+              <img
+                src={product.photo_url}
+                alt={product.name}
+                class="w-full h-auto rounded-xl shadow-2xl"
+              />
+            ) : (
+              <div class="w-full h-64 rounded-xl bg-dracula-current/20 flex items-center justify-center">
+                <span class="text-6xl">🛍️</span>
+              </div>
+            )
+          }
+        </div>
+      </div>
 
-            <!-- Product Details -->
+      <!-- Product Details -->
+      <div>
+        <!-- Price -->
+        <div class="flex items-center justify-between mb-4">
+          <span
+            class={`px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 ${sellerType === 'leader' ? 'bg-leader/20 text-leader' : 'bg-entrepreneur/20 text-entrepreneur'}`}
+          >
+            {sellerType === 'leader' ? <UsersThree size={14} /> : <Tag size={14} />}
+            {sellerType === 'leader' ? 'Producto de Lider' : 'Producto'}
+          </span>
+          <span class="text-3xl font-bold text-dracula-green">{formattedPrice}</span>
+        </div>
+
+        <!-- Title -->
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">{product.name}</h1>
+
+        <!-- Description -->
+        {
+          product.description && (
+            <p class="text-lg text-dracula-fg/80 mb-8 leading-relaxed">{product.description}</p>
+          )
+        }
+
+        <!-- Impact Section -->
+        <div class="glass p-6 rounded-2xl mb-8 border border-leader/30 relative overflow-hidden">
+          <div class="absolute -right-6 -top-6 text-leader/10">
+            <Heart size={120} weight="fill" />
+          </div>
+          <div class="relative">
+            <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+              <Moon size={20} weight="duotone" className="text-comoon-purple" />
+              Impacto de tu compra
+            </h3>
+            <p class="text-dracula-fg/90 mb-4">{contributionDisplay}</p>
+            <a
+              href={`/causes/${product.cause_id}`}
+              class="block bg-dracula-bg/50 p-4 rounded-xl hover:bg-dracula-current/50 transition-colors border border-white/5"
+            >
+              <p class="text-leader font-bold text-xl mb-1">"{product.cause_title}"</p>
+              <p class="text-sm text-dracula-comment">
+                Causa liderada por <span class="text-white font-medium">{product.leader_name}</span>
+              </p>
+            </a>
+          </div>
+        </div>
+
+        <!-- Contact Buttons -->
+        <div class="mb-6">
+          <h3 class="text-sm font-bold text-dracula-comment mb-3 uppercase tracking-wider">
+            Contactar al vendedor
+          </h3>
+          <ContactButtons
+            client:idle
+            contactInfo={sellerContact}
+            productName={product.name}
+            size="lg"
+          />
+        </div>
+
+        <!-- Seller Info -->
+        <div
+          class="flex items-center justify-between p-4 bg-dracula-current/20 rounded-xl border border-white/5"
+        >
+          <div class="flex items-center gap-3">
+            {
+              sellerType === 'leader' ? (
+                <UsersThree size={24} className="text-leader" />
+              ) : (
+                <Storefront size={24} className="text-entrepreneur" />
+              )
+            }
             <div>
-                <!-- Category & Price -->
-                <div class="flex items-center justify-between mb-4">
-                    <span class="bg-entrepreneur/20 text-entrepreneur px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
-                        <Tag size={14} />
-                        Artesania
-                    </span>
-                    <span class="text-3xl font-bold text-dracula-green">{formattedPrice}</span>
-                </div>
-
-                <!-- Title -->
-                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">{product.name}</h1>
-
-                <!-- Description -->
-                <p class="text-lg text-dracula-fg/80 mb-8 leading-relaxed">{product.description}</p>
-
-                <!-- Impact Section -->
-                <div class="glass p-6 rounded-2xl mb-8 border border-leader/30 relative overflow-hidden">
-                    <div class="absolute -right-6 -top-6 text-leader/10">
-                        <Heart size={120} weight="fill" />
-                    </div>
-                    <div class="relative">
-                        <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                            <Moon size={20} weight="duotone" className="text-comoon-purple" />
-                            Impacto de tu compra
-                        </h3>
-                        <p class="text-dracula-fg/90 mb-4">
-                            Al comprar este producto, <span class="text-dracula-green font-bold">{formattedContribution}</span> van directamente a apoyar:
-                        </p>
-                        <a
-                            href={`/causes/${product.causeId}`}
-                            class="block bg-dracula-bg/50 p-4 rounded-xl hover:bg-dracula-current/50 transition-colors border border-white/5"
-                        >
-                            <p class="text-leader font-bold text-xl mb-1">"{product.cause}"</p>
-                            <p class="text-sm text-dracula-comment">
-                                Causa liderada por <span class="text-white font-medium">{product.leaderName}</span>
-                            </p>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- WhatsApp Button -->
-                <div class="mb-6">
-                    <WhatsAppButton
-                        client:load
-                        productName={product.name}
-                        leaderName={product.leaderName}
-                        entrepreneurPhone={product.entrepreneurPhone}
-                    />
-                </div>
-
-                <!-- Entrepreneur Info -->
-                <div class="flex items-center justify-between p-4 bg-dracula-current/20 rounded-xl border border-white/5">
-                    <div class="flex items-center gap-3">
-                        <Storefront size={24} className="text-entrepreneur" />
-                        <div>
-                            <a
-                                href={`/entrepreneurs/${product.entrepreneurId}`}
-                                class="font-bold text-white hover:text-entrepreneur transition-colors"
-                            >
-                                {product.entrepreneur}
-                            </a>
-                            <p class="text-xs text-dracula-comment flex items-center gap-1">
-                                <MapPin size={12} />
-                                {product.entrepreneurLocation}
-                            </p>
-                        </div>
-                    </div>
-                    <a
-                        href={`/entrepreneurs/${product.entrepreneurId}`}
-                        class="text-sm text-entrepreneur hover:underline"
-                    >
-                        Ver tienda
-                    </a>
-                </div>
-
-                <!-- Share Section -->
-                <div class="mt-8 pt-6 border-t border-white/10">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-dracula-comment flex items-center gap-2">
-                            <Moon size={16} weight="duotone" className="text-comoon-purple" />
-                            Difusion Lunar
-                        </span>
-                        <ShareButtons
-                            client:visible
-                            title={product.name}
-                            text={`Mira este producto en comoon: ${product.name}. Tu compra apoya la causa "${product.cause}"`}
-                        />
-                    </div>
-                </div>
+              <a
+                href={sellerProfileUrl}
+                class={`font-bold text-white hover:${sellerType === 'leader' ? 'text-leader' : 'text-entrepreneur'} transition-colors`}
+              >
+                {sellerName}
+              </a>
+              {
+                sellerLocation && (
+                  <p class="text-xs text-dracula-comment flex items-center gap-1">
+                    <MapPin size={12} />
+                    {sellerLocation}
+                  </p>
+                )
+              }
             </div>
+          </div>
+          <a
+            href={sellerProfileUrl}
+            class={`text-sm hover:underline ${sellerType === 'leader' ? 'text-leader' : 'text-entrepreneur'}`}
+          >
+            Ver perfil
+          </a>
         </div>
 
-        <!-- Related Products Section -->
-        <div class="mt-16">
-            <h2 class="text-2xl font-bold text-white mb-6">Mas productos que apoyan esta causa</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Placeholder for related products -->
-                <a href="/store?causa=1" class="glass p-6 rounded-xl text-center hover:border-leader/50 border border-transparent transition-all">
-                    <Heart size={40} className="mx-auto mb-3 text-leader" />
-                    <p class="font-bold text-white mb-2">Ver mas productos</p>
-                    <p class="text-sm text-dracula-comment">que apoyan "{product.cause}"</p>
-                </a>
-            </div>
+        <!-- Share Section -->
+        <div class="mt-8 pt-6 border-t border-white/10">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-dracula-comment flex items-center gap-2">
+              <Moon size={16} weight="duotone" className="text-comoon-purple" />
+              Difusion Lunar
+            </span>
+            <ShareButtons
+              client:visible
+              title={product.name}
+              text={`Mira este producto en comoon: ${product.name}. Tu compra apoya la causa "${product.cause_title}"`}
+            />
+          </div>
         </div>
+      </div>
     </div>
+
+    <!-- Related Products Section -->
+    <div class="mt-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Mas productos que apoyan esta causa</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a
+          href={`/store?causa=${product.cause_id}`}
+          class="glass p-6 rounded-xl text-center hover:border-leader/50 border border-transparent transition-all"
+        >
+          <Heart size={40} className="mx-auto mb-3 text-leader" />
+          <p class="font-bold text-white mb-2">Ver mas productos</p>
+          <p class="text-sm text-dracula-comment">que apoyan "{product.cause_title}"</p>
+        </a>
+      </div>
+    </div>
+  </div>
 </Layout>
