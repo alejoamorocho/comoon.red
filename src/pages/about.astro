@@ -1,0 +1,328 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { LeaderTagsList } from '../components/LeaderTagBadge';
+import {
+  ArrowRight,
+  Heart,
+  Handshake,
+  TrendUp,
+  UsersThree,
+  Storefront,
+  Quotes,
+} from '@phosphor-icons/react';
+
+// Stats
+const db = Astro.locals.runtime?.env?.DB;
+let stats = { leaders: 0, entrepreneurs: 0, products: 0, raised: 0 };
+if (db) {
+  const [leaderCount, entrepreneurCount, productCount, raisedSum] = await Promise.all([
+    db.prepare('SELECT COUNT(*) as c FROM leaders').first<{ c: number }>(),
+    db.prepare('SELECT COUNT(*) as c FROM entrepreneurs').first<{ c: number }>(),
+    db.prepare('SELECT COUNT(*) as c FROM products WHERE is_active = 1').first<{ c: number }>(),
+    db.prepare('SELECT COALESCE(SUM(current_amount), 0) as c FROM causes').first<{ c: number }>(),
+  ]);
+  stats = {
+    leaders: leaderCount?.c || 0,
+    entrepreneurs: entrepreneurCount?.c || 0,
+    products: productCount?.c || 0,
+    raised: raisedSum?.c || 0,
+  };
+}
+
+const formatCurrency = (n: number) => {
+  if (n >= 1000000) return `$${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `$${(n / 1000).toFixed(0)}K`;
+  return `$${n.toLocaleString('es-CO')}`;
+};
+---
+
+<Layout title="Acerca de" fullWidth>
+  <!-- Hero -->
+  <section class="relative px-6 pt-20 pb-24 overflow-hidden">
+    <div
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-comoon-purple/10 rounded-full blur-[160px] pointer-events-none"
+    >
+    </div>
+
+    <div class="relative z-10 max-w-3xl mx-auto text-center">
+      <p class="text-comoon-purple text-xs font-bold uppercase tracking-[0.2em] mb-4">Acerca de</p>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
+        <span class="text-white">co</span><span class="text-comoon-purple">moon</span>
+      </h1>
+      <p class="text-lg text-dracula-comment-accessible leading-relaxed max-w-2xl mx-auto">
+        Somos una plataforma de economia solidaria que conecta lideres sociales con emprendedores
+        para que cada venta genere impacto real en las comunidades que mas lo necesitan.
+      </p>
+    </div>
+  </section>
+
+  <!-- Problema / Conexion / Impacto -->
+  <section class="px-6 pb-24">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
+      <div
+        class="glass rounded-2xl p-8 text-center border border-white/5 hover:border-dracula-red/20 transition-colors"
+      >
+        <div
+          class="w-14 h-14 rounded-xl bg-dracula-red/10 flex items-center justify-center mx-auto mb-5"
+        >
+          <Heart size={28} className="text-dracula-red" weight="duotone" />
+        </div>
+        <h3 class="font-bold text-white mb-3">El Problema</h3>
+        <p class="text-sm text-dracula-comment-accessible leading-relaxed">
+          Los lideres sociales necesitan recursos pero no tienen acceso a financiacion. Los
+          consumidores quieren ayudar pero no saben como.
+        </p>
+      </div>
+
+      <div
+        class="glass rounded-2xl p-8 text-center border border-white/5 hover:border-comoon-purple/20 transition-colors"
+      >
+        <div
+          class="w-14 h-14 rounded-xl bg-comoon-purple/10 flex items-center justify-center mx-auto mb-5"
+        >
+          <Handshake size={28} className="text-comoon-purple" weight="duotone" />
+        </div>
+        <h3 class="font-bold text-white mb-3">La Conexion</h3>
+        <p class="text-sm text-dracula-comment-accessible leading-relaxed">
+          Comoon conecta la necesidad con la solucion. Cada venta de un emprendedor genera una
+          donacion a una causa de un lider.
+        </p>
+      </div>
+
+      <div
+        class="glass rounded-2xl p-8 text-center border border-white/5 hover:border-dracula-green/20 transition-colors"
+      >
+        <div
+          class="w-14 h-14 rounded-xl bg-dracula-green/10 flex items-center justify-center mx-auto mb-5"
+        >
+          <TrendUp size={28} className="text-dracula-green" weight="duotone" />
+        </div>
+        <h3 class="font-bold text-white mb-3">El Impacto</h3>
+        <p class="text-sm text-dracula-comment-accessible leading-relaxed">
+          Comprar es ayudar. Emprender es transformar. Liderar es inspirar. Un ecosistema donde
+          todos ganan.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Como funciona -->
+  <section class="px-6 py-24 border-y border-white/5">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <p class="text-comoon-purple text-xs font-bold uppercase tracking-[0.2em] mb-3">
+          Como funciona
+        </p>
+        <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight">
+          Tres actores, un proposito
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-10">
+        <div class="text-center">
+          <div
+            class="w-16 h-16 rounded-2xl bg-leader/10 border border-leader/20 flex items-center justify-center mx-auto mb-5"
+          >
+            <UsersThree size={32} className="text-leader" weight="duotone" />
+          </div>
+          <h3 class="font-bold text-white mb-2">Lideres publican causas</h3>
+          <p class="text-sm text-dracula-comment-accessible leading-relaxed">
+            Crean causas verificadas con metas claras, evidencia y transparencia total.
+          </p>
+        </div>
+
+        <div class="text-center">
+          <div
+            class="w-16 h-16 rounded-2xl bg-entrepreneur/10 border border-entrepreneur/20 flex items-center justify-center mx-auto mb-5"
+          >
+            <Storefront size={32} className="text-entrepreneur" weight="duotone" />
+          </div>
+          <h3 class="font-bold text-white mb-2">Emprendedores vinculan productos</h3>
+          <p class="text-sm text-dracula-comment-accessible leading-relaxed">
+            Conectan sus productos a causas y definen cuanto de cada venta se destina al impacto.
+          </p>
+        </div>
+
+        <div class="text-center">
+          <div
+            class="w-16 h-16 rounded-2xl bg-community/10 border border-community/20 flex items-center justify-center mx-auto mb-5"
+          >
+            <Heart size={32} className="text-community" weight="duotone" />
+          </div>
+          <h3 class="font-bold text-white mb-2">Tu compra genera cambio</h3>
+          <p class="text-sm text-dracula-comment-accessible leading-relaxed">
+            Cada producto comprado aporta directamente a una causa. Consumo consciente con impacto
+            real.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roles -->
+  <section class="px-6 py-24">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+      <!-- Lider -->
+      <div
+        class="glass rounded-2xl p-8 border border-leader/10 hover:border-leader/25 transition-colors"
+      >
+        <div class="w-12 h-12 rounded-xl bg-leader/10 flex items-center justify-center mb-5">
+          <UsersThree size={24} className="text-leader" weight="duotone" />
+        </div>
+        <h3 class="text-xl font-bold text-white mb-3">Lideres Sociales</h3>
+        <p class="text-sm text-dracula-comment-accessible mb-5 leading-relaxed">
+          Personas que dedican su vida a transformar comunidades. Publican causas, reciben apoyo de
+          emprendedores y muestran transparencia.
+        </p>
+        <div class="flex flex-wrap gap-2 mb-6">
+          <LeaderTagsList
+            client:visible
+            tags={[
+              'ambiental',
+              'social',
+              'educacion',
+              'alimentacion',
+              'salud',
+              'cultura',
+              'comunidad',
+              'animales',
+            ]}
+            size="sm"
+            maxVisible={8}
+          />
+        </div>
+        <a
+          href="/register"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-leader hover:underline"
+        >
+          Registrarme como Lider <ArrowRight size={14} />
+        </a>
+      </div>
+
+      <!-- Emprendedor -->
+      <div
+        class="glass rounded-2xl p-8 border border-entrepreneur/10 hover:border-entrepreneur/25 transition-colors"
+      >
+        <div class="w-12 h-12 rounded-xl bg-entrepreneur/10 flex items-center justify-center mb-5">
+          <Storefront size={24} className="text-entrepreneur" weight="duotone" />
+        </div>
+        <h3 class="text-xl font-bold text-white mb-3">Emprendedores</h3>
+        <p class="text-sm text-dracula-comment-accessible mb-5 leading-relaxed">
+          Creadores, artesanos y productores que quieren que sus ventas generen impacto. Vinculan
+          productos a causas y definen su aporte.
+        </p>
+        <div class="glass rounded-lg p-3 mb-6 border border-entrepreneur/10">
+          <div class="flex items-center gap-2">
+            <Quotes size={16} className="text-entrepreneur shrink-0" />
+            <p class="text-xs text-dracula-fg/70 italic">
+              "Mis clientes ya no solo compran cafe. Compran la historia de una comunidad."
+            </p>
+          </div>
+        </div>
+        <a
+          href="/register"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-entrepreneur hover:underline"
+        >
+          Registrarme como Emprendedor <ArrowRight size={14} />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="px-6 py-20 border-y border-white/5">
+    <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <p class="text-3xl font-bold text-leader">{stats.leaders}</p>
+        <p class="text-xs text-dracula-comment-accessible mt-1">Lideres</p>
+      </div>
+      <div>
+        <p class="text-3xl font-bold text-entrepreneur">{stats.entrepreneurs}</p>
+        <p class="text-xs text-dracula-comment-accessible mt-1">Emprendedores</p>
+      </div>
+      <div>
+        <p class="text-3xl font-bold text-community">{stats.products}</p>
+        <p class="text-xs text-dracula-comment-accessible mt-1">Productos</p>
+      </div>
+      <div>
+        <p class="text-3xl font-bold text-dracula-green">{formatCurrency(stats.raised)}</p>
+        <p class="text-xs text-dracula-comment-accessible mt-1">Recaudados</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonios -->
+  <section class="px-6 py-24">
+    <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+      <div class="glass rounded-2xl p-6 border border-white/5">
+        <Quotes size={20} className="text-leader/30 mb-3" />
+        <p class="text-sm text-dracula-fg/80 mb-5 leading-relaxed italic">
+          "Antes tenia que ir de puerta en puerta pidiendo donaciones. Ahora los recursos llegan
+          mientras duermo. Comoon cambio todo."
+        </p>
+        <div class="flex items-center gap-3">
+          <img
+            src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=80&q=80"
+            alt=""
+            width="32"
+            height="32"
+            class="w-8 h-8 rounded-full object-cover"
+            loading="lazy"
+          />
+          <div>
+            <p class="text-xs font-semibold text-white">Maria Gonzalez</p>
+            <p class="text-[10px] text-leader">Lider · Quibdo</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-6 border border-white/5">
+        <Quotes size={20} className="text-entrepreneur/30 mb-3" />
+        <p class="text-sm text-dracula-fg/80 mb-5 leading-relaxed italic">
+          "Mis clientes ya no solo compran cafe. Compran la historia de Carlos y su escuela de
+          musica. Las ventas subieron 40%."
+        </p>
+        <div class="flex items-center gap-3">
+          <img
+            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80"
+            alt=""
+            width="32"
+            height="32"
+            class="w-8 h-8 rounded-full object-cover"
+            loading="lazy"
+          />
+          <div>
+            <p class="text-xs font-semibold text-white">Pedro Ramirez</p>
+            <p class="text-[10px] text-entrepreneur">Emprendedor · Manizales</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="px-6 py-20 text-center">
+    <div class="max-w-xl mx-auto">
+      <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
+        Unete a la economia solidaria
+      </h2>
+      <p class="text-sm text-dracula-comment-accessible mb-8">
+        Elige tu rol y empieza a generar impacto hoy.
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <a
+          href="/register"
+          class="px-6 py-3 bg-white text-dracula-bg font-bold text-sm rounded-full hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-all"
+        >
+          Crear cuenta
+        </a>
+        <a
+          href="/"
+          class="px-6 py-3 border border-white/15 text-white text-sm rounded-full hover:bg-white/5 transition-all"
+        >
+          Explorar
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

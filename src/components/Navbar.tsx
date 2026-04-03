@@ -1,13 +1,13 @@
 import {
   UsersThree,
   Storefront,
-  Briefcase,
   Rows,
   SignOut,
   User,
   Trophy,
   ShoppingBag,
   Gear,
+  Info,
 } from '@phosphor-icons/react';
 
 interface NavbarProps {
@@ -17,7 +17,6 @@ interface NavbarProps {
   userName?: string;
 }
 
-// Logo SVG Component
 function ComoonLogo({ size = 32 }: { size?: number }) {
   return (
     <svg
@@ -68,48 +67,55 @@ function LogoutButton() {
           window.location.href = '/';
         });
       }}
-      className="flex items-center gap-2 rounded-full border border-dracula-comment/50 px-3 py-2 text-sm font-medium text-dracula-comment transition-colors hover:border-dracula-red hover:text-dracula-red"
+      className="flex items-center gap-2 rounded-full border border-dracula-comment/30 px-3 py-1.5 text-xs font-medium text-dracula-comment transition-colors hover:border-dracula-red/50 hover:text-dracula-red"
     >
-      <SignOut size={18} />
+      <SignOut size={14} />
       <span className="hidden sm:inline">Salir</span>
     </button>
   );
 }
 
-export default function Navbar({
-  isLoggedIn = false,
-  userRole,
-  onboardingComplete,
-  userName,
-}: NavbarProps) {
+export default function Navbar({ isLoggedIn = false, userRole, onboardingComplete }: NavbarProps) {
   const isOnboarded = isLoggedIn && onboardingComplete;
 
   return (
     <nav
       aria-label="Navegacion principal"
-      className="glass sticky top-4 z-50 mx-4 mt-4 flex items-center justify-between rounded-xl px-6 py-4 shadow-lg shadow-dracula-bg/50"
+      className="sticky top-0 z-50 flex items-center justify-between border-b border-white/5 bg-dracula-bg/80 px-6 py-3 backdrop-blur-lg"
     >
-      <a href="/" className="group flex items-center gap-2">
-        <ComoonLogo size={36} />
-        <span className="text-2xl font-bold lowercase tracking-tight">
-          <span className="text-white">co</span>
-          <span className="text-comoon-purple">moon</span>
-        </span>
-      </a>
+      {/* Left: Logo + About */}
+      <div className="flex items-center gap-6">
+        <a href="/" className="group flex items-center gap-2">
+          <ComoonLogo size={28} />
+          <span className="text-lg font-bold lowercase tracking-tight">
+            <span className="text-white">co</span>
+            <span className="text-comoon-purple">moon</span>
+          </span>
+        </a>
 
-      <div className="flex items-center gap-4 md:gap-6">
-        {/* Not logged in: public nav */}
+        <a
+          href="/about"
+          className="hidden items-center gap-1.5 text-xs font-medium text-dracula-comment-accessible transition-colors hover:text-white sm:flex"
+        >
+          <Info size={14} weight="duotone" />
+          About
+        </a>
+      </div>
+
+      {/* Right: Nav links + Auth */}
+      <div className="flex items-center gap-3 md:gap-5">
+        {/* Public nav */}
         {!isLoggedIn && (
           <>
-            <NavLink href="/feed" icon={<Rows size={24} weight="duotone" />} label="Feed" />
+            <NavLink href="/feed" icon={<Rows size={18} weight="duotone" />} label="Feed" />
             <NavLink
               href="/store"
-              icon={<Storefront size={24} weight="duotone" />}
+              icon={<Storefront size={18} weight="duotone" />}
               label="Tienda"
             />
             <NavLink
               href="/leaders"
-              icon={<UsersThree size={24} weight="duotone" />}
+              icon={<UsersThree size={18} weight="duotone" />}
               label="Lideres"
             />
           </>
@@ -118,40 +124,40 @@ export default function Navbar({
         {/* Logged in but NOT onboarded */}
         {isLoggedIn && !onboardingComplete && (
           <>
-            <NavLink href="/feed" icon={<Rows size={24} weight="duotone" />} label="Feed" />
+            <NavLink href="/feed" icon={<Rows size={18} weight="duotone" />} label="Feed" />
             <NavLink href="/onboarding" label="Completar Perfil" />
           </>
         )}
 
-        {/* Leader nav (onboarded) */}
+        {/* Leader nav */}
         {isOnboarded && userRole === 'leader' && (
           <>
-            <NavLink href="/feed" icon={<Rows size={24} weight="duotone" />} label="Feed" />
+            <NavLink href="/feed" icon={<Rows size={18} weight="duotone" />} label="Feed" />
             <NavLink
               href="/dashboard/leader?tab=causas"
-              icon={<Trophy size={24} weight="duotone" />}
-              label="Mis Causas"
+              icon={<Trophy size={18} weight="duotone" />}
+              label="Causas"
             />
             <NavLink
               href="/dashboard/leader?tab=productos"
-              icon={<ShoppingBag size={24} weight="duotone" />}
-              label="Mi Tienda"
+              icon={<ShoppingBag size={18} weight="duotone" />}
+              label="Tienda"
             />
           </>
         )}
 
-        {/* Entrepreneur nav (onboarded) */}
+        {/* Entrepreneur nav */}
         {isOnboarded && userRole === 'entrepreneur' && (
           <>
-            <NavLink href="/feed" icon={<Rows size={24} weight="duotone" />} label="Feed" />
+            <NavLink href="/feed" icon={<Rows size={18} weight="duotone" />} label="Feed" />
             <NavLink
               href="/dashboard/entrepreneur?tab=productos"
-              icon={<ShoppingBag size={24} weight="duotone" />}
-              label="Mis Productos"
+              icon={<ShoppingBag size={18} weight="duotone" />}
+              label="Productos"
             />
             <NavLink
               href="/leaders"
-              icon={<UsersThree size={24} weight="duotone" />}
+              icon={<UsersThree size={18} weight="duotone" />}
               label="Causas"
             />
           </>
@@ -160,27 +166,27 @@ export default function Navbar({
         {/* Admin nav */}
         {isOnboarded && userRole === 'admin' && (
           <>
-            <NavLink href="/feed" icon={<Rows size={24} weight="duotone" />} label="Feed" />
+            <NavLink href="/feed" icon={<Rows size={18} weight="duotone" />} label="Feed" />
             <NavLink
               href="/leaders"
-              icon={<UsersThree size={24} weight="duotone" />}
+              icon={<UsersThree size={18} weight="duotone" />}
               label="Lideres"
             />
             <NavLink
               href="/store"
-              icon={<Storefront size={24} weight="duotone" />}
+              icon={<Storefront size={18} weight="duotone" />}
               label="Tienda"
             />
             <NavLink
               href="/dashboard/admin"
-              icon={<Gear size={24} weight="duotone" />}
+              icon={<Gear size={18} weight="duotone" />}
               label="Admin"
             />
           </>
         )}
 
-        {/* Auth buttons */}
-        <div className="ml-2 flex items-center gap-2">
+        {/* Auth */}
+        <div className="ml-1 flex items-center gap-2">
           {isLoggedIn ? (
             <>
               {isOnboarded && (
@@ -192,15 +198,15 @@ export default function Navbar({
                         ? '/dashboard/entrepreneur'
                         : '/dashboard/admin'
                   }
-                  className={`flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     userRole === 'leader'
-                      ? 'border-leader text-leader hover:bg-leader hover:text-dracula-bg'
+                      ? 'border-leader/40 text-leader hover:bg-leader hover:text-dracula-bg'
                       : userRole === 'entrepreneur'
-                        ? 'border-entrepreneur text-entrepreneur hover:bg-entrepreneur hover:text-dracula-bg'
-                        : 'border-dracula-purple text-dracula-purple hover:bg-dracula-purple hover:text-dracula-bg'
+                        ? 'border-entrepreneur/40 text-entrepreneur hover:bg-entrepreneur hover:text-dracula-bg'
+                        : 'border-dracula-purple/40 text-dracula-purple hover:bg-dracula-purple hover:text-dracula-bg'
                   }`}
                 >
-                  <User size={18} />
+                  <User size={14} />
                   <span className="hidden sm:inline">
                     {userRole === 'leader'
                       ? 'Lider'
@@ -216,13 +222,13 @@ export default function Navbar({
             <>
               <a
                 href="/login"
-                className="flex items-center gap-1 rounded-full border border-white px-3 py-2 text-sm font-medium text-dracula-fg/80 transition-colors hover:text-white"
+                className="text-xs font-medium text-dracula-comment-accessible transition-colors hover:text-white"
               >
-                <span>Ingresar</span>
+                Ingresar
               </a>
               <a
                 href="/register"
-                className="rounded-full border border-dracula-purple px-4 py-2 text-sm font-bold text-dracula-purple transition-colors hover:bg-dracula-purple hover:text-dracula-bg"
+                className="rounded-full border border-comoon-purple/30 bg-comoon-purple/15 px-3.5 py-1.5 text-xs font-bold text-comoon-purple transition-colors hover:bg-comoon-purple hover:text-white"
               >
                 Unete
               </a>
@@ -238,11 +244,11 @@ function NavLink({ href, icon, label }: { href: string; icon?: React.ReactNode; 
   return (
     <a
       href={href}
-      className="flex items-center gap-2 font-medium text-dracula-fg/80 transition-colors duration-200 hover:text-dracula-cyan"
+      className="flex items-center gap-1.5 text-xs font-medium text-dracula-fg/60 transition-colors hover:text-white"
       aria-label={label}
     >
       {icon}
-      <span className="hidden lg:inline">{label}</span>
+      <span className="hidden md:inline">{label}</span>
     </a>
   );
 }

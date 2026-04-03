@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import StoreFilters from '../../components/StoreFilters';
-import { ShoppingBag, Heart } from '@phosphor-icons/react';
+import { ShoppingBag, Heart, Storefront, ArrowRight } from '@phosphor-icons/react';
 
 // Get filter from URL params
 const url = new URL(Astro.request.url);
@@ -105,94 +105,152 @@ if (filterLeader) {
 }
 ---
 
-<Layout title="Tienda con Proposito">
-  <div class="py-8">
-    <!-- Header -->
-    <div class="text-center mb-10">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4">
-        <span class="text-entrepreneur">Tienda</span> con <span class="text-comoon-purple"
-          >Proposito</span
+<Layout title="Tienda con Proposito" fullWidth>
+  <!-- ===== HERO HEADER ===== -->
+  <section class="relative px-6 pt-24 pb-16 overflow-hidden">
+    <!-- Ambient lights -->
+    <div
+      class="absolute top-0 left-1/3 w-[600px] h-[600px] bg-entrepreneur/10 rounded-full blur-[160px] pointer-events-none"
+    >
+    </div>
+    <div
+      class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-comoon-purple/8 rounded-full blur-[120px] pointer-events-none"
+    >
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto text-center">
+      <p class="text-entrepreneur text-xs font-bold uppercase tracking-[0.2em] mb-4">
+        Tienda con Proposito
+      </p>
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4">
+        Productos que <span
+          class="text-transparent bg-clip-text bg-gradient-to-r from-entrepreneur to-dracula-green"
+          >transforman</span
         >
       </h1>
-      <p class="text-lg text-dracula-fg/70 max-w-2xl mx-auto">
-        Productos unicos de emprendedores y lideres colombianos. <span
-          class="text-dracula-green font-medium">Cada compra ilumina una causa social.</span
+      <p class="text-lg text-dracula-comment-accessible max-w-2xl mx-auto leading-relaxed">
+        Productos unicos de emprendedores y lideres colombianos.
+        <span class="text-entrepreneur font-medium">Cada compra ilumina una causa social.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== FILTERS & CONTENT ===== -->
+  <section class="border-t border-white/5 px-6 py-12">
+    <div class="max-w-7xl mx-auto">
+      <!-- Filters Component -->
+      <div class="mb-8">
+        <StoreFilters
+          client:idle
+          causes={causes}
+          leaders={leaders}
+          activeCauseId={filterCause}
+          activeLeaderId={filterLeader}
+        />
+      </div>
+
+      <!-- Active Filter Badge + Results Count -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <p class="text-sm text-dracula-comment-accessible flex items-center gap-2">
+          <ShoppingBag size={18} weight="duotone" />
+          Mostrando <span class="text-white font-bold">{allProducts.length}</span> productos
+        </p>
+
+        {
+          activeFilter && (
+            <div class="flex items-center gap-2">
+              <span class="text-dracula-comment-accessible text-sm">
+                Filtrando por {activeFilter.type}:
+              </span>
+              <span class="bg-entrepreneur/10 text-entrepreneur border border-entrepreneur/20 px-4 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
+                {activeFilter.type === 'causa' ? <Heart size={14} weight="duotone" /> : null}
+                {activeFilter.value}
+                <a
+                  href="/store"
+                  class="ml-1 text-entrepreneur/60 hover:text-white transition-colors"
+                >
+                  &times;
+                </a>
+              </span>
+            </div>
+          )
+        }
+      </div>
+
+      <!-- Products Grid -->
+      {
+        allProducts.length > 0 ? (
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {allProducts.map((product) => (
+              <ProductCard
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                entrepreneur={product.entrepreneur}
+                entrepreneurPhone={product.entrepreneurPhone}
+                cause={product.cause}
+                causeId={product.causeId}
+                leaderName={product.leaderName}
+                contributionText={product.contributionText}
+                photoUrl={product.photoUrl}
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-24">
+            <div class="glass rounded-2xl p-12 max-w-md mx-auto border border-white/10">
+              <ShoppingBag
+                size={56}
+                weight="duotone"
+                className="mx-auto mb-6 text-dracula-comment"
+              />
+              <h3 class="text-xl font-bold text-white mb-2">No hay productos</h3>
+              <p class="text-dracula-comment-accessible mb-8">
+                No encontramos productos con estos filtros.
+              </p>
+              <a
+                href="/store"
+                class="inline-flex items-center gap-2 px-6 py-3 bg-white text-dracula-bg font-bold text-sm rounded-full hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-all duration-300"
+              >
+                Ver todos los productos
+                <ArrowRight size={16} />
+              </a>
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- ===== CTA SECTION ===== -->
+  <section class="border-t border-white/5 px-6 py-24">
+    <div class="relative max-w-3xl mx-auto text-center">
+      <!-- Ambient glow -->
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-entrepreneur/8 rounded-full blur-[120px] pointer-events-none"
+      >
+      </div>
+
+      <div class="relative z-10 glass rounded-2xl p-12 border border-entrepreneur/20">
+        <Storefront size={40} weight="duotone" className="mx-auto mb-4 text-entrepreneur" />
+        <p class="text-entrepreneur text-xs font-bold uppercase tracking-[0.2em] mb-3">
+          Vende con Proposito
+        </p>
+        <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-4">
+          Eres emprendedor o lider?
+        </h2>
+        <p class="text-dracula-comment-accessible mb-8 max-w-lg mx-auto leading-relaxed">
+          Publica tus productos y vinculalos a causas sociales. Vende con proposito y genera impacto
+          real en tu comunidad.
+        </p>
+        <a
+          href="/register"
+          class="inline-flex items-center gap-2 px-8 py-4 bg-entrepreneur text-white font-bold text-sm rounded-full hover:shadow-[0_0_30px_rgba(34,197,94,0.3)] transition-all duration-300 group"
         >
-      </p>
+          Crear mi Tienda
+          <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+        </a>
+      </div>
     </div>
-
-    <!-- Filters Component -->
-    <StoreFilters
-      client:idle
-      causes={causes}
-      leaders={leaders}
-      activeCauseId={filterCause}
-      activeLeaderId={filterLeader}
-    />
-
-    <!-- Active Filter Badge -->
-    {
-      activeFilter && (
-        <div class="flex items-center justify-center gap-2 mb-6">
-          <span class="text-dracula-comment text-sm">Filtrando por {activeFilter.type}:</span>
-          <span class="bg-leader/20 text-leader px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2">
-            {activeFilter.type === 'causa' ? <Heart size={14} /> : null}
-            {activeFilter.value}
-            <a href="/store" class="ml-2 hover:text-white">
-              &times;
-            </a>
-          </span>
-        </div>
-      )
-    }
-
-    <!-- Results Count -->
-    <div class="flex items-center justify-between mb-6 px-2">
-      <p class="text-sm text-dracula-comment flex items-center gap-2">
-        <ShoppingBag size={18} />
-        Mostrando <span class="text-white font-bold">{allProducts.length}</span> productos
-      </p>
-    </div>
-
-    <!-- Products Grid -->
-    {
-      allProducts.length > 0 ? (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {allProducts.map((product) => (
-            <ProductCard
-              id={product.id}
-              name={product.name}
-              price={product.price}
-              entrepreneur={product.entrepreneur}
-              entrepreneurPhone={product.entrepreneurPhone}
-              cause={product.cause}
-              causeId={product.causeId}
-              leaderName={product.leaderName}
-              contributionText={product.contributionText}
-              photoUrl={product.photoUrl}
-            />
-          ))}
-        </div>
-      ) : (
-        <div class="text-center py-16 glass rounded-2xl">
-          <ShoppingBag size={64} className="mx-auto mb-4 text-dracula-comment" />
-          <h3 class="text-xl font-bold text-white mb-2">No hay productos</h3>
-          <p class="text-dracula-comment mb-4">No encontramos productos con estos filtros.</p>
-          <a href="/store" class="btn-primary inline-block">
-            Ver todos los productos
-          </a>
-        </div>
-      )
-    }
-
-    <!-- CTA Section -->
-    <div class="mt-16 text-center glass p-8 rounded-2xl border border-entrepreneur/30">
-      <h2 class="text-2xl font-bold text-white mb-4">Eres emprendedor o lider?</h2>
-      <p class="text-dracula-fg/70 mb-6 max-w-xl mx-auto">
-        Publica tus productos y vinculalos a causas sociales. Vende con proposito y genera impacto
-        real.
-      </p>
-      <a href="/register" class="btn-primary inline-block">Crear mi Tienda</a>
-    </div>
-  </div>
+  </section>
 </Layout>

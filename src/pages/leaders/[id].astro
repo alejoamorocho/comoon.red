@@ -9,7 +9,6 @@ import {
   MapPin,
   UsersThree,
   Star,
-  Image,
   Quotes,
   Moon,
   Heart,
@@ -148,111 +147,121 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
   description={leader.bio || `Conoce a ${leader.name}, lider social en Comoon.`}
   ogImage={leader.photo_url}
   ogType="profile"
+  fullWidth
 >
-  {/* Cover Banner */}
-  {
-    leader.cover_url && (
-      <div class="w-full h-64 md:h-80 relative overflow-hidden">
-        <img
-          src={leader.cover_url}
-          alt={`Portada de ${leader.name}`}
-          class="w-full h-full object-cover"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-transparent to-transparent" />
-      </div>
-    )
-  }
-
-  <div class="max-w-5xl mx-auto py-8 px-4">
-    <!-- Back Button -->
-    <a
-      href="/leaders"
-      class="inline-flex items-center gap-2 text-dracula-comment hover:text-white mb-8 transition-colors group"
+  <!-- ===== HEADER / COVER ===== -->
+  <section class="relative overflow-hidden">
+    <!-- Ambient lights -->
+    <div
+      class="absolute top-0 left-1/3 w-[700px] h-[700px] bg-leader/10 rounded-full blur-[180px] pointer-events-none"
     >
-      <ArrowLeft class="group-hover:-translate-x-1 transition-transform" />
-      Volver a Lideres
-    </a>
+    </div>
+    <div
+      class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-comoon-purple/8 rounded-full blur-[140px] pointer-events-none"
+    >
+    </div>
 
-    <!-- Header Profile Card -->
-    <div class="glass p-8 rounded-2xl mb-12 border border-leader/30 relative overflow-hidden">
-      <div class="absolute top-0 right-0 w-64 h-64 bg-leader/10 rounded-full blur-3xl -z-10"></div>
+    {/* Cover image */}
+    {
+      leader.cover_url && (
+        <div class="w-full h-64 md:h-80 relative overflow-hidden">
+          <img
+            src={leader.cover_url}
+            alt={`Portada de ${leader.name}`}
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-dracula-bg/50 to-transparent" />
+        </div>
+      )
+    }
 
+    <div class="relative z-10 max-w-5xl mx-auto px-6 py-8">
+      <!-- Back -->
+      <a
+        href="/leaders"
+        class="inline-flex items-center gap-2 text-dracula-comment hover:text-white transition-colors group text-sm mb-10"
+      >
+        <ArrowLeft
+          size={16}
+          className="group-hover:-translate-x-1 transition-transform"
+          weight="duotone"
+        />
+        Volver a Lideres
+      </a>
+
+      <!-- Profile card -->
       <div class="md:flex gap-10 items-start">
-        {
-          leader.photo_url ? (
-            <img
-              src={leader.photo_url}
-              alt={leader.name}
-              class="w-40 h-40 md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl mx-auto md:mx-0 -mt-20 md:mt-0 border-4 border-dracula-bg"
-            />
-          ) : (
-            <div class="w-40 h-40 md:w-48 md:h-48 rounded-2xl bg-leader/20 flex items-center justify-center mx-auto md:mx-0 -mt-20 md:mt-0 border-4 border-dracula-bg">
-              <span class="text-6xl font-bold text-leader">{leader.name?.charAt(0)}</span>
-            </div>
-          )
-        }
-        <div class="mt-8 md:mt-0 flex-1">
-          <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-            <div>
-              <div class="flex items-center gap-3 mb-2">
-                <h1 class="text-3xl md:text-4xl font-bold text-white">{leader.name}</h1>
-                {
-                  leader.is_verified && (
-                    <span class="bg-dracula-green/20 text-dracula-green px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                      <CheckCircle size={14} weight="fill" />
-                      Verificado
-                    </span>
-                  )
-                }
+        {/* Photo */}
+        <div class="shrink-0 mx-auto md:mx-0 mb-8 md:mb-0">
+          {
+            leader.photo_url ? (
+              <img
+                src={leader.photo_url}
+                alt={leader.name}
+                class="w-36 h-36 md:w-44 md:h-44 rounded-2xl object-cover shadow-2xl border-2 border-leader/20"
+              />
+            ) : (
+              <div class="w-36 h-36 md:w-44 md:h-44 rounded-2xl bg-leader/10 flex items-center justify-center border-2 border-leader/20">
+                <span class="text-5xl font-bold text-leader/60">{leader.name?.charAt(0)}</span>
               </div>
-              {
-                leader.organization_name && (
-                  <p class="text-leader/80 font-medium flex items-center gap-2 mb-1">
-                    <Buildings size={18} weight="duotone" />
-                    {leader.organization_name}
-                  </p>
-                )
-              }
-              {
-                location && (
-                  <div class="flex items-center gap-2 text-leader font-medium mb-2">
-                    <MapPin size={20} weight="duotone" />
-                    <span>{location}</span>
-                  </div>
-                )
-              }
-              {
-                leader.parsedTags && leader.parsedTags.length > 0 && (
-                  <LeaderTagsList
-                    client:visible
-                    tags={leader.parsedTags}
-                    size="md"
-                    maxVisible={4}
-                  />
-                )
-              }
-            </div>
+            )
+          }
+        </div>
+
+        {/* Info */}
+        <div class="flex-1 text-center md:text-left">
+          <div class="flex flex-col md:flex-row items-center md:items-start gap-3 mb-3">
+            <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-white">{leader.name}</h1>
+            {
+              leader.is_verified && (
+                <span class="shrink-0 bg-dracula-green/15 text-dracula-green px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border border-dracula-green/20">
+                  <CheckCircle size={14} weight="fill" />
+                  Verificado
+                </span>
+              )
+            }
           </div>
 
           {
-            leader.bio && (
-              <p class="text-lg text-dracula-fg/90 mb-6 italic border-l-4 border-leader pl-4">
-                {leader.bio}
+            leader.organization_name && (
+              <p class="text-leader/70 font-medium flex items-center gap-2 justify-center md:justify-start mb-2">
+                <Buildings size={16} weight="duotone" />
+                {leader.organization_name}
               </p>
             )
           }
 
-          <!-- Contact Buttons -->
-          <div class="mb-6">
-            <ContactButtons client:visible contactInfo={contactInfo} size="md" />
-          </div>
+          {
+            location && (
+              <p class="text-dracula-comment-accessible flex items-center gap-2 justify-center md:justify-start mb-4 text-sm">
+                <MapPin size={16} weight="duotone" className="text-leader" />
+                {location}
+              </p>
+            )
+          }
 
-          <div
-            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-white/10 pt-4"
-          >
-            <div class="flex items-center gap-2">
-              <span class="text-sm text-dracula-comment flex items-center gap-2">
-                <Moon size={16} weight="duotone" className="text-comoon-purple" />
+          {
+            leader.parsedTags && leader.parsedTags.length > 0 && (
+              <div class="mb-5 flex justify-center md:justify-start">
+                <LeaderTagsList client:visible tags={leader.parsedTags} size="md" maxVisible={4} />
+              </div>
+            )
+          }
+
+          {
+            leader.bio && (
+              <p class="text-dracula-fg/80 text-lg leading-relaxed mb-6 max-w-2xl">{leader.bio}</p>
+            )
+          }
+
+          <!-- Actions row -->
+          <div class="flex flex-col sm:flex-row items-center gap-4">
+            <div class="flex items-center gap-3">
+              <ContactButtons client:visible contactInfo={contactInfo} size="md" />
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-dracula-comment text-sm flex items-center gap-1.5">
+                <Moon size={14} weight="duotone" className="text-comoon-purple" />
                 Difusion Lunar
               </span>
               <ShareButtons
@@ -263,8 +272,11 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
             </div>
             {
               activeCause && (
-                <a href="#causa" class="btn-primary flex items-center gap-2 text-sm px-6">
-                  <Heart size={18} weight="fill" />
+                <a
+                  href="#causa"
+                  class="ml-auto px-6 py-2.5 bg-leader text-dracula-bg font-bold text-sm rounded-full hover:shadow-[0_0_30px_rgba(45,212,191,0.25)] transition-all duration-300 flex items-center gap-2"
+                >
+                  <Heart size={16} weight="fill" />
                   Ver Causa Activa
                 </a>
               )
@@ -273,116 +285,137 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
         </div>
       </div>
     </div>
+  </section>
 
-    {/* Quiénes Somos */}
-    {
-      leader.who_we_are && (
-        <div class="mb-12">
-          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Heart size={28} weight="duotone" className="text-dracula-pink" />
-            Quiénes Somos
-          </h2>
-          <div class="glass p-8 rounded-2xl border border-dracula-pink/20 bg-dracula-pink/5">
-            <p class="text-lg text-dracula-fg/90 leading-relaxed whitespace-pre-line">
-              {leader.who_we_are}
-            </p>
-          </div>
-        </div>
-      )
-    }
-
-    {/* Por qué hacemos lo que hacemos */}
-    {
-      leader.our_why && (
-        <div class="mb-12">
-          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Lightbulb size={28} weight="duotone" className="text-dracula-yellow" />
-            Por qué hacemos lo que hacemos
-          </h2>
-          <div class="glass p-8 rounded-2xl border-l-4 border-dracula-yellow bg-dracula-yellow/5">
-            <p class="text-lg text-dracula-fg/90 leading-relaxed italic whitespace-pre-line">
-              "{leader.our_why}"
-            </p>
-          </div>
-        </div>
-      )
-    }
-
-    {/* Con qué nos puedes ayudar */}
-    {
-      leader.how_to_help && (
-        <div class="mb-12">
-          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <HandHeart size={28} weight="duotone" className="text-dracula-green" />
-            Con qué nos puedes ayudar
-          </h2>
-          <div class="glass p-8 rounded-2xl border-2 border-dracula-green/30 bg-dracula-green/5 relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 text-dracula-green/10">
-              <HandHeart size={100} weight="fill" />
-            </div>
-            <p class="text-lg text-dracula-fg/90 leading-relaxed relative z-10 whitespace-pre-line">
-              {leader.how_to_help}
-            </p>
-          </div>
-        </div>
-      )
-    }
-
-    {/* Impact Stats */}
-    {
-      hasStats && (
-        <div class="mb-12">
-          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Star size={28} weight="duotone" className="text-leader" />
+  <!-- ===== IMPACT STATS ===== -->
+  {
+    hasStats && (
+      <section class="border-t border-white/5 py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-3 text-center">
             Impacto
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white text-center mb-12">
+            Numeros que hablan
           </h2>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
             {leader.people_impacted && (
-              <div class="glass p-6 rounded-2xl text-center border border-leader/20">
-                <Users size={32} className="text-leader mx-auto mb-2" weight="duotone" />
-                <p class="text-3xl font-bold text-white">
+              <div class="glass rounded-2xl p-8 text-center border border-white/10 hover:border-leader/20 transition-colors">
+                <Users size={28} className="text-leader mx-auto mb-3" weight="duotone" />
+                <p class="text-3xl font-bold text-white mb-1">
                   {Number(leader.people_impacted).toLocaleString('es-CO')}
                 </p>
                 <p class="text-sm text-dracula-comment">Personas impactadas</p>
               </div>
             )}
             {leader.years_active && (
-              <div class="glass p-6 rounded-2xl text-center border border-leader/20">
-                <CalendarBlank size={32} className="text-leader mx-auto mb-2" weight="duotone" />
-                <p class="text-3xl font-bold text-white">{leader.years_active}</p>
-                <p class="text-sm text-dracula-comment">Años activo(a)</p>
+              <div class="glass rounded-2xl p-8 text-center border border-white/10 hover:border-leader/20 transition-colors">
+                <CalendarBlank size={28} className="text-leader mx-auto mb-3" weight="duotone" />
+                <p class="text-3xl font-bold text-white mb-1">{leader.years_active}</p>
+                <p class="text-sm text-dracula-comment">Anos activo(a)</p>
               </div>
             )}
             {activeCausesCount > 0 && (
-              <div class="glass p-6 rounded-2xl text-center border border-leader/20">
-                <Heart size={32} className="text-leader mx-auto mb-2" weight="duotone" />
-                <p class="text-3xl font-bold text-white">{activeCausesCount}</p>
+              <div class="glass rounded-2xl p-8 text-center border border-white/10 hover:border-leader/20 transition-colors">
+                <Heart size={28} className="text-leader mx-auto mb-3" weight="duotone" />
+                <p class="text-3xl font-bold text-white mb-1">{activeCausesCount}</p>
                 <p class="text-sm text-dracula-comment">Causas activas</p>
               </div>
             )}
           </div>
         </div>
-      )
-    }
+      </section>
+    )
+  }
 
-    {/* Achievements / Logros */}
-    {
-      achievements.length > 0 && (
-        <div class="mb-12">
-          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Trophy size={28} weight="duotone" className="text-dracula-yellow" />
-            Logros
+  <!-- ===== QUIENES SOMOS ===== -->
+  {
+    leader.who_we_are && (
+      <section class="border-t border-white/5 py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-dracula-pink text-xs font-bold uppercase tracking-[0.2em] mb-3">
+            Nuestra Historia
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8">
+            Quienes Somos
           </h2>
+          <div class="glass rounded-2xl p-8 md:p-10 border border-white/10 hover:border-dracula-pink/20 transition-colors">
+            <p class="text-lg text-dracula-fg/85 leading-relaxed whitespace-pre-line">
+              {leader.who_we_are}
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- ===== POR QUE LO HACEMOS ===== -->
+  {
+    leader.our_why && (
+      <section class="border-t border-white/5 py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-dracula-yellow text-xs font-bold uppercase tracking-[0.2em] mb-3">
+            Nuestro Proposito
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8">
+            Por que hacemos lo que hacemos
+          </h2>
+          <div class="glass rounded-2xl p-8 md:p-10 border border-white/10 hover:border-dracula-yellow/20 transition-colors relative overflow-hidden">
+            <div class="absolute top-6 right-6 text-dracula-yellow/10">
+              <Lightbulb size={80} weight="fill" />
+            </div>
+            <p class="text-lg text-dracula-fg/85 leading-relaxed italic relative z-10 whitespace-pre-line">
+              "{leader.our_why}"
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- ===== COMO AYUDAR ===== -->
+  {
+    leader.how_to_help && (
+      <section class="border-t border-white/5 py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-dracula-green text-xs font-bold uppercase tracking-[0.2em] mb-3">
+            Colabora
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8">
+            Como nos puedes ayudar
+          </h2>
+          <div class="glass rounded-2xl p-8 md:p-10 border border-white/10 hover:border-dracula-green/20 transition-colors relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 text-dracula-green/8">
+              <HandHeart size={120} weight="fill" />
+            </div>
+            <p class="text-lg text-dracula-fg/85 leading-relaxed relative z-10 whitespace-pre-line">
+              {leader.how_to_help}
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- ===== ACHIEVEMENTS ===== -->
+  {
+    achievements.length > 0 && (
+      <section class="border-t border-white/5 py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-dracula-yellow text-xs font-bold uppercase tracking-[0.2em] mb-3">
+            Reconocimientos
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">Logros</h2>
           <div class="space-y-4">
             {achievements.map((a: any, i: number) => (
-              <div class="glass p-6 rounded-2xl border-l-4 border-dracula-yellow/60 flex gap-4 items-start">
-                <div class="shrink-0 w-10 h-10 rounded-full bg-dracula-yellow/20 flex items-center justify-center">
+              <div class="glass rounded-2xl p-6 border border-white/10 hover:border-dracula-yellow/20 transition-colors flex gap-5 items-start">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-dracula-yellow/15 flex items-center justify-center border border-dracula-yellow/20">
                   <span class="text-dracula-yellow font-bold text-sm">{i + 1}</span>
                 </div>
                 <div>
                   {a.title && <h3 class="text-lg font-bold text-white mb-1">{a.title}</h3>}
                   {a.description && (
-                    <p class="text-dracula-fg/80 text-sm leading-relaxed">{a.description}</p>
+                    <p class="text-dracula-fg/75 text-sm leading-relaxed">{a.description}</p>
                   )}
                   {a.date && <p class="text-xs text-dracula-comment mt-2">{a.date}</p>}
                 </div>
@@ -390,36 +423,40 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
             ))}
           </div>
         </div>
-      )
-    }
+      </section>
+    )
+  }
 
-    {/* Testimonials / Testimonios */}
-    {
-      testimonials.length > 0 && (
-        <div class="mb-12">
-          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Quotes size={28} weight="duotone" className="text-dracula-cyan" />
+  <!-- ===== TESTIMONIALS ===== -->
+  {
+    testimonials.length > 0 && (
+      <section class="border-t border-white/5 py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-dracula-cyan text-xs font-bold uppercase tracking-[0.2em] mb-3">
+            Voces de la Comunidad
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">
             Testimonios
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {testimonials.map((t: any) => (
-              <div class="glass p-6 rounded-2xl border border-dracula-cyan/20 relative">
-                <div class="absolute top-4 right-4 text-dracula-cyan/20">
-                  <Quotes size={40} weight="fill" />
+              <div class="glass rounded-2xl p-6 border border-white/10 hover:border-dracula-cyan/20 transition-colors relative">
+                <div class="absolute top-5 right-5 text-dracula-cyan/15">
+                  <Quotes size={36} weight="fill" />
                 </div>
-                <p class="text-dracula-fg/90 italic mb-4 leading-relaxed relative z-10">
+                <p class="text-dracula-fg/85 italic mb-5 leading-relaxed relative z-10">
                   "{t.quote || t.text}"
                 </p>
-                <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                <div class="flex items-center gap-3 border-t border-white/5 pt-4">
                   {t.photo && (
                     <img
                       src={t.photo}
                       alt={t.name || 'Testimonio'}
-                      class="w-10 h-10 rounded-full object-cover border-2 border-dracula-cyan/40"
+                      class="w-10 h-10 rounded-full object-cover border border-dracula-cyan/30"
                     />
                   )}
                   <div>
-                    {t.name && <p class="text-white font-bold text-sm">{t.name}</p>}
+                    {t.name && <p class="text-white font-semibold text-sm">{t.name}</p>}
                     {t.role && <p class="text-xs text-dracula-comment">{t.role}</p>}
                   </div>
                 </div>
@@ -427,60 +464,68 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
             ))}
           </div>
         </div>
-      )
-    }
+      </section>
+    )
+  }
 
-    {/* Media Gallery / Galería */}
-    {
-      mediaGallery.length > 0 && (
-        <div class="mb-12">
-          <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Camera size={28} weight="duotone" className="text-dracula-purple" />
-            Galería
-          </h2>
+  <!-- ===== MEDIA GALLERY ===== -->
+  {
+    mediaGallery.length > 0 && (
+      <section class="border-t border-white/5 py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-dracula-purple text-xs font-bold uppercase tracking-[0.2em] mb-3">
+            Momentos
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">Galeria</h2>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
             {mediaGallery.map((photo: string, i: number) => (
-              <div class="rounded-xl overflow-hidden border border-white/10 hover:border-leader/40 transition-colors">
+              <div class="rounded-2xl overflow-hidden border border-white/10 hover:border-leader/30 transition-all duration-300 group">
                 <img
                   src={photo}
-                  alt={`Galería ${i + 1}`}
+                  alt={`Galeria ${i + 1}`}
                   loading="lazy"
                   decoding="async"
-                  class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                  class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
             ))}
           </div>
         </div>
-      )
-    }
+      </section>
+    )
+  }
 
-    <!-- Active Cause -->
-    {
-      activeCause && (
-        <div id="causa" class="mb-16 scroll-mt-24">
-          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <UsersThree size={28} className="text-leader" />
+  <!-- ===== ACTIVE CAUSE ===== -->
+  {
+    activeCause && (
+      <section id="causa" class="border-t border-white/5 py-20 px-6 scroll-mt-24">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-3">Apoya Ahora</p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">
             Causa Activa
           </h2>
-          <div class="glass p-8 rounded-2xl border border-leader/30">
-            <h3 class="text-2xl font-bold text-leader mb-4">{activeCause.title}</h3>
+
+          <div class="glass rounded-2xl p-8 md:p-10 border border-white/10 hover:border-leader/20 transition-colors relative overflow-hidden">
+            {/* Ambient glow */}
+            <div class="absolute top-0 right-0 w-64 h-64 bg-leader/8 rounded-full blur-[80px] pointer-events-none" />
+
+            <h3 class="text-2xl font-bold text-white mb-4">{activeCause.title}</h3>
             {activeCause.description && (
-              <p class="text-dracula-fg/80 mb-6 text-lg leading-relaxed">
+              <p class="text-dracula-fg/75 mb-8 text-lg leading-relaxed max-w-3xl">
                 {activeCause.description}
               </p>
             )}
 
             {activeCause.goal > 0 && (
-              <div class="mb-6">
-                <div class="flex justify-between text-sm font-bold mb-2">
+              <div class="mb-8 max-w-2xl">
+                <div class="flex justify-between text-sm font-semibold mb-3">
                   <span class="text-dracula-green">
                     {formatCurrency(activeCause.raised)} recaudados
                   </span>
                   <span class="text-dracula-comment">Meta: {formatCurrency(activeCause.goal)}</span>
                 </div>
                 <div
-                  class="w-full bg-dracula-bg rounded-full h-4 overflow-hidden"
+                  class="w-full bg-white/5 rounded-full h-3 overflow-hidden"
                   role="progressbar"
                   aria-valuenow={activeCause.raised}
                   aria-valuemin={0}
@@ -488,46 +533,50 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
                   aria-label="Progreso de la causa"
                 >
                   <div
-                    class="bg-gradient-to-r from-dracula-green to-dracula-cyan h-full rounded-full transition-all duration-1000"
-                    style={`width: ${progressPercent}%`}
+                    class="bg-gradient-to-r from-leader to-dracula-green h-full rounded-full transition-all duration-1000"
+                    style={`width: ${Math.min(progressPercent, 100)}%`}
                   />
                 </div>
-                <p class="text-center text-dracula-comment text-sm mt-2">
+                <p class="text-center text-dracula-comment text-sm mt-3">
                   {progressPercent}% de la meta alcanzada
                 </p>
               </div>
             )}
 
-            <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="flex flex-col sm:flex-row gap-4 items-center">
               <a
                 href={`/causes/${activeCause.id}`}
-                class="text-leader hover:underline flex items-center gap-2"
+                class="px-6 py-2.5 border border-leader/30 text-leader font-semibold text-sm rounded-full hover:bg-leader/10 hover:border-leader/50 transition-all duration-300 flex items-center gap-2"
               >
-                <Star size={18} />
-                Ver detalles completos de la causa
+                <Star size={16} weight="duotone" />
+                Ver detalles de la causa
               </a>
               <a
                 href={`/store?causa=${activeCause.id}`}
-                class="btn-primary flex items-center gap-2"
+                class="px-6 py-2.5 bg-leader text-dracula-bg font-bold text-sm rounded-full hover:shadow-[0_0_30px_rgba(45,212,191,0.25)] transition-all duration-300 flex items-center gap-2"
               >
-                <Heart size={18} weight="fill" />
-                Ver productos que apoyan esta causa
+                <Heart size={16} weight="fill" />
+                Productos que apoyan esta causa
               </a>
             </div>
           </div>
         </div>
-      )
-    }
+      </section>
+    )
+  }
 
-    <!-- Products (Leader's Store) -->
-    {
-      products.length > 0 && (
-        <div>
-          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <ShoppingBag size={28} className="text-entrepreneur" />
+  <!-- ===== PRODUCTS ===== -->
+  {
+    products.length > 0 && (
+      <section class="border-t border-white/5 py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-entrepreneur text-xs font-bold uppercase tracking-[0.2em] mb-3">
+            Tienda Social
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-3">
             Tienda del Lider
           </h2>
-          <p class="text-dracula-comment mb-6">
+          <p class="text-dracula-comment-accessible mb-10 text-lg">
             Productos propios y de emprendedores aliados. Cada compra genera impacto directo.
           </p>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -547,7 +596,7 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
             ))}
           </div>
         </div>
-      )
-    }
-  </div>
+      </section>
+    )
+  }
 </Layout>

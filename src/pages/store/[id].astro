@@ -13,6 +13,8 @@ import {
   Images,
   CheckCircle,
   Clock as ClockIcon,
+  ArrowRight,
+  ShoppingBag,
 } from '@phosphor-icons/react';
 
 const { id } = Astro.params;
@@ -104,18 +106,20 @@ try {
 const availabilityMap: Record<string, { label: string; classes: string }> = {
   available: {
     label: 'Disponible',
-    classes: 'bg-dracula-green/20 text-dracula-green border-dracula-green/40',
+    classes: 'bg-dracula-green/10 text-dracula-green border-dracula-green/30',
   },
   out_of_stock: {
     label: 'Agotado',
-    classes: 'bg-dracula-red/20 text-dracula-red border-dracula-red/40',
+    classes: 'bg-dracula-red/10 text-dracula-red border-dracula-red/30',
   },
   pre_order: {
     label: 'Pre-orden',
-    classes: 'bg-dracula-yellow/20 text-dracula-yellow border-dracula-yellow/40',
+    classes: 'bg-dracula-yellow/10 text-dracula-yellow border-dracula-yellow/30',
   },
 };
 const availability = product.availability ? availabilityMap[product.availability] || null : null;
+
+const sellerColor = sellerType === 'leader' ? 'leader' : 'entrepreneur';
 ---
 
 <Layout
@@ -123,227 +127,289 @@ const availability = product.availability ? availabilityMap[product.availability
   description={`${product.name} - ${contributionDisplay} a "${product.cause_title}". Compra con proposito en Comoon.`}
   ogImage={product.photo_url}
   ogType="product"
+  fullWidth
 >
-  <div class="max-w-6xl mx-auto py-8 px-4">
-    <!-- Back Button -->
-    <a
-      href="/store"
-      class="inline-flex items-center gap-2 text-dracula-comment hover:text-white mb-8 transition-colors group"
+  <!-- ===== BACK NAV ===== -->
+  <section class="px-6 pt-8">
+    <div class="max-w-7xl mx-auto">
+      <a
+        href="/store"
+        class="inline-flex items-center gap-2 text-sm text-dracula-comment-accessible hover:text-white transition-colors group"
+      >
+        <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+        Volver a la Tienda
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== PRODUCT DETAIL ===== -->
+  <section class="relative px-6 py-12">
+    <!-- Ambient lights -->
+    <div
+      class="absolute top-0 right-0 w-[500px] h-[500px] bg-entrepreneur/6 rounded-full blur-[140px] pointer-events-none"
     >
-      <ArrowLeft class="group-hover:-translate-x-1 transition-transform" />
-      Volver a la Tienda
-    </a>
+    </div>
+    <div
+      class="absolute bottom-1/4 left-0 w-[400px] h-[400px] bg-comoon-purple/6 rounded-full blur-[120px] pointer-events-none"
+    >
+    </div>
 
-    <div class="grid lg:grid-cols-2 gap-10">
-      <!-- Product Image -->
-      <div class="space-y-4">
-        <div class="glass p-3 rounded-2xl">
-          {
-            product.photo_url ? (
-              <img
-                id="main-product-image"
-                src={product.photo_url}
-                alt={product.name}
-                class="w-full h-auto rounded-xl shadow-2xl"
-              />
-            ) : (
-              <div class="w-full h-64 rounded-xl bg-dracula-current/20 flex items-center justify-center">
-                <span class="text-6xl">🛍️</span>
-              </div>
-            )
-          }
-        </div>
-        {
-          galleryPhotos.length > 0 && (
-            <div>
-              <p class="text-sm text-dracula-comment mb-2 flex items-center gap-1">
-                <Images size={16} />
-                Galería ({galleryPhotos.length + (product.photo_url ? 1 : 0)} fotos)
-              </p>
-              <div class="flex gap-2 overflow-x-auto pb-2">
-                {product.photo_url && (
-                  <button
-                    class="gallery-thumb shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-entrepreneur hover:border-white transition-colors"
-                    data-src={product.photo_url}
-                    onclick="document.getElementById('main-product-image').src = this.dataset.src"
-                  >
-                    <img
-                      src={product.photo_url}
-                      alt="Principal"
-                      class="w-full h-full object-cover"
-                    />
-                  </button>
-                )}
-                {galleryPhotos.map((photo: string, i: number) => (
-                  <button
-                    class="gallery-thumb shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/10 hover:border-entrepreneur transition-colors"
-                    data-src={photo}
-                    onclick="document.getElementById('main-product-image').src = this.dataset.src"
-                  >
-                    <img
-                      src={photo}
-                      alt={`Foto ${i + 1}`}
-                      loading="lazy"
-                      class="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-          )
-        }
-      </div>
-
-      <!-- Product Details -->
-      <div>
-        <!-- Price & Badges -->
-        <div class="flex flex-wrap items-center gap-2 mb-4">
-          <span
-            class={`px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 ${sellerType === 'leader' ? 'bg-leader/20 text-leader' : 'bg-entrepreneur/20 text-entrepreneur'}`}
-          >
-            {sellerType === 'leader' ? <UsersThree size={14} /> : <Tag size={14} />}
-            {sellerType === 'leader' ? 'Producto de Lider' : 'Producto'}
-          </span>
-          {
-            product.category && (
-              <span class="px-3 py-1 rounded-full text-sm font-medium bg-dracula-purple/20 text-dracula-purple border border-dracula-purple/30 flex items-center gap-1">
-                <Tag size={12} />
-                {product.category}
-              </span>
-            )
-          }
-          {
-            availability && (
-              <span
-                class={`px-3 py-1 rounded-full text-sm font-bold border flex items-center gap-1 ${availability.classes}`}
-              >
-                {product.availability === 'available' && <CheckCircle size={14} weight="fill" />}
-                {product.availability === 'out_of_stock' && <ClockIcon size={14} weight="fill" />}
-                {product.availability === 'pre_order' && <ClockIcon size={14} weight="fill" />}
-                {availability.label}
-              </span>
-            )
-          }
-          <span class="text-3xl font-bold text-dracula-green ml-auto">{formattedPrice}</span>
-        </div>
-
-        <!-- Title -->
-        <h1 class="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">{product.name}</h1>
-
-        <!-- Description -->
-        {
-          product.description && (
-            <p class="text-lg text-dracula-fg/80 mb-8 leading-relaxed">{product.description}</p>
-          )
-        }
-
-        <!-- Impact Section (Prominent) -->
-        <div
-          class="glass p-8 rounded-2xl mb-8 border-2 border-leader/40 relative overflow-hidden bg-leader/5 shadow-[0_0_30px_rgba(139,92,246,0.08)]"
-        >
-          <div class="absolute -right-6 -top-6 text-leader/10">
-            <Heart size={140} weight="fill" />
-          </div>
-          <div class="relative">
-            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
-              <Heart size={24} weight="fill" className="text-leader" />
-              Tu compra genera impacto real
-            </h3>
-            <p class="text-2xl font-bold text-leader mb-4">{contributionDisplay}</p>
-            <a
-              href={`/causes/${product.cause_id}`}
-              class="block bg-dracula-bg/60 p-5 rounded-xl hover:bg-dracula-current/50 transition-colors border border-leader/20 group"
-            >
-              <p class="text-leader font-bold text-xl mb-1 group-hover:underline">
-                "{product.cause_title}"
-              </p>
-              <p class="text-sm text-dracula-comment">
-                Causa liderada por <span class="text-white font-medium">{product.leader_name}</span>
-              </p>
-            </a>
-          </div>
-        </div>
-
-        <!-- Contact Buttons -->
-        <div class="mb-6">
-          <h3 class="text-sm font-bold text-dracula-comment mb-3 uppercase tracking-wider">
-            Contactar al vendedor
-          </h3>
-          <ContactButtons
-            client:idle
-            contactInfo={sellerContact}
-            productName={product.name}
-            size="lg"
-          />
-        </div>
-
-        <!-- Seller Info -->
-        <div
-          class="flex items-center justify-between p-4 bg-dracula-current/20 rounded-xl border border-white/5"
-        >
-          <div class="flex items-center gap-3">
+    <div class="relative z-10 max-w-7xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16">
+        <!-- ===== LEFT: Product Image ===== -->
+        <div class="space-y-4">
+          <div class="glass rounded-2xl overflow-hidden border border-white/10">
             {
-              sellerType === 'leader' ? (
-                <UsersThree size={24} className="text-leader" />
+              product.photo_url ? (
+                <img
+                  id="main-product-image"
+                  src={product.photo_url}
+                  alt={product.name}
+                  class="w-full h-auto object-cover"
+                />
               ) : (
-                <Storefront size={24} className="text-entrepreneur" />
+                <div class="w-full aspect-square bg-dracula-current/30 flex items-center justify-center">
+                  <ShoppingBag size={80} weight="duotone" className="text-dracula-comment" />
+                </div>
               )
             }
-            <div>
-              <a
-                href={sellerProfileUrl}
-                class={`font-bold text-white hover:${sellerType === 'leader' ? 'text-leader' : 'text-entrepreneur'} transition-colors`}
-              >
-                {sellerName}
-              </a>
+          </div>
+
+          <!-- Gallery Thumbnails -->
+          {
+            galleryPhotos.length > 0 && (
+              <div>
+                <p class="text-xs text-dracula-comment-accessible mb-3 flex items-center gap-1.5 uppercase tracking-wider font-bold">
+                  <Images size={14} weight="duotone" />
+                  Galeria ({galleryPhotos.length + (product.photo_url ? 1 : 0)} fotos)
+                </p>
+                <div class="flex gap-2 overflow-x-auto pb-2">
+                  {product.photo_url && (
+                    <button
+                      class="gallery-thumb shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 border-entrepreneur/40 hover:border-entrepreneur transition-colors"
+                      data-src={product.photo_url}
+                      onclick="document.getElementById('main-product-image').src = this.dataset.src"
+                    >
+                      <img
+                        src={product.photo_url}
+                        alt="Principal"
+                        class="w-full h-full object-cover"
+                      />
+                    </button>
+                  )}
+                  {galleryPhotos.map((photo: string, i: number) => (
+                    <button
+                      class="gallery-thumb shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 border-white/10 hover:border-entrepreneur/40 transition-colors"
+                      data-src={photo}
+                      onclick="document.getElementById('main-product-image').src = this.dataset.src"
+                    >
+                      <img
+                        src={photo}
+                        alt={`Foto ${i + 1}`}
+                        loading="lazy"
+                        class="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+        </div>
+
+        <!-- ===== RIGHT: Product Details ===== -->
+        <div class="space-y-8">
+          <!-- Badges Row -->
+          <div class="flex flex-wrap items-center gap-2">
+            <span
+              class={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 border ${
+                sellerType === 'leader'
+                  ? 'bg-leader/10 text-leader border-leader/20'
+                  : 'bg-entrepreneur/10 text-entrepreneur border-entrepreneur/20'
+              }`}
+            >
               {
-                sellerLocation && (
-                  <p class="text-xs text-dracula-comment flex items-center gap-1">
-                    <MapPin size={12} />
-                    {sellerLocation}
-                  </p>
+                sellerType === 'leader' ? (
+                  <UsersThree size={14} weight="duotone" />
+                ) : (
+                  <Tag size={14} weight="duotone" />
                 )
               }
+              {sellerType === 'leader' ? 'Producto de Lider' : 'Producto'}
+            </span>
+            {
+              product.category && (
+                <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-comoon-purple/10 text-comoon-purple border border-comoon-purple/20 flex items-center gap-1.5">
+                  <Tag size={12} weight="duotone" />
+                  {product.category}
+                </span>
+              )
+            }
+            {
+              availability && (
+                <span
+                  class={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1.5 ${availability.classes}`}
+                >
+                  {product.availability === 'available' && <CheckCircle size={14} weight="fill" />}
+                  {product.availability === 'out_of_stock' && <ClockIcon size={14} weight="fill" />}
+                  {product.availability === 'pre_order' && <ClockIcon size={14} weight="fill" />}
+                  {availability.label}
+                </span>
+              )
+            }
+          </div>
+
+          <!-- Title & Price -->
+          <div>
+            <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-3 leading-tight">
+              {product.name}
+            </h1>
+            <p class="text-4xl font-bold text-entrepreneur">{formattedPrice}</p>
+          </div>
+
+          <!-- Description -->
+          {
+            product.description && (
+              <p class="text-lg text-dracula-comment-accessible leading-relaxed">
+                {product.description}
+              </p>
+            )
+          }
+
+          <!-- ===== Impact Section ===== -->
+          <div class="glass rounded-2xl p-8 border border-leader/20 relative overflow-hidden">
+            <!-- Background decoration -->
+            <div class="absolute -right-8 -top-8 pointer-events-none opacity-[0.06]">
+              <Heart size={160} weight="fill" />
+            </div>
+
+            <div class="relative">
+              <p
+                class="text-xs font-bold uppercase tracking-[0.2em] text-leader mb-3 flex items-center gap-2"
+              >
+                <Heart size={16} weight="duotone" />
+                Tu compra genera impacto real
+              </p>
+              <p class="text-2xl font-bold text-white mb-5">{contributionDisplay}</p>
+              <a
+                href={`/causes/${product.cause_id}`}
+                class="block glass rounded-xl p-5 border border-leader/10 hover:border-leader/30 transition-all group"
+              >
+                <p class="text-leader font-bold text-lg mb-1 group-hover:underline">
+                  &ldquo;{product.cause_title}&rdquo;
+                </p>
+                <p class="text-sm text-dracula-comment-accessible">
+                  Causa liderada por <span class="text-white font-medium"
+                    >{product.leader_name}</span
+                  >
+                </p>
+              </a>
             </div>
           </div>
-          <a
-            href={sellerProfileUrl}
-            class={`text-sm hover:underline ${sellerType === 'leader' ? 'text-leader' : 'text-entrepreneur'}`}
-          >
-            Ver perfil
-          </a>
-        </div>
 
-        <!-- Share Section -->
-        <div class="mt-8 pt-6 border-t border-white/10">
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-dracula-comment flex items-center gap-2">
-              <Moon size={16} weight="duotone" className="text-comoon-purple" />
-              Difusion Lunar
-            </span>
-            <ShareButtons
-              client:visible
-              title={product.name}
-              text={`Mira este producto en comoon: ${product.name}. Tu compra apoya la causa "${product.cause_title}"`}
+          <!-- ===== Contact Buttons ===== -->
+          <div>
+            <p
+              class="text-xs font-bold uppercase tracking-[0.2em] text-dracula-comment-accessible mb-4"
+            >
+              Contactar al vendedor
+            </p>
+            <ContactButtons
+              client:idle
+              contactInfo={sellerContact}
+              productName={product.name}
+              size="lg"
             />
+          </div>
+
+          <!-- ===== Seller Info Card ===== -->
+          <div
+            class="glass rounded-2xl p-5 border border-white/10 flex items-center justify-between"
+          >
+            <div class="flex items-center gap-3">
+              {
+                sellerType === 'leader' ? (
+                  <div class="w-10 h-10 rounded-full bg-leader/10 flex items-center justify-center">
+                    <UsersThree size={20} weight="duotone" className="text-leader" />
+                  </div>
+                ) : (
+                  <div class="w-10 h-10 rounded-full bg-entrepreneur/10 flex items-center justify-center">
+                    <Storefront size={20} weight="duotone" className="text-entrepreneur" />
+                  </div>
+                )
+              }
+              <div>
+                <a
+                  href={sellerProfileUrl}
+                  class={`font-bold text-white hover:text-${sellerColor} transition-colors`}
+                >
+                  {sellerName}
+                </a>
+                {
+                  sellerLocation && (
+                    <p class="text-xs text-dracula-comment-accessible flex items-center gap-1">
+                      <MapPin size={12} weight="duotone" />
+                      {sellerLocation}
+                    </p>
+                  )
+                }
+              </div>
+            </div>
+            <a
+              href={sellerProfileUrl}
+              class={`text-sm font-medium text-${sellerColor} hover:underline flex items-center gap-1 group`}
+            >
+              Ver perfil
+              <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+            </a>
+          </div>
+
+          <!-- ===== Share Section ===== -->
+          <div class="pt-6 border-t border-white/5">
+            <div class="flex items-center justify-between">
+              <span
+                class="text-xs text-dracula-comment-accessible flex items-center gap-2 uppercase tracking-wider font-bold"
+              >
+                <Moon size={14} weight="duotone" className="text-comoon-purple" />
+                Difusion Lunar
+              </span>
+              <ShareButtons
+                client:visible
+                title={product.name}
+                text={`Mira este producto en comoon: ${product.name}. Tu compra apoya la causa "${product.cause_title}"`}
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- Related Products Section -->
-    <div class="mt-16">
-      <h2 class="text-2xl font-bold text-white mb-6">Mas productos que apoyan esta causa</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <a
-          href={`/store?causa=${product.cause_id}`}
-          class="glass p-6 rounded-xl text-center hover:border-leader/50 border border-transparent transition-all"
-        >
-          <Heart size={40} className="mx-auto mb-3 text-leader" />
-          <p class="font-bold text-white mb-2">Ver mas productos</p>
-          <p class="text-sm text-dracula-comment">que apoyan "{product.cause_title}"</p>
-        </a>
-      </div>
+  <!-- ===== RELATED PRODUCTS ===== -->
+  <section class="border-t border-white/5 px-6 py-24">
+    <div class="max-w-7xl mx-auto text-center">
+      <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-4">Descubre mas</p>
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-10">
+        Mas productos que apoyan esta causa
+      </h2>
+      <a
+        href={`/store?causa=${product.cause_id}`}
+        class="inline-flex glass rounded-2xl p-8 border border-white/10 hover:border-leader/30 transition-all duration-300 group items-center gap-6"
+      >
+        <Heart size={36} weight="duotone" className="text-leader shrink-0" />
+        <div class="text-left">
+          <p class="font-bold text-white mb-1 group-hover:text-leader transition-colors">
+            Ver mas productos
+          </p>
+          <p class="text-sm text-dracula-comment-accessible">
+            que apoyan &ldquo;{product.cause_title}&rdquo;
+          </p>
+        </div>
+        <ArrowRight
+          size={20}
+          className="text-dracula-comment ml-4 transition-transform group-hover:translate-x-1"
+        />
+      </a>
     </div>
-  </div>
+  </section>
 </Layout>

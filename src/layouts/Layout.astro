@@ -8,6 +8,7 @@ interface Props {
   ogImage?: string;
   ogUrl?: string;
   ogType?: string;
+  fullWidth?: boolean;
 }
 
 const {
@@ -16,6 +17,7 @@ const {
   ogImage,
   ogUrl,
   ogType = 'website',
+  fullWidth = false,
 } = Astro.props;
 const canonicalUrl = ogUrl || Astro.url.href;
 
@@ -75,25 +77,116 @@ const userName = Astro.locals.user?.name;
       onboardingComplete={onboardingComplete}
       userName={userName}
     />
-    <main id="main-content" class="flex-grow container mx-auto px-4 py-8">
+    <main
+      id="main-content"
+      class:list={['flex-grow', fullWidth ? '' : 'container mx-auto px-4 py-8']}
+    >
       <slot />
     </main>
-    <footer class="text-center py-6 text-dracula-comment-accessible text-sm space-y-2">
-      <p>
-        &copy; {new Date().getFullYear()}
-        <span class="font-bold"
-          ><span class="text-white">co</span><span class="text-comoon-purple">moon</span></span
-        >. Cada compra ilumina una causa.
-      </p>
-      <p>
-        dev: <a
-          href="https://instagram.com/alejoamorocho"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="hover:underline"
-          ><span class="text-white">Alejo</span><span class="text-comoon-purple">Amorocho</span></a
+    <footer class="border-t border-white/5 bg-dracula-current/20">
+      <div class="max-w-7xl mx-auto px-6 py-16">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+          <div>
+            <a href="/" class="flex items-center gap-2 mb-4">
+              <span class="text-xl font-bold lowercase tracking-tight">
+                <span class="text-white">co</span><span class="text-comoon-purple">moon</span>
+              </span>
+            </a>
+            <p class="text-sm text-dracula-comment-accessible leading-relaxed">
+              Economia solidaria con proposito. Cada compra ilumina una causa real.
+            </p>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-widest text-dracula-fg/50 mb-4">
+              Explorar
+            </h4>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a
+                  href="/feed"
+                  class="text-dracula-comment-accessible hover:text-white transition-colors"
+                  >Feed</a>
+              </li>
+              <li>
+                <a
+                  href="/store"
+                  class="text-dracula-comment-accessible hover:text-white transition-colors"
+                  >Tienda</a>
+              </li>
+              <li>
+                <a
+                  href="/leaders"
+                  class="text-dracula-comment-accessible hover:text-white transition-colors"
+                  >Lideres</a>
+              </li>
+              <li>
+                <a
+                  href="/entrepreneurs"
+                  class="text-dracula-comment-accessible hover:text-white transition-colors"
+                  >Emprendedores</a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-widest text-dracula-fg/50 mb-4">
+              Unete
+            </h4>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a
+                  href="/register"
+                  class="text-dracula-comment-accessible hover:text-white transition-colors"
+                  >Registrarse</a>
+              </li>
+              <li>
+                <a
+                  href="/login"
+                  class="text-dracula-comment-accessible hover:text-white transition-colors"
+                  >Iniciar Sesion</a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-widest text-dracula-fg/50 mb-4">
+              Legal
+            </h4>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a
+                  href="#"
+                  class="text-dracula-comment-accessible hover:text-white transition-colors"
+                  >Terminos</a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-dracula-comment-accessible hover:text-white transition-colors"
+                  >Privacidad</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-dracula-comment-accessible"
         >
-      </p>
+          <p>
+            &copy; {new Date().getFullYear()}
+            <span class="font-bold"
+              ><span class="text-white">co</span><span class="text-comoon-purple">moon</span></span
+            >
+          </p>
+          <p>
+            dev: <a
+              href="https://instagram.com/alejoamorocho"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-white transition-colors"
+              ><span class="text-white">Alejo</span><span class="text-comoon-purple">Amorocho</span
+              ></a
+            >
+          </p>
+        </div>
+      </div>
     </footer>
   </body>
 </html>

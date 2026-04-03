@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProfileCompleteBadge from '../../components/ProfileCompleteBadge';
-import { Storefront, MapPin } from '@phosphor-icons/react';
+import { Storefront, MapPin, MagnifyingGlass, ShoppingBag } from '@phosphor-icons/react';
 import { isEntrepreneurProfileComplete } from '../../utils/profileCompletion';
 
 // Fetch entrepreneurs from database
@@ -60,55 +60,178 @@ const entrepreneurs = entrepreneursData
   .sort((a, b) => (b.isComplete ? 1 : 0) - (a.isComplete ? 1 : 0));
 ---
 
-<Layout title="Emprendedores">
-  <div class="py-12 px-4">
-    <div class="text-center mb-16">
-      <h1 class="text-4xl font-bold mb-4 text-entrepreneur flex items-center justify-center gap-3">
-        <Storefront weight="duotone" /> Emprendedores con Proposito
-      </h1>
-      <p class="text-lg text-dracula-fg/70 max-w-2xl mx-auto">
-        Conoce a los creadores detrás de los productos. Cada emprendimiento aquí tiene una historia
-        de resiliencia y compromiso social.
-      </p>
+<Layout title="Emprendedores" fullWidth>
+  <!-- ===== HERO ===== -->
+  <section class="relative py-24 px-6 overflow-hidden">
+    <!-- Ambient lights -->
+    <div
+      class="absolute top-1/4 left-1/3 w-[600px] h-[600px] bg-entrepreneur/10 rounded-full blur-[160px] pointer-events-none"
+    >
+    </div>
+    <div
+      class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-comoon-purple/8 rounded-full blur-[120px] pointer-events-none"
+    >
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-      {
-        entrepreneurs.map((ent) => (
-          <a
-            href={`/entrepreneurs/${ent.id}`}
-            class="glass block rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-300 group relative"
-          >
-            {ent.isComplete && (
-              <div class="absolute top-2 left-2 z-10">
-                <ProfileCompleteBadge client:visible isComplete={true} size="sm" />
-              </div>
-            )}
-            <div class="h-48 overflow-hidden relative">
-              <img
-                src={ent.photoUrl}
-                alt={ent.store_name}
-                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div class="absolute top-4 right-4 bg-dracula-bg/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-entrepreneur border border-entrepreneur/30">
-                {ent.category}
-              </div>
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-bold text-white mb-2 group-hover:text-entrepreneur transition-colors">
-                {ent.store_name}
-              </h3>
-              <div class="flex items-center gap-2 text-entrepreneur-dark text-sm font-medium mb-3">
-                <MapPin size={18} weight="duotone" /> {ent.location}
-              </div>
-              <p class="text-dracula-fg/70 text-sm line-clamp-3">{ent.bio}</p>
-              <span class="inline-block mt-4 text-entrepreneur font-bold text-sm">
-                Ver Tienda &rarr;
-              </span>
-            </div>
-          </a>
-        ))
-      }
+    <div class="relative z-10 max-w-7xl mx-auto text-center">
+      <p class="text-entrepreneur text-xs font-bold uppercase tracking-[0.2em] mb-4">
+        Emprendedores
+      </p>
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-6">
+        Vendedores con proposito
+      </h1>
+      <p class="text-lg text-dracula-comment-accessible max-w-2xl mx-auto mb-12 leading-relaxed">
+        Conoce a los creadores detras de los productos. Cada emprendimiento aqui tiene una historia
+        de resiliencia y compromiso social.
+      </p>
+
+      <!-- Search bar -->
+      <div class="max-w-xl mx-auto relative">
+        <MagnifyingGlass
+          size={20}
+          weight="duotone"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-dracula-comment"
+        />
+        <input
+          type="text"
+          id="entrepreneur-search"
+          placeholder="Buscar emprendedor por nombre o ubicacion..."
+          class="w-full pl-12 pr-6 py-4 rounded-full bg-dracula-current/60 border border-white/10 backdrop-blur-md text-white placeholder:text-dracula-comment/60 focus:outline-none focus:border-entrepreneur/40 focus:shadow-[0_0_30px_rgba(34,197,94,0.1)] transition-all duration-300"
+        />
+      </div>
     </div>
-  </div>
+  </section>
+
+  <!-- ===== ENTREPRENEURS GRID ===== -->
+  <section class="py-24 px-6 border-t border-white/5">
+    <div class="max-w-7xl mx-auto">
+      <!-- Results count -->
+      <p id="results-count" class="text-sm text-dracula-comment mb-8">
+        {entrepreneurs.length} emprendedores registrados
+      </p>
+
+      {
+        entrepreneurs.length > 0 ? (
+          <div id="entrepreneurs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {entrepreneurs.map((ent) => (
+              <a
+                href={`/entrepreneurs/${ent.id}`}
+                data-name={ent.store_name.toLowerCase()}
+                data-location={ent.location.toLowerCase()}
+                class="entrepreneur-card glass rounded-2xl overflow-hidden border border-white/10 hover:border-entrepreneur/30 transition-all duration-300 group block"
+              >
+                {/* Image */}
+                <div class="h-52 overflow-hidden relative bg-dracula-current">
+                  {ent.photoUrl ? (
+                    <img
+                      src={ent.photoUrl}
+                      alt={ent.store_name}
+                      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center">
+                      <Storefront size={48} weight="duotone" className="text-entrepreneur/30" />
+                    </div>
+                  )}
+                  {ent.isComplete && (
+                    <div class="absolute top-3 left-3 z-10">
+                      <ProfileCompleteBadge client:visible isComplete={true} size="sm" />
+                    </div>
+                  )}
+                  {ent.activeProductsCount > 0 && (
+                    <div class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-dracula-bg/80 backdrop-blur px-3 py-1.5 rounded-full text-xs font-bold text-entrepreneur border border-entrepreneur/20">
+                      <ShoppingBag size={14} weight="duotone" />
+                      {ent.activeProductsCount}{' '}
+                      {ent.activeProductsCount === 1 ? 'producto' : 'productos'}
+                    </div>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div class="p-6">
+                  <h3 class="text-lg font-bold text-white mb-2 group-hover:text-entrepreneur transition-colors duration-300">
+                    {ent.store_name}
+                  </h3>
+
+                  {ent.location && (
+                    <div class="flex items-center gap-1.5 text-dracula-comment text-sm mb-3">
+                      <MapPin
+                        size={16}
+                        weight="duotone"
+                        className="text-entrepreneur/60 shrink-0"
+                      />
+                      <span class="truncate">{ent.location}</span>
+                    </div>
+                  )}
+
+                  {ent.bio && (
+                    <p class="text-dracula-comment-accessible text-sm line-clamp-3 leading-relaxed">
+                      {ent.bio}
+                    </p>
+                  )}
+
+                  <span class="inline-flex items-center gap-1 mt-4 text-entrepreneur text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Ver tienda &rarr;
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div class="glass rounded-2xl p-16 text-center border border-white/10">
+            <Storefront size={48} weight="duotone" className="text-entrepreneur/30 mx-auto mb-4" />
+            <p class="text-dracula-comment text-lg">Aun no hay emprendedores registrados.</p>
+          </div>
+        )
+      }
+
+      <!-- Empty search state -->
+      <div id="no-results" class="hidden glass rounded-2xl p-16 text-center border border-white/10">
+        <MagnifyingGlass
+          size={48}
+          weight="duotone"
+          className="text-dracula-comment/30 mx-auto mb-4"
+        />
+        <p class="text-dracula-comment text-lg">
+          No se encontraron emprendedores con ese criterio.
+        </p>
+      </div>
+    </div>
+  </section>
 </Layout>
+
+<script>
+  const searchInput = document.getElementById('entrepreneur-search') as HTMLInputElement;
+  const grid = document.getElementById('entrepreneurs-grid');
+  const cards = document.querySelectorAll('.entrepreneur-card');
+  const noResults = document.getElementById('no-results');
+  const resultsCount = document.getElementById('results-count');
+
+  if (searchInput && grid) {
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase().trim();
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const el = card as HTMLElement;
+        const name = el.dataset.name || '';
+        const location = el.dataset.location || '';
+        const matches = !query || name.includes(query) || location.includes(query);
+        el.style.display = matches ? '' : 'none';
+        if (matches) visible++;
+      });
+
+      if (noResults) {
+        noResults.classList.toggle('hidden', visible > 0);
+      }
+      if (grid) {
+        (grid as HTMLElement).style.display = visible > 0 ? '' : 'none';
+      }
+      if (resultsCount) {
+        resultsCount.textContent = query
+          ? `${visible} resultado${visible !== 1 ? 's' : ''}`
+          : `${cards.length} emprendedores registrados`;
+      }
+    });
+  }
+</script>
