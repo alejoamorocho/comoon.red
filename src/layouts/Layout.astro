@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ViewTransitions } from 'astro:transitions';
 import Navbar from '../components/Navbar';
 
 interface Props {
@@ -50,6 +51,7 @@ const userName = Astro.locals.user?.name;
       onload="this.media='all'"
     />
     <title>{title} | comoon</title>
+    <ViewTransitions />
     <!-- Open Graph -->
     <meta property="og:title" content={`${title} | comoon`} />
     <meta property="og:description" content={description} />
@@ -217,7 +219,7 @@ const userName = Astro.locals.user?.name;
           </p>
           <p>
             dev: <a
-              href="https://instagram.com/alejoamorocho"
+              href="https://github.com/alejoamorocho"
               target="_blank"
               rel="noopener noreferrer"
               class="hover:text-white transition-colors"

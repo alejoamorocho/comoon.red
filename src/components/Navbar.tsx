@@ -23,14 +23,14 @@ const NAV_PILLS = [
     href: '/feed',
     label: 'Feed',
     icon: Rows,
-    color:
-      'border-white/8 bg-dracula-current/20 text-dracula-fg/70 hover:text-white hover:border-white/20',
+    color: 'border-white/10 bg-white/5 text-dracula-fg/70 hover:text-white hover:border-white/20',
   },
   {
     href: '/leaders',
     label: 'Líderes',
     icon: UsersThree,
-    color: 'border-leader/15 bg-leader/5 text-leader/80 hover:text-leader hover:border-leader/30',
+    color:
+      'border-comoon-purple/15 bg-comoon-purple/5 text-comoon-purple/80 hover:text-comoon-purple hover:border-comoon-purple/30',
   },
   {
     href: '/causes',
@@ -87,15 +87,18 @@ export default function Navbar({
   return (
     <nav
       aria-label="Navegación principal"
-      className="sticky top-0 z-50 flex items-center justify-between border-b border-white/5 bg-dracula-bg/80 px-6 py-3 backdrop-blur-lg"
+      className="sticky top-0 z-50 flex items-center justify-between gap-2 border-b border-white/5 bg-dracula-bg/80 px-3 py-3 backdrop-blur-lg sm:px-6"
     >
       {/* Left: Logo */}
-      <a href="/" className="flex items-center">
+      <a href="/" className="flex items-center" style={{ viewTransitionName: 'comoon-logo' }}>
         <ComoonBrand size={28} />
       </a>
 
       {/* Center: Unified nav pills */}
-      <div className="flex items-center gap-1.5">
+      <div
+        className="scrollbar-hide flex items-center gap-1 overflow-x-auto sm:gap-1.5"
+        style={{ viewTransitionName: 'nav-pills' }}
+      >
         {NAV_PILLS.map((pill) => {
           const Icon = pill.icon;
           const isActive = currentPath === pill.href || currentPath.startsWith(pill.href + '/');

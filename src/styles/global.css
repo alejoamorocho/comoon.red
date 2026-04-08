@@ -25,3 +25,21 @@
     @apply rounded-lg bg-dracula-current px-4 py-2 font-medium text-dracula-fg transition-all hover:bg-opacity-80;
   }
 }
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* View Transition animations */
+::view-transition-old(comoon-logo),
+::view-transition-new(comoon-logo),
+::view-transition-old(nav-pills),
+::view-transition-new(nav-pills) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
