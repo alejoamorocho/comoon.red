@@ -26,6 +26,12 @@ const NAV_PILLS = [
     color: 'border-white/10 bg-white/5 text-dracula-fg/70 hover:text-white hover:border-white/20',
   },
   {
+    href: '/causes',
+    label: 'Causas',
+    icon: Heart,
+    color: 'border-leader/15 bg-leader/5 text-leader/80 hover:text-leader hover:border-leader/30',
+  },
+  {
     href: '/leaders',
     label: 'Líderes',
     icon: UsersThree,
@@ -33,10 +39,11 @@ const NAV_PILLS = [
       'border-comoon-purple/15 bg-comoon-purple/5 text-comoon-purple/80 hover:text-comoon-purple hover:border-comoon-purple/30',
   },
   {
-    href: '/causes',
-    label: 'Causas',
-    icon: Heart,
-    color: 'border-leader/15 bg-leader/5 text-leader/80 hover:text-leader hover:border-leader/30',
+    href: '/store',
+    label: 'Tienda',
+    icon: Storefront,
+    color:
+      'border-entrepreneur/15 bg-entrepreneur/5 text-entrepreneur/80 hover:text-entrepreneur hover:border-entrepreneur/30',
   },
   {
     href: '/entrepreneurs',
@@ -44,13 +51,6 @@ const NAV_PILLS = [
     icon: ShoppingBag,
     color:
       'border-community/15 bg-community/5 text-community/80 hover:text-community hover:border-community/30',
-  },
-  {
-    href: '/store',
-    label: 'Tienda',
-    icon: Storefront,
-    color:
-      'border-entrepreneur/15 bg-entrepreneur/5 text-entrepreneur/80 hover:text-entrepreneur hover:border-entrepreneur/30',
   },
 ];
 
