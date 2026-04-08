@@ -3,13 +3,13 @@ import { PlusCircle, CircleNotch, CheckCircle, CaretDown } from '@phosphor-icons
 import ImageUpload from '../ImageUpload';
 
 const CATEGORIES = [
-  { value: '', label: 'Seleccionar categoria...' },
-  { value: 'educacion', label: 'Educacion' },
+  { value: '', label: 'Seleccionar categoría...' },
+  { value: 'educacion', label: 'Educación' },
   { value: 'salud', label: 'Salud' },
   { value: 'ambiente', label: 'Ambiente' },
   { value: 'cultura', label: 'Cultura' },
   { value: 'vivienda', label: 'Vivienda' },
-  { value: 'alimentacion', label: 'Alimentacion' },
+  { value: 'alimentacion', label: 'Alimentación' },
   { value: 'comunidad', label: 'Comunidad' },
   { value: 'otro', label: 'Otro' },
 ];
@@ -18,7 +18,7 @@ const NEEDS_OPTIONS = [
   { value: 'voluntarios', label: 'Voluntarios' },
   { value: 'dinero', label: 'Dinero' },
   { value: 'insumos', label: 'Insumos' },
-  { value: 'difusion', label: 'Difusion' },
+  { value: 'difusion', label: 'Difusión' },
   { value: 'transporte', label: 'Transporte' },
   { value: 'otro', label: 'Otro' },
 ];
@@ -85,7 +85,7 @@ export default function CreateCauseForm() {
         setError(data.error || 'Error al crear la causa');
       }
     } catch {
-      setError('Error de conexion');
+      setError('Error de conexión');
     } finally {
       setLoading(false);
     }
@@ -95,7 +95,7 @@ export default function CreateCauseForm() {
     return (
       <div className="py-8 text-center">
         <CheckCircle size={48} className="mx-auto mb-3 text-dracula-green" weight="fill" />
-        <p className="text-lg font-bold text-white">Causa creada exitosamente!</p>
+        <p className="text-lg font-bold text-white">¡Causa creada exitosamente!</p>
         <p className="text-sm text-dracula-comment">Redirigiendo...</p>
       </div>
     );
@@ -109,23 +109,23 @@ export default function CreateCauseForm() {
         </div>
       )}
       <div>
-        <label className="mb-2 block text-sm font-bold text-dracula-fg">Titulo de la Causa</label>
+        <label className="mb-2 block text-sm font-bold text-dracula-fg">Título de la Causa</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Ej. Biblioteca Comunitaria para Ninos..."
+          placeholder="Ej. Biblioteca Comunitaria para Niños..."
           className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-dracula-purple"
           required
         />
       </div>
       <div>
-        <label className="mb-2 block text-sm font-bold text-dracula-fg">Descripcion</label>
+        <label className="mb-2 block text-sm font-bold text-dracula-fg">Descripción</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
-          placeholder="Describe el impacto que tendra esta causa..."
+          placeholder="Describe el impacto que tendrá esta causa..."
           className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-dracula-purple"
         />
       </div>
@@ -174,7 +174,7 @@ export default function CreateCauseForm() {
           onClick={() => setShowMore(!showMore)}
           className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold text-dracula-comment transition-colors hover:text-dracula-fg"
         >
-          <span>Mas detalles (opcional)</span>
+          <span>Más detalles (opcional)</span>
           <CaretDown size={16} className={`transition-transform ${showMore ? 'rotate-180' : ''}`} />
         </button>
 
@@ -182,12 +182,12 @@ export default function CreateCauseForm() {
           <div className="space-y-4 border-t border-dracula-current/50 px-4 pb-4 pt-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-sm font-bold text-dracula-fg">Ubicacion</label>
+                <label className="mb-2 block text-sm font-bold text-dracula-fg">Ubicación</label>
                 <input
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Ej. Bogota, Colombia"
+                  placeholder="Ej. Bogotá, Colombia"
                   className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-dracula-purple"
                 />
               </div>
@@ -230,7 +230,7 @@ export default function CreateCauseForm() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-bold text-dracula-fg">Categoria</label>
+              <label className="mb-2 block text-sm font-bold text-dracula-fg">Categoría</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -274,7 +274,7 @@ export default function CreateCauseForm() {
                 value={fundUsage}
                 onChange={(e) => setFundUsage(e.target.value)}
                 rows={3}
-                placeholder="Describe como se usaran los fondos recaudados..."
+                placeholder="Describe cómo se usarán los fondos recaudados..."
                 className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 text-white outline-none focus:border-dracula-purple"
               />
             </div>

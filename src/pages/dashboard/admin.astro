@@ -31,9 +31,9 @@ const pendingLeaders = [
     id: 3,
     name: 'Ana Perea',
     email: 'ana.perea@email.com',
-    location: 'Tumaco, Narino',
+    location: 'Tumaco, Nariño',
     date: '2024-01-20',
-    bio: 'Lidereza comunitaria enfocada en derechos de la mujer.',
+    bio: 'Lideresa comunitaria enfocada en derechos de la mujer.',
   },
   {
     id: 4,
@@ -41,7 +41,7 @@ const pendingLeaders = [
     email: 'miguel.t@email.com',
     location: 'Apartado, Antioquia',
     date: '2024-01-19',
-    bio: 'Trabajo con jovenes en riesgo desde hace 8 anos.',
+    bio: 'Trabajo con jóvenes en riesgo desde hace 8 años.',
   },
 ];
 
@@ -50,7 +50,7 @@ const pendingEntrepreneurs = [
     id: 3,
     name: 'Dulces del Choco',
     email: 'dulces@email.com',
-    location: 'Quibdo, Choco',
+    location: 'Quibdó, Chocó',
     date: '2024-01-21',
   },
 ];
@@ -66,7 +66,7 @@ const recentCauses = [
   },
   {
     id: 2,
-    title: 'Escuela de Musica',
+    title: 'Escuela de Música',
     leader: 'Carlos Rodriguez',
     status: 'active',
     raised: 4500000,
@@ -96,12 +96,12 @@ const recentUsers = [
 ];
 ---
 
-<Layout title="Panel de Administracion">
+<Layout title="Panel de Administración">
   <div class="max-w-7xl mx-auto py-8 px-4">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-white mb-2">Panel de Administracion</h1>
+        <h1 class="text-3xl font-bold text-white mb-2">Panel de Administración</h1>
         <p class="text-dracula-comment">
           Bienvenido, Administrador. Gestiona la plataforma comoon.
         </p>
@@ -136,7 +136,7 @@ const recentUsers = [
           </div>
           <div>
             <p class="text-2xl font-bold text-white">{stats.totalLeaders}</p>
-            <p class="text-xs text-dracula-comment">Lideres</p>
+            <p class="text-xs text-dracula-comment">Líderes</p>
           </div>
         </div>
       </div>
@@ -193,7 +193,7 @@ const recentUsers = [
         <div class="glass p-6 rounded-xl">
           <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
             <Clock className="text-dracula-yellow" size={24} />
-            Lideres Pendientes de Aprobacion
+            Líderes Pendientes de Aprobación
             <span
               class="ml-auto bg-dracula-yellow/20 text-dracula-yellow text-xs px-2 py-1 rounded-full"
               >{pendingLeaders.length}</span
@@ -236,7 +236,7 @@ const recentUsers = [
                 ))}
               </div>
             ) : (
-              <p class="text-dracula-comment text-center py-4">No hay lideres pendientes</p>
+              <p class="text-dracula-comment text-center py-4">No hay líderes pendientes</p>
             )
           }
         </div>
@@ -382,7 +382,7 @@ const recentUsers = [
                           {user.role === 'admin'
                             ? 'Admin'
                             : user.role === 'leader'
-                              ? 'Lider'
+                              ? 'Líder'
                               : 'Emprendedor'}
                         </span>
                       </td>
@@ -428,7 +428,7 @@ const recentUsers = [
 
     <!-- Quick Actions -->
     <div class="mt-8 glass p-6 rounded-xl">
-      <h2 class="text-xl font-bold text-white mb-4">Acciones Rapidas</h2>
+      <h2 class="text-xl font-bold text-white mb-4">Acciones Rápidas</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <a
           href="/dashboard/admin/users"

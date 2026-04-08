@@ -174,9 +174,11 @@ import { UPDATE_TYPE_CONFIG } from '../../types/feed';
 
 <Layout title={cause.title} fullWidth>
   <!-- Hero Header -->
-  <section class="relative py-20 px-6 overflow-hidden">
+  <section
+    class="relative py-20 px-6 overflow-hidden bg-gradient-to-b from-leader/[0.07] to-transparent"
+  >
     <div
-      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-leader/8 rounded-full blur-[140px] pointer-events-none"
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-leader/15 rounded-full blur-[140px] pointer-events-none"
     >
     </div>
 
@@ -452,6 +454,7 @@ import { UPDATE_TYPE_CONFIG } from '../../types/feed';
               client:visible
               title={cause.title}
               text={`Ayuda a la causa "${cause.title}" comprando productos en comoon`}
+              causeId={Number(id)}
             />
             <a
               href={`/leaders/${leader?.id}`}
@@ -473,7 +476,7 @@ import { UPDATE_TYPE_CONFIG } from '../../types/feed';
           </p>
           <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8 flex items-center gap-3">
             <ListChecks size={32} className="text-dracula-orange" weight="duotone" />
-            Que necesitamos
+            ¿Qué necesitamos?
           </h2>
           <div class="flex flex-wrap gap-3">
             {needs.map((need: any) => {
@@ -527,7 +530,7 @@ import { UPDATE_TYPE_CONFIG } from '../../types/feed';
           </p>
           <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8 flex items-center gap-3">
             <ChartBar size={32} className="text-dracula-cyan" weight="duotone" />
-            Metricas de impacto
+            Métricas de impacto
           </h2>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
             {impactMetrics.map((m: any) => (
@@ -550,7 +553,7 @@ import { UPDATE_TYPE_CONFIG } from '../../types/feed';
           </p>
           <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8 flex items-center gap-3">
             <Image size={32} className="text-dracula-purple" weight="duotone" />
-            Galeria
+            Galería
           </h2>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
             {evidencePhotos.map((photo: string, i: number) => (
@@ -661,8 +664,8 @@ import { UPDATE_TYPE_CONFIG } from '../../types/feed';
       products.length === 0 && !isCompleted && (
         <section class="py-12">
           <div class="text-center py-16 glass rounded-2xl border border-white/5">
-            <p class="text-dracula-comment mb-3">Aun no hay productos vinculados a esta causa.</p>
-            <p class="text-sm text-dracula-fg/50">Pronto emprendedores se uniran para apoyarla.</p>
+            <p class="text-dracula-comment mb-3">Aún no hay productos vinculados a esta causa.</p>
+            <p class="text-sm text-dracula-fg/50">Pronto emprendedores se unirán para apoyarla.</p>
           </div>
         </section>
       )

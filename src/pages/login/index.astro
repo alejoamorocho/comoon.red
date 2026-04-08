@@ -3,17 +3,19 @@ import Layout from '../../layouts/Layout.astro';
 import LoginForm from '../../components/LoginForm';
 ---
 
-<Layout title="Iniciar Sesion" fullWidth>
+<Layout title="Iniciar Sesión" fullWidth>
   <!-- ===== HERO ===== -->
-  <section class="relative py-20 px-6 overflow-hidden">
+  <section
+    class="relative py-20 px-6 overflow-hidden bg-gradient-to-b from-comoon-purple/[0.07] to-transparent"
+  >
     <div
-      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-comoon-purple/8 rounded-full blur-[140px] pointer-events-none"
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-comoon-purple/15 rounded-full blur-[140px] pointer-events-none"
     >
     </div>
 
     <div class="relative z-10 max-w-3xl mx-auto text-center">
       <p class="text-comoon-purple text-xs font-bold uppercase tracking-[0.2em] mb-4">Bienvenido</p>
-      <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">Iniciar Sesion</h1>
+      <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">Iniciar Sesión</h1>
       <p class="text-lg text-dracula-comment-accessible leading-relaxed max-w-2xl mx-auto">
         Accede a tu panel de control
       </p>

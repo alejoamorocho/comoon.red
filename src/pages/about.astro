@@ -38,20 +38,56 @@ const formatCurrency = (n: number) => {
 
 <Layout title="Acerca de" fullWidth>
   <!-- Hero -->
-  <section class="relative py-20 px-6 overflow-hidden">
+  <section
+    class="relative py-20 px-6 overflow-hidden bg-gradient-to-b from-comoon-purple/[0.07] to-transparent"
+  >
     <div
-      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-comoon-purple/8 rounded-full blur-[140px] pointer-events-none"
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-comoon-purple/15 rounded-full blur-[140px] pointer-events-none"
     >
     </div>
 
     <div class="relative z-10 max-w-3xl mx-auto text-center">
       <p class="text-comoon-purple text-xs font-bold uppercase tracking-[0.2em] mb-4">Acerca de</p>
-      <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">
-        <span class="text-white">co</span><span class="text-comoon-purple">moon</span>
+      <h1 class="group inline-flex items-center gap-2 mb-4 cursor-default">
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 375 375"
+          preserveAspectRatio="xMidYMid meet"
+          class="transition-transform duration-700 group-hover:rotate-[360deg]"
+        >
+          <defs>
+            <clipPath id="about-moon-outer"
+              ><path
+                d="M 59.0625 37.5 L 316.3125 37.5 L 316.3125 337.5 L 59.0625 337.5 Z"
+                clip-rule="nonzero"></path></clipPath
+            >
+            <clipPath id="about-moon-inner"
+              ><path
+                d="M 153.1875 92.722656 L 315.9375 92.722656 L 315.9375 282.472656 L 153.1875 282.472656 Z"
+                clip-rule="nonzero"></path></clipPath
+            >
+          </defs>
+          <g clip-path="url(#about-moon-outer)"
+            ><path
+              fill="#9986bf"
+              d="M 232.242188 321.746094 C 263.921875 321.746094 293.058594 310.769531 316.019531 292.398438 C 288.84375 320.152344 250.902344 337.367188 208.972656 337.367188 C 126.183594 337.367188 59.0625 270.246094 59.0625 187.457031 C 59.0625 104.671875 126.183594 37.570312 208.972656 37.570312 C 250.902344 37.570312 288.824219 54.785156 316.019531 82.539062 C 293.058594 64.167969 263.921875 53.195312 232.242188 53.195312 C 158.09375 53.195312 97.976562 113.308594 97.976562 187.457031 C 97.976562 261.628906 158.09375 321.722656 232.242188 321.722656 Z"
+            ></path></g
+          >
+          <g clip-path="url(#about-moon-inner)"
+            ><path
+              fill="#fdfdfd"
+              d="M 206.285156 102.5 C 186.226562 102.5 167.777344 109.449219 153.242188 121.082031 C 170.445312 103.507812 194.46875 92.609375 221.019531 92.609375 C 273.4375 92.609375 315.9375 135.109375 315.9375 187.527344 C 315.9375 239.945312 273.4375 282.429688 221.019531 282.429688 C 194.46875 282.429688 170.460938 271.53125 153.242188 253.957031 C 167.777344 265.589844 186.226562 272.539062 206.285156 272.539062 C 253.234375 272.539062 291.296875 234.472656 291.296875 187.527344 C 291.296875 140.5625 253.234375 102.511719 206.285156 102.511719 Z"
+            ></path></g
+          >
+        </svg>
+        <span class="text-3xl md:text-5xl font-bold tracking-tight">
+          <span class="text-white">co</span><span class="text-comoon-purple">moon</span>
+        </span>
       </h1>
       <p class="text-lg text-dracula-comment-accessible leading-relaxed max-w-2xl mx-auto">
-        Somos una plataforma de economia solidaria que conecta lideres sociales con emprendedores
-        para que cada venta genere impacto real en las comunidades que mas lo necesitan.
+        Somos una plataforma de economía solidaria que conecta líderes sociales con emprendedores
+        para que cada venta genere impacto real en las comunidades que más lo necesitan.
       </p>
     </div>
   </section>
@@ -69,8 +105,8 @@ const formatCurrency = (n: number) => {
         </div>
         <h3 class="font-bold text-white mb-3">El Problema</h3>
         <p class="text-sm text-dracula-comment-accessible leading-relaxed">
-          Los lideres sociales necesitan recursos pero no tienen acceso a financiacion. Los
-          consumidores quieren ayudar pero no saben como.
+          Los líderes sociales necesitan recursos pero no tienen acceso a financiación. Los
+          consumidores quieren ayudar pero no saben cómo.
         </p>
       </div>
 
@@ -82,10 +118,10 @@ const formatCurrency = (n: number) => {
         >
           <Handshake size={28} className="text-comoon-purple" weight="duotone" />
         </div>
-        <h3 class="font-bold text-white mb-3">La Conexion</h3>
+        <h3 class="font-bold text-white mb-3">La Conexión</h3>
         <p class="text-sm text-dracula-comment-accessible leading-relaxed">
-          Comoon conecta la necesidad con la solucion. Cada venta de un emprendedor genera una
-          donacion a una causa de un lider.
+          Comoon conecta la necesidad con la solución. Cada venta de un emprendedor genera una
+          donación a una causa de un líder.
         </p>
       </div>
 
@@ -111,10 +147,10 @@ const formatCurrency = (n: number) => {
     <div class="max-w-5xl mx-auto">
       <div class="text-center mb-16">
         <p class="text-comoon-purple text-xs font-bold uppercase tracking-[0.2em] mb-3">
-          Como funciona
+          Cómo funciona
         </p>
         <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight">
-          Tres actores, un proposito
+          Tres actores, un propósito
         </h2>
       </div>
 
@@ -125,7 +161,7 @@ const formatCurrency = (n: number) => {
           >
             <UsersThree size={32} className="text-leader" weight="duotone" />
           </div>
-          <h3 class="font-bold text-white mb-2">Lideres publican causas</h3>
+          <h3 class="font-bold text-white mb-2">Líderes publican causas</h3>
           <p class="text-sm text-dracula-comment-accessible leading-relaxed">
             Crean causas verificadas con metas claras, evidencia y transparencia total.
           </p>
@@ -139,7 +175,7 @@ const formatCurrency = (n: number) => {
           </div>
           <h3 class="font-bold text-white mb-2">Emprendedores vinculan productos</h3>
           <p class="text-sm text-dracula-comment-accessible leading-relaxed">
-            Conectan sus productos a causas y definen cuanto de cada venta se destina al impacto.
+            Conectan sus productos a causas y definen cuánto de cada venta se destina al impacto.
           </p>
         </div>
 
@@ -169,7 +205,7 @@ const formatCurrency = (n: number) => {
         <div class="w-12 h-12 rounded-xl bg-leader/10 flex items-center justify-center mb-5">
           <UsersThree size={24} className="text-leader" weight="duotone" />
         </div>
-        <h3 class="text-xl font-bold text-white mb-3">Lideres Sociales</h3>
+        <h3 class="text-xl font-bold text-white mb-3">Líderes Sociales</h3>
         <p class="text-sm text-dracula-comment-accessible mb-5 leading-relaxed">
           Personas que dedican su vida a transformar comunidades. Publican causas, reciben apoyo de
           emprendedores y muestran transparencia.
@@ -195,7 +231,7 @@ const formatCurrency = (n: number) => {
           href="/register"
           class="inline-flex items-center gap-2 text-sm font-semibold text-leader hover:underline"
         >
-          Registrarme como Lider <ArrowRight size={14} />
+          Registrarme como Líder <ArrowRight size={14} />
         </a>
       </div>
 
@@ -234,7 +270,7 @@ const formatCurrency = (n: number) => {
     <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
       <div>
         <p class="text-3xl font-bold text-leader">{stats.leaders}</p>
-        <p class="text-xs text-dracula-comment-accessible mt-1">Lideres</p>
+        <p class="text-xs text-dracula-comment-accessible mt-1">Líderes</p>
       </div>
       <div>
         <p class="text-3xl font-bold text-entrepreneur">{stats.entrepreneurs}</p>
@@ -257,8 +293,8 @@ const formatCurrency = (n: number) => {
       <div class="glass rounded-2xl p-6 border border-white/5">
         <Quotes size={20} className="text-leader/30 mb-3" />
         <p class="text-sm text-dracula-fg/80 mb-5 leading-relaxed italic">
-          "Antes tenia que ir de puerta en puerta pidiendo donaciones. Ahora los recursos llegan
-          mientras duermo. Comoon cambio todo."
+          "Antes tenía que ir de puerta en puerta pidiendo donaciones. Ahora los recursos llegan
+          mientras duermo. Comoon cambió todo."
         </p>
         <div class="flex items-center gap-3">
           <img
@@ -270,8 +306,8 @@ const formatCurrency = (n: number) => {
             loading="lazy"
           />
           <div>
-            <p class="text-xs font-semibold text-white">Maria Gonzalez</p>
-            <p class="text-[10px] text-leader">Lider · Quibdo</p>
+            <p class="text-xs font-semibold text-white">María González</p>
+            <p class="text-[10px] text-leader">Líder · Quibdó</p>
           </div>
         </div>
       </div>
@@ -280,7 +316,7 @@ const formatCurrency = (n: number) => {
         <Quotes size={20} className="text-entrepreneur/30 mb-3" />
         <p class="text-sm text-dracula-fg/80 mb-5 leading-relaxed italic">
           "Mis clientes ya no solo compran cafe. Compran la historia de Carlos y su escuela de
-          musica. Las ventas subieron 40%."
+          música. Las ventas subieron 40%."
         </p>
         <div class="flex items-center gap-3">
           <img
@@ -292,7 +328,7 @@ const formatCurrency = (n: number) => {
             loading="lazy"
           />
           <div>
-            <p class="text-xs font-semibold text-white">Pedro Ramirez</p>
+            <p class="text-xs font-semibold text-white">Pedro Ramírez</p>
             <p class="text-[10px] text-entrepreneur">Emprendedor · Manizales</p>
           </div>
         </div>
@@ -304,7 +340,7 @@ const formatCurrency = (n: number) => {
   <section class="px-6 py-20 text-center">
     <div class="max-w-xl mx-auto">
       <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
-        Unete a la economia solidaria
+        Únete a la economía solidaria
       </h2>
       <p class="text-sm text-dracula-comment-accessible mb-8">
         Elige tu rol y empieza a generar impacto hoy.

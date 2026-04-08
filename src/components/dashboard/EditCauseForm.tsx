@@ -79,12 +79,12 @@ function CollapsibleSection({
 }
 
 const CATEGORY_OPTIONS = [
-  { value: 'educacion', label: 'Educacion' },
+  { value: 'educacion', label: 'Educación' },
   { value: 'salud', label: 'Salud' },
   { value: 'ambiente', label: 'Ambiente' },
   { value: 'cultura', label: 'Cultura' },
   { value: 'vivienda', label: 'Vivienda' },
-  { value: 'alimentacion', label: 'Alimentacion' },
+  { value: 'alimentacion', label: 'Alimentación' },
   { value: 'comunidad', label: 'Comunidad' },
   { value: 'otro', label: 'Otro' },
 ];
@@ -93,7 +93,7 @@ const NEEDS_OPTIONS = [
   { value: 'voluntarios', label: 'Voluntarios' },
   { value: 'dinero', label: 'Dinero' },
   { value: 'insumos', label: 'Insumos' },
-  { value: 'difusion', label: 'Difusion' },
+  { value: 'difusion', label: 'Difusión' },
   { value: 'transporte', label: 'Transporte' },
   { value: 'otro', label: 'Otro' },
 ];
@@ -200,7 +200,7 @@ export default function EditCauseForm({ causeId, initialData }: EditCauseFormPro
         setError(data.error || 'Error al guardar');
       }
     } catch {
-      setError('Error de conexion');
+      setError('Error de conexión');
     } finally {
       setLoading(false);
     }
@@ -224,16 +224,16 @@ export default function EditCauseForm({ causeId, initialData }: EditCauseFormPro
         </div>
       )}
 
-      {/* Section 1: Informacion Basica */}
+      {/* Section 1: Información Básica */}
       <CollapsibleSection
-        title="Informacion Basica"
+        title="Información Básica"
         icon={<Heart size={22} className="text-leader" />}
         isOpen={openSections.basic}
         onToggle={() => toggleSection('basic')}
       >
         <div>
           <label className="mb-2 block text-sm font-bold text-dracula-fg">
-            Titulo <span className="text-dracula-red">*</span>
+            Título <span className="text-dracula-red">*</span>
           </label>
           <input
             type="text"
@@ -244,7 +244,7 @@ export default function EditCauseForm({ causeId, initialData }: EditCauseFormPro
           />
         </div>
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Descripcion</label>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Descripción</label>
           <textarea
             rows={4}
             value={description}
@@ -273,15 +273,15 @@ export default function EditCauseForm({ causeId, initialData }: EditCauseFormPro
         </div>
       </CollapsibleSection>
 
-      {/* Section 2: Ubicacion y Comunidad */}
+      {/* Section 2: Ubicación y Comunidad */}
       <CollapsibleSection
-        title="Ubicacion y Comunidad"
+        title="Ubicación y Comunidad"
         icon={<MapPin size={22} className="text-leader" />}
         isOpen={openSections.location}
         onToggle={() => toggleSection('location')}
       >
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Ubicacion</label>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Ubicación</label>
           <input
             type="text"
             value={location}
@@ -301,7 +301,7 @@ export default function EditCauseForm({ causeId, initialData }: EditCauseFormPro
             onChange={(e) =>
               setBeneficiaryCount(e.target.value === '' ? '' : Number(e.target.value))
             }
-            placeholder="Numero de personas beneficiadas"
+            placeholder="Número de personas beneficiadas"
             className={inputClass}
           />
         </div>
@@ -309,7 +309,7 @@ export default function EditCauseForm({ causeId, initialData }: EditCauseFormPro
 
       {/* Section 3: Linea de Tiempo */}
       <CollapsibleSection
-        title="Linea de Tiempo"
+        title="Línea de Tiempo"
         icon={<CalendarBlank size={22} className="text-leader" />}
         isOpen={openSections.timeline}
         onToggle={() => toggleSection('timeline')}
@@ -336,15 +336,15 @@ export default function EditCauseForm({ causeId, initialData }: EditCauseFormPro
         </div>
       </CollapsibleSection>
 
-      {/* Section 4: Categoria y Necesidades */}
+      {/* Section 4: Categoría y Necesidades */}
       <CollapsibleSection
-        title="Categoria y Necesidades"
+        title="Categoría y Necesidades"
         icon={<ListChecks size={22} className="text-leader" />}
         isOpen={openSections.category}
         onToggle={() => toggleSection('category')}
       >
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Categoria</label>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Categoría</label>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -392,7 +392,7 @@ export default function EditCauseForm({ causeId, initialData }: EditCauseFormPro
         <div>
           <label className="mb-2 block text-sm font-bold text-dracula-fg">Uso de fondos</label>
           <p className="mb-2 text-sm italic text-dracula-comment">
-            Explica como se usan los fondos. La transparencia genera confianza.
+            Explica cómo se usan los fondos. La transparencia genera confianza.
           </p>
           <textarea
             rows={4}

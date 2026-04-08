@@ -3,7 +3,7 @@
 // Base interface for all feed items
 interface BaseFeedItem {
   id: number;
-  type: 'product' | 'cause' | 'cause_update' | 'post';
+  type: 'product' | 'cause' | 'cause_update';
   created_at: string;
 }
 
@@ -38,21 +38,6 @@ export interface ProductFeedItem extends BaseFeedItem {
   leader: {
     id: number;
     name: string;
-  };
-}
-
-// Post feed item (free-form publication)
-export interface PostFeedItem extends BaseFeedItem {
-  type: 'post';
-  content: string;
-  photo_url: string | null;
-  author: {
-    user_id: number;
-    name: string;
-    photo_url: string | null;
-    role: string;
-    city: string | null;
-    department: string | null;
   };
 }
 
@@ -99,11 +84,11 @@ export interface CauseUpdateFeedItem extends BaseFeedItem {
 }
 
 // Union type for feed items
-export type FeedItem = ProductFeedItem | CauseFeedItem | CauseUpdateFeedItem | PostFeedItem;
+export type FeedItem = ProductFeedItem | CauseFeedItem | CauseUpdateFeedItem;
 
 // Filter types
 export interface FeedFilters {
-  types?: ('product' | 'cause' | 'cause_update' | 'post')[];
+  types?: ('product' | 'cause' | 'cause_update')[];
   department?: string;
   city?: string;
   categories?: string[];

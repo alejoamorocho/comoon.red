@@ -9,12 +9,7 @@ interface UseFeedOptions {
 
 export function useFeed({ initialItems = [], initialCursor = null }: UseFeedOptions = {}) {
   // Filter state
-  const [activeTypes, setActiveTypes] = useState<FeedType[]>([
-    'product',
-    'cause',
-    'cause_update',
-    'post',
-  ]);
+  const [activeTypes, setActiveTypes] = useState<FeedType[]>(['product', 'cause', 'cause_update']);
   const [activeDepartment, setActiveDepartment] = useState<string | null>(null);
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -45,7 +40,7 @@ export function useFeed({ initialItems = [], initialCursor = null }: UseFeedOpti
       const params = new URLSearchParams();
       if (cursorValue) params.append('cursor', cursorValue);
       params.append('limit', '20');
-      if (activeTypes.length < 4) params.append('types', activeTypes.join(','));
+      if (activeTypes.length < 3) params.append('types', activeTypes.join(','));
       if (activeDepartment) params.append('department', activeDepartment);
       if (activeCategories.length > 0) params.append('categories', activeCategories.join(','));
       return params.toString();
@@ -130,13 +125,13 @@ export function useFeed({ initialItems = [], initialCursor = null }: UseFeedOpti
 
   // Clear all filters
   const handleClearFilters = () => {
-    setActiveTypes(['product', 'cause', 'cause_update', 'post']);
+    setActiveTypes(['product', 'cause', 'cause_update']);
     setActiveDepartment(null);
     setActiveCategories([]);
   };
 
   const hasActiveFilters =
-    activeTypes.length < 4 || activeDepartment !== null || activeCategories.length > 0;
+    activeTypes.length < 3 || activeDepartment !== null || activeCategories.length > 0;
 
   return {
     // Feed data

@@ -57,9 +57,9 @@ export default function RegisterForm() {
   // Password validation
   useEffect(() => {
     if (formData.confirmPassword && formData.password !== formData.confirmPassword) {
-      setPasswordError('Las contrasenas no coinciden');
+      setPasswordError('Las contraseñas no coinciden');
     } else if (formData.password && formData.password.length < 8) {
-      setPasswordError('La contrasena debe tener al menos 8 caracteres');
+      setPasswordError('La contraseña debe tener al menos 8 caracteres');
     } else {
       setPasswordError('');
     }
@@ -71,11 +71,11 @@ export default function RegisterForm() {
 
     // Validate passwords
     if (formData.password !== formData.confirmPassword) {
-      setPasswordError('Las contrasenas no coinciden');
+      setPasswordError('Las contraseñas no coinciden');
       return;
     }
     if (formData.password.length < 8) {
-      setPasswordError('La contrasena debe tener al menos 8 caracteres');
+      setPasswordError('La contraseña debe tener al menos 8 caracteres');
       return;
     }
 
@@ -132,7 +132,7 @@ export default function RegisterForm() {
       }
     } catch (err) {
       console.error('Registration error:', err);
-      setError('Error de conexion. Intenta de nuevo.');
+      setError('Error de conexión. Intenta de nuevo.');
       setLoading(false);
     }
   };
@@ -141,14 +141,14 @@ export default function RegisterForm() {
     return (
       <div className="py-12 text-center">
         <CheckCircle size={64} className="mx-auto mb-4 text-dracula-green" weight="fill" />
-        <h2 className="mb-2 text-3xl font-bold text-white">Registro Exitoso!</h2>
+        <h2 className="mb-2 text-3xl font-bold text-white">¡Registro Exitoso!</h2>
         <p className="mb-6 text-dracula-fg/80">
           Gracias por unirte a{' '}
           <span className="font-bold">
             <span className="text-white">co</span>
             <span className="text-comoon-purple">moon</span>
           </span>
-          . Ya puedes iniciar sesion y gestionar tu perfil.
+          . Ya puedes iniciar sesión y gestionar tu perfil.
         </p>
         <div className="flex justify-center gap-4">
           <a
@@ -161,7 +161,7 @@ export default function RegisterForm() {
             href="/login"
             className="rounded-lg bg-dracula-purple px-6 py-2 font-bold text-dracula-bg transition-colors hover:bg-white"
           >
-            Iniciar Sesion
+            Iniciar Sesión
           </a>
         </div>
       </div>
@@ -183,7 +183,7 @@ export default function RegisterForm() {
           type="button"
           role="radio"
           aria-checked={role === 'leader'}
-          aria-label="Soy Lider"
+          aria-label="Soy Líder"
           onClick={() => setRole('leader')}
           className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
             role === 'leader'
@@ -192,7 +192,7 @@ export default function RegisterForm() {
           }`}
         >
           <UsersThree size={28} weight={role === 'leader' ? 'fill' : 'duotone'} />
-          <span className="text-sm font-bold">Soy Lider</span>
+          <span className="text-sm font-bold">Soy Líder</span>
         </button>
         <button
           type="button"
@@ -228,7 +228,7 @@ export default function RegisterForm() {
           />
         </div>
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Correo Electronico</label>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Correo Electrónico</label>
           <input
             type="email"
             required
@@ -246,7 +246,7 @@ export default function RegisterForm() {
         <div>
           <label className="mb-2 block text-sm font-bold text-dracula-fg">
             <Lock size={16} className="mr-1 inline" />
-            Contrasena
+            Contraseña
           </label>
           <div className="relative">
             <input
@@ -255,7 +255,7 @@ export default function RegisterForm() {
               minLength={8}
               disabled={loading}
               className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2 pr-10 text-white outline-none focus:border-dracula-purple focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dracula-purple disabled:opacity-50"
-              placeholder="Minimo 8 caracteres"
+              placeholder="Mínimo 8 caracteres"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
@@ -271,7 +271,7 @@ export default function RegisterForm() {
         <div>
           <label className="mb-2 block text-sm font-bold text-dracula-fg">
             <Lock size={16} className="mr-1 inline" />
-            Confirmar Contrasena
+            Confirmar Contraseña
           </label>
           <div className="relative">
             <input
@@ -284,7 +284,7 @@ export default function RegisterForm() {
                   ? 'border-dracula-red focus:border-dracula-red'
                   : 'border-dracula-current focus:border-dracula-purple'
               }`}
-              placeholder="Repite tu contrasena"
+              placeholder="Repite tu contraseña"
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
             />
@@ -350,7 +350,7 @@ export default function RegisterForm() {
 
       <div>
         <label className="mb-2 block text-sm font-bold text-dracula-fg">
-          Biografia / Descripcion
+          Biografía / Descripción
         </label>
         <textarea
           rows={4}
@@ -359,8 +359,8 @@ export default function RegisterForm() {
           className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-2 text-white outline-none focus:border-dracula-purple focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dracula-purple disabled:opacity-50"
           placeholder={
             role === 'leader'
-              ? 'Cuentanos sobre tu liderazgo y tu comunidad...'
-              : 'Describe tu emprendimiento y que productos ofreces...'
+              ? 'Cuéntanos sobre tu liderazgo y tu comunidad...'
+              : 'Describe tu emprendimiento y qué productos ofreces...'
           }
           value={formData.bio}
           onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
@@ -378,16 +378,16 @@ export default function RegisterForm() {
             Registrando...
           </>
         ) : role === 'leader' ? (
-          'Registrarme como Lider'
+          'Registrarme como Líder'
         ) : (
           'Registrarme como Emprendedor'
         )}
       </button>
 
       <p className="text-center text-sm text-dracula-comment-accessible">
-        Ya tienes cuenta?{' '}
+        ¿Ya tienes cuenta?{' '}
         <a href="/login" className="font-medium text-dracula-purple hover:underline">
-          Inicia Sesion
+          Inicia Sesión
         </a>
       </p>
     </form>

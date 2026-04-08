@@ -38,7 +38,7 @@ export default function HeroAuth() {
               : 'bg-dracula-current/20 text-dracula-comment hover:text-white'
           }`}
         >
-          Iniciar Sesion
+          Iniciar Sesión
         </button>
       </div>
 
@@ -80,11 +80,11 @@ function CompactLogin() {
           data.user?.onboardingComplete === false ? '/onboarding' : data.redirectTo || '/feed';
         window.location.href = redirectUrl;
       } else {
-        setError(data.error || 'Error al iniciar sesion');
+        setError(data.error || 'Error al iniciar sesión');
         setLoading(false);
       }
     } catch {
-      setError('Error de conexion. Intenta de nuevo.');
+      setError('Error de conexión. Intenta de nuevo.');
       setLoading(false);
     }
   };
@@ -104,7 +104,7 @@ function CompactLogin() {
           required
           disabled={loading}
           className="w-full rounded-lg border border-dracula-current bg-dracula-bg/80 px-4 py-2.5 text-sm text-white placeholder-dracula-comment outline-none transition-colors focus:border-comoon-purple"
-          placeholder="Correo electronico"
+          placeholder="Correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -116,7 +116,7 @@ function CompactLogin() {
           required
           disabled={loading}
           className="w-full rounded-lg border border-dracula-current bg-dracula-bg/80 px-4 py-2.5 pr-10 text-sm text-white placeholder-dracula-comment outline-none transition-colors focus:border-comoon-purple"
-          placeholder="Contrasena"
+          placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -139,7 +139,7 @@ function CompactLogin() {
         ) : (
           <>
             <SignIn size={18} />
-            Iniciar Sesion
+            Iniciar Sesión
           </>
         )}
       </button>
@@ -172,9 +172,9 @@ function CompactRegister() {
 
   useEffect(() => {
     if (confirmPassword && password !== confirmPassword) {
-      setPasswordError('Las contrasenas no coinciden');
+      setPasswordError('Las contraseñas no coinciden');
     } else if (password && password.length < 8) {
-      setPasswordError('Minimo 8 caracteres');
+      setPasswordError('Mínimo 8 caracteres');
     } else {
       setPasswordError('');
     }
@@ -185,11 +185,11 @@ function CompactRegister() {
     setError('');
 
     if (password !== confirmPassword) {
-      setPasswordError('Las contrasenas no coinciden');
+      setPasswordError('Las contraseñas no coinciden');
       return;
     }
     if (password.length < 8) {
-      setPasswordError('Minimo 8 caracteres');
+      setPasswordError('Mínimo 8 caracteres');
       return;
     }
 
@@ -240,7 +240,7 @@ function CompactRegister() {
         setLoading(false);
       }
     } catch {
-      setError('Error de conexion. Intenta de nuevo.');
+      setError('Error de conexión. Intenta de nuevo.');
       setLoading(false);
     }
   };
@@ -266,7 +266,7 @@ function CompactRegister() {
           }`}
         >
           <UsersThree size={16} weight={role === 'leader' ? 'fill' : 'regular'} />
-          Lider
+          Líder
         </button>
         <button
           type="button"
@@ -297,7 +297,7 @@ function CompactRegister() {
         required
         disabled={loading}
         className="w-full rounded-lg border border-dracula-current bg-dracula-bg/80 px-4 py-2.5 text-sm text-white placeholder-dracula-comment outline-none transition-colors focus:border-comoon-purple"
-        placeholder="Correo electronico"
+        placeholder="Correo electrónico"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -310,7 +310,7 @@ function CompactRegister() {
             minLength={8}
             disabled={loading}
             className="w-full rounded-lg border border-dracula-current bg-dracula-bg/80 px-4 py-2.5 pr-9 text-sm text-white placeholder-dracula-comment outline-none transition-colors focus:border-comoon-purple"
-            placeholder="Contrasena"
+            placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -375,7 +375,7 @@ function CompactRegister() {
         disabled={loading}
         className="w-full resize-none rounded-lg border border-dracula-current bg-dracula-bg/80 px-4 py-2.5 text-sm text-white placeholder-dracula-comment outline-none transition-colors focus:border-comoon-purple"
         placeholder={
-          role === 'leader' ? 'Cuentanos sobre tu liderazgo...' : 'Describe tu emprendimiento...'
+          role === 'leader' ? 'Cuéntanos sobre tu liderazgo...' : 'Describe tu emprendimiento...'
         }
         value={bio}
         onChange={(e) => setBio(e.target.value)}

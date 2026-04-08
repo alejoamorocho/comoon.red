@@ -190,7 +190,7 @@ export default function OnboardingWizard({ role, profileId, initialData }: Onboa
 
       setStep(step + 1);
     } catch {
-      setError('Error de conexion. Intenta de nuevo.');
+      setError('Error de conexión. Intenta de nuevo.');
     } finally {
       setLoading(false);
     }

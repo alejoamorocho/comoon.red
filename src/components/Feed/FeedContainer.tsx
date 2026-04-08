@@ -73,7 +73,9 @@ export default function FeedContainer({
         {items.length > 0 && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
-              <FeedItemComponent key={`${item.type}-${item.id}`} item={item} />
+              <div key={`${item.type}-${item.id}`} className="flex h-full flex-col">
+                <FeedItemComponent item={item} />
+              </div>
             ))}
           </div>
         )}

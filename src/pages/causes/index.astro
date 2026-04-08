@@ -1,0 +1,301 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { MagnifyingGlass, MapPin, Heart, CheckCircle, TrendUp } from '@phosphor-icons/react';
+
+// Fetch causes from database
+const db = Astro.locals.runtime?.env?.DB;
+
+let causesData: Array<{
+  id: string;
+  title: string;
+  description: string;
+  photo_url: string;
+  current_amount: number;
+  target_goal: number;
+  status: string;
+  leader_name: string;
+  leader_photo: string;
+  leader_city: string;
+  leader_department: string;
+}> = [];
+
+if (db) {
+  try {
+    const { results } = await db
+      .prepare(
+        `SELECT c.*, l.name as leader_name, l.photo_url as leader_photo, l.city as leader_city, l.department as leader_department
+         FROM causes c
+         LEFT JOIN leaders l ON c.leader_id = l.id
+         WHERE c.status IN ('active','completed')
+         ORDER BY c.share_count DESC, c.created_at DESC`,
+      )
+      .all();
+
+    causesData = (results || []).map((c: any) => ({
+      id: String(c.id),
+      title: c.title || '',
+      description: c.description || '',
+      photo_url: c.photo_url || '',
+      current_amount: c.current_amount || 0,
+      target_goal: c.target_goal || 0,
+      status: c.status || 'active',
+      leader_name: c.leader_name || '',
+      leader_photo: c.leader_photo || '',
+      leader_city: c.leader_city || '',
+      leader_department: c.leader_department || '',
+    }));
+  } catch (e) {
+    console.error('Failed to fetch causes:', e);
+    causesData = [];
+  }
+}
+
+const causeImages = [
+  'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=600&q=80',
+];
+---
+
+<Layout title="Causas" fullWidth>
+  <!-- ===== HERO ===== -->
+  <section
+    class="relative py-20 px-6 overflow-hidden bg-gradient-to-b from-leader/[0.07] to-transparent"
+  >
+    <div
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-leader/15 rounded-full blur-[140px] pointer-events-none"
+    >
+    </div>
+
+    <div class="relative z-10 max-w-3xl mx-auto text-center">
+      <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-4">Causas</p>
+      <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">
+        Causas que transforman comunidades
+      </h1>
+      <p class="text-lg text-dracula-comment-accessible leading-relaxed max-w-2xl mx-auto">
+        Descubre las causas sociales que líderes colombianos impulsan para generar cambio real.
+      </p>
+
+      <!-- Search -->
+      <div class="max-w-xl mx-auto mt-8">
+        <div class="relative">
+          <MagnifyingGlass
+            size={20}
+            weight="duotone"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-dracula-comment pointer-events-none"
+          />
+          <input
+            type="text"
+            id="cause-search"
+            placeholder="Buscar por nombre, descripción o líder..."
+            class="w-full pl-12 pr-6 py-4 bg-dracula-current/60 border border-white/10 rounded-full text-white placeholder:text-dracula-comment/60 focus:outline-none focus:border-leader/40 focus:shadow-[0_0_30px_rgba(45,212,191,0.1)] transition-all duration-300 backdrop-blur-md"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CAUSES GRID ===== -->
+  <section class="border-t border-white/5 py-24 px-6">
+    <div class="max-w-7xl mx-auto">
+      <!-- Stats bar -->
+      <div class="flex items-center justify-center gap-8 mb-16 text-sm">
+        <div class="flex items-center gap-2">
+          <Heart size={18} weight="duotone" className="text-leader" />
+          <span class="text-dracula-comment-accessible">
+            <span class="text-white font-semibold">{causesData.length}</span> causas registradas
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <CheckCircle size={18} weight="duotone" className="text-dracula-green" />
+          <span class="text-dracula-comment-accessible">
+            <span class="text-white font-semibold"
+              >{causesData.filter((c) => c.status === 'completed').length}</span
+            > completadas
+          </span>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      {
+        causesData.length > 0 ? (
+          <div id="causes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {causesData.map((cause, i) => {
+              const progress =
+                cause.target_goal > 0
+                  ? Math.min(100, Math.round((cause.current_amount / cause.target_goal) * 100))
+                  : 0;
+              const location = [cause.leader_city, cause.leader_department]
+                .filter(Boolean)
+                .join(', ');
+              return (
+                <a
+                  href={`/causes/${cause.id}`}
+                  class="cause-card group glass rounded-2xl overflow-hidden border border-white/5 hover:border-leader/20 transition-all duration-300 hover:shadow-[0_0_40px_rgba(45,212,191,0.08)]"
+                  data-title={cause.title.toLowerCase()}
+                  data-description={cause.description.toLowerCase()}
+                  data-leader={cause.leader_name.toLowerCase()}
+                  data-location={location.toLowerCase()}
+                >
+                  {/* Image */}
+                  <div class="relative h-48 overflow-hidden">
+                    {cause.photo_url ? (
+                      <img
+                        src={cause.photo_url}
+                        alt={cause.title}
+                        width={600}
+                        height={192}
+                        loading="lazy"
+                        decoding="async"
+                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <img
+                        src={causeImages[i % causeImages.length]}
+                        alt={cause.title}
+                        width={600}
+                        height={192}
+                        loading="lazy"
+                        decoding="async"
+                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    )}
+                    <div class="absolute inset-0 bg-gradient-to-t from-dracula-bg via-dracula-bg/20 to-transparent" />
+
+                    {/* Status badge */}
+                    <div class="absolute top-3 right-3">
+                      {cause.status === 'completed' ? (
+                        <span class="bg-dracula-green/20 backdrop-blur-sm text-dracula-green px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-dracula-green/20">
+                          <CheckCircle size={12} weight="fill" />
+                          Completada
+                        </span>
+                      ) : (
+                        <span class="bg-leader/20 backdrop-blur-sm text-leader px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-leader/20">
+                          <TrendUp size={12} weight="fill" />
+                          Activa
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div class="p-5">
+                    <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-leader transition-colors">
+                      {cause.title}
+                    </h3>
+                    <p class="text-sm text-dracula-comment-accessible line-clamp-2 leading-relaxed mb-4">
+                      {cause.description}
+                    </p>
+
+                    {/* Progress bar */}
+                    {cause.target_goal > 0 && (
+                      <div class="mb-4">
+                        <div class="flex items-center justify-between text-xs text-dracula-comment mb-1.5">
+                          <span class="text-dracula-green font-bold">
+                            ${cause.current_amount.toLocaleString('es-CO')}
+                          </span>
+                          <span>{progress}%</span>
+                        </div>
+                        <div class="w-full bg-dracula-bg h-1.5 rounded-full overflow-hidden border border-white/5">
+                          <div
+                            class={`h-full rounded-full ${cause.status === 'completed' ? 'bg-dracula-green' : 'bg-gradient-to-r from-leader to-leader/60'}`}
+                            style={`width: ${progress}%`}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Leader info */}
+                    <div class="flex items-center gap-3 pt-3 border-t border-white/5">
+                      {cause.leader_photo ? (
+                        <img
+                          src={cause.leader_photo}
+                          alt={cause.leader_name}
+                          width={28}
+                          height={28}
+                          loading="lazy"
+                          class="w-7 h-7 rounded-full object-cover border border-leader/30"
+                        />
+                      ) : (
+                        <div class="w-7 h-7 rounded-full bg-leader/10 flex items-center justify-center border border-leader/20">
+                          <span class="text-leader text-xs font-bold">
+                            {cause.leader_name?.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm text-white font-medium truncate">{cause.leader_name}</p>
+                        {location && (
+                          <p class="text-xs text-dracula-comment flex items-center gap-1">
+                            <MapPin size={10} weight="duotone" />
+                            {location}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        ) : (
+          <div class="text-center py-24">
+            <Heart size={48} weight="duotone" className="text-dracula-comment mx-auto mb-4" />
+            <p class="text-lg text-dracula-comment">No hay causas registradas aún.</p>
+          </div>
+        )
+      }
+
+      <!-- No results (hidden by default, shown by JS) -->
+      <div id="no-results" class="text-center py-24 hidden">
+        <MagnifyingGlass size={48} weight="duotone" className="text-dracula-comment mx-auto mb-4" />
+        <p class="text-lg text-dracula-comment">No se encontraron causas con ese criterio.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search script -->
+  <script>
+    const searchInput = document.getElementById('cause-search') as HTMLInputElement;
+    const cards = document.querySelectorAll('.cause-card') as NodeListOf<HTMLElement>;
+    const noResults = document.getElementById('no-results');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          const title = card.dataset.title || '';
+          const description = card.dataset.description || '';
+          const leader = card.dataset.leader || '';
+          const location = card.dataset.location || '';
+          const match =
+            !query ||
+            title.includes(query) ||
+            description.includes(query) ||
+            leader.includes(query) ||
+            location.includes(query);
+          card.style.display = match ? '' : 'none';
+          if (match) visibleCount++;
+        });
+
+        if (noResults) {
+          noResults.classList.toggle('hidden', visibleCount > 0);
+        }
+      });
+    }
+  </script>
+</Layout>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

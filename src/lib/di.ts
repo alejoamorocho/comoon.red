@@ -7,7 +7,6 @@ import { ProductRepository } from '../repositories/product.repository';
 import { CauseUpdateRepository } from '../repositories/cause-update.repository';
 import { TransactionRepository } from '../repositories/transaction.repository';
 import { FeedRepository } from '../repositories/feed.repository';
-import { PostRepository } from '../repositories/post.repository';
 import { AuthService } from '../services/auth.service';
 import { FeedService } from '../services/feed.service';
 import { LeaderService } from '../services/leader.service';
@@ -15,7 +14,6 @@ import { ProductService } from '../services/product.service';
 import { CauseUpdateService } from '../services/cause-update.service';
 import { CauseService } from '../services/cause.service';
 import { EntrepreneurService } from '../services/entrepreneur.service';
-import { PostService } from '../services/post.service';
 
 export interface Services {
   auth: AuthService;
@@ -25,7 +23,6 @@ export interface Services {
   causeUpdate: CauseUpdateService;
   cause: CauseService;
   entrepreneur: EntrepreneurService;
-  post: PostService;
 }
 
 export interface Repositories {
@@ -37,7 +34,6 @@ export interface Repositories {
   causeUpdate: CauseUpdateRepository;
   transaction: TransactionRepository;
   feed: FeedRepository;
-  post: PostRepository;
 }
 
 export function createRepositories(db: D1Database): Repositories {
@@ -50,7 +46,6 @@ export function createRepositories(db: D1Database): Repositories {
     causeUpdate: new CauseUpdateRepository(db),
     transaction: new TransactionRepository(db),
     feed: new FeedRepository(db),
-    post: new PostRepository(db),
   };
 }
 
@@ -64,7 +59,5 @@ export function createServices(env: { DB: D1Database; JWT_SECRET: string }): Ser
   const causeUpdate = new CauseUpdateService(repos.causeUpdate, repos.cause, repos.leader);
   const cause = new CauseService(repos.cause, repos.leader);
   const entrepreneur = new EntrepreneurService(repos.entrepreneur);
-  const post = new PostService(repos.post);
-
-  return { auth, feed, leader, product, causeUpdate, cause, entrepreneur, post };
+  return { auth, feed, leader, product, causeUpdate, cause, entrepreneur };
 }

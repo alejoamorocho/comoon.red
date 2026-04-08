@@ -66,12 +66,12 @@ export default function LoginForm() {
         // Redirect to appropriate page
         window.location.href = redirectUrl;
       } else {
-        setError(data.error || 'Error al iniciar sesion');
+        setError(data.error || 'Error al iniciar sesión');
         setLoading(false);
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Error de conexion. Intenta de nuevo.');
+      setError('Error de conexión. Intenta de nuevo.');
       setLoading(false);
     }
   };
@@ -87,7 +87,7 @@ export default function LoginForm() {
 
       <div>
         <label htmlFor="login-email" className="mb-2 block text-sm font-bold text-dracula-fg">
-          Correo Electronico
+          Correo Electrónico
         </label>
         <input
           id="login-email"
@@ -103,7 +103,7 @@ export default function LoginForm() {
 
       <div>
         <label htmlFor="login-password" className="mb-2 block text-sm font-bold text-dracula-fg">
-          Contrasena
+          Contraseña
         </label>
         <div className="relative">
           <input
@@ -111,7 +111,7 @@ export default function LoginForm() {
             type={showPassword ? 'text' : 'password'}
             required
             className="w-full rounded-lg border border-dracula-current bg-dracula-bg px-4 py-3 pr-12 text-white outline-none transition-colors focus:border-dracula-purple focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dracula-purple"
-            placeholder="Tu contrasena"
+            placeholder="Tu contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
@@ -138,7 +138,7 @@ export default function LoginForm() {
           <span className="text-dracula-fg/80">Recordarme</span>
         </label>
         <a href="#" className="text-dracula-purple hover:underline">
-          Olvidaste tu contrasena?
+          ¿Olvidaste tu contraseña?
         </a>
       </div>
 
@@ -155,15 +155,15 @@ export default function LoginForm() {
         ) : (
           <>
             <SignIn size={20} />
-            Iniciar Sesion
+            Iniciar Sesión
           </>
         )}
       </button>
 
       <p className="text-center text-sm text-dracula-comment-accessible">
-        No tienes cuenta?{' '}
+        ¿No tienes cuenta?{' '}
         <a href="/register" className="font-medium text-comoon-purple hover:underline">
-          Registrate
+          Regístrate
         </a>
       </p>
 
@@ -176,7 +176,7 @@ export default function LoginForm() {
               <span className="text-dracula-purple">Admin:</span> admin@comoon.co / admin123
             </p>
             <p>
-              <span className="text-leader">Lider:</span> elena.marin@email.com / cualquier
+              <span className="text-leader">Líder:</span> elena.marin@email.com / cualquier
             </p>
             <p>
               <span className="text-entrepreneur">Emprendedor:</span> artesanias@email.com /

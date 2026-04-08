@@ -67,21 +67,23 @@ const leaders = leadersData
   .sort((a, b) => (b.isComplete ? 1 : 0) - (a.isComplete ? 1 : 0));
 ---
 
-<Layout title="Lideres Sociales" fullWidth>
+<Layout title="Líderes Sociales" fullWidth>
   <!-- ===== HERO ===== -->
-  <section class="relative py-20 px-6 overflow-hidden">
+  <section
+    class="relative py-20 px-6 overflow-hidden bg-gradient-to-b from-leader/[0.07] to-transparent"
+  >
     <div
-      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-leader/8 rounded-full blur-[140px] pointer-events-none"
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-leader/15 rounded-full blur-[140px] pointer-events-none"
     >
     </div>
 
     <div class="relative z-10 max-w-3xl mx-auto text-center">
-      <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-4">Lideres Sociales</p>
+      <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-4">Líderes Sociales</p>
       <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">
         Transformadores de comunidades
       </h1>
       <p class="text-lg text-dracula-comment-accessible leading-relaxed max-w-2xl mx-auto">
-        Rostros reales de transformacion. Cada uno de ellos lidera una causa verificada que necesita
+        Rostros reales de transformación. Cada uno de ellos lidera una causa verificada que necesita
         tu apoyo.
       </p>
 
@@ -96,7 +98,7 @@ const leaders = leadersData
           <input
             type="text"
             id="leader-search"
-            placeholder="Buscar por nombre, ubicacion o causa..."
+            placeholder="Buscar por nombre, ubicación o causa..."
             class="w-full pl-12 pr-6 py-4 bg-dracula-current/60 border border-white/10 rounded-full text-white placeholder:text-dracula-comment/60 focus:outline-none focus:border-leader/40 focus:shadow-[0_0_30px_rgba(45,212,191,0.1)] transition-all duration-300 backdrop-blur-md"
           />
         </div>
@@ -112,7 +114,7 @@ const leaders = leadersData
         <div class="flex items-center gap-2">
           <UsersThree size={18} weight="duotone" className="text-leader" />
           <span class="text-dracula-comment-accessible">
-            <span class="text-white font-semibold">{leaders.length}</span> lideres registrados
+            <span class="text-white font-semibold">{leaders.length}</span> líderes registrados
           </span>
         </div>
         <div class="flex items-center gap-2">
@@ -234,7 +236,7 @@ const leaders = leadersData
         leaders.length === 0 && (
           <div class="text-center py-24">
             <UsersThree size={48} weight="duotone" className="text-dracula-comment mx-auto mb-4" />
-            <p class="text-lg text-dracula-comment">No hay lideres registrados aun.</p>
+            <p class="text-lg text-dracula-comment">No hay líderes registrados aún.</p>
           </div>
         )
       }
@@ -242,7 +244,7 @@ const leaders = leadersData
       <!-- No results (hidden by default, shown by JS) -->
       <div id="no-results" class="text-center py-24 hidden">
         <MagnifyingGlass size={48} weight="duotone" className="text-dracula-comment mx-auto mb-4" />
-        <p class="text-lg text-dracula-comment">No se encontraron lideres con ese criterio.</p>
+        <p class="text-lg text-dracula-comment">No se encontraron líderes con ese criterio.</p>
       </div>
     </div>
   </section>

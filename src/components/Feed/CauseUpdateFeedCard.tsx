@@ -21,7 +21,7 @@ export default function CauseUpdateFeedCard({ update }: CauseUpdateFeedCardProps
 
   return (
     <div
-      className={`glass overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-xl ${borderClass} group`}
+      className={`glass flex h-full flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-xl ${borderClass} group`}
     >
       {/* Update with photo */}
       {update.photo_url && (
@@ -58,7 +58,7 @@ export default function CauseUpdateFeedCard({ update }: CauseUpdateFeedCardProps
         </div>
       )}
 
-      <div className="p-5">
+      <div className="flex flex-1 flex-col p-5">
         {/* Type badge (if no photo) */}
         {!update.photo_url && (
           <div className="mb-3 flex items-center justify-between">
@@ -170,7 +170,7 @@ export default function CauseUpdateFeedCard({ update }: CauseUpdateFeedCardProps
         {/* View cause link */}
         <a
           href={`/causes/${update.cause.id}`}
-          className={`inline-flex items-center gap-1.5 text-sm font-medium ${textClass} transition-opacity hover:opacity-80`}
+          className={`mt-auto inline-flex items-center gap-1.5 text-sm font-medium ${textClass} transition-opacity hover:opacity-80`}
         >
           Ver causa
           <ArrowRight size={14} />

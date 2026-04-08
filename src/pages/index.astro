@@ -31,7 +31,7 @@ if (db) {
        FROM causes c
        LEFT JOIN leaders l ON c.leader_id = l.id
        WHERE c.status = 'active'
-       ORDER BY c.current_amount DESC
+       ORDER BY c.share_count DESC, c.current_amount DESC
        LIMIT 6`,
     )
     .all();
@@ -84,7 +84,7 @@ const placeholderCauses = [
   {
     id: 0,
     title: 'Comedor Comunitario Esperanza',
-    description: 'Alimentacion para 200 familias vulnerables',
+    description: 'Alimentación para 200 familias vulnerables',
     leader_name: 'Elena Marin',
     leader_location: 'Buenaventura',
     current_amount: 850000,
@@ -92,8 +92,8 @@ const placeholderCauses = [
   },
   {
     id: 0,
-    title: 'Escuela de Musica Ancestral',
-    description: 'Preservando tradiciones musicales del Pacifico',
+    title: 'Escuela de Música Ancestral',
+    description: 'Preservando tradiciones musicales del Pacífico',
     leader_name: 'Carlos Perea',
     leader_location: 'Tumaco',
     current_amount: 420000,
@@ -110,10 +110,10 @@ const placeholderCauses = [
   },
   {
     id: 0,
-    title: 'Biblioteca Movil del Choco',
-    description: 'Libros y educacion para comunidades rurales',
+    title: 'Biblioteca Móvil del Chocó',
+    description: 'Libros y educación para comunidades rurales',
     leader_name: 'Juan Mosquera',
-    leader_location: 'Quibdo',
+    leader_location: 'Quibdó',
     current_amount: 680000,
     target_goal: 1800000,
   },
@@ -122,10 +122,10 @@ const placeholderCauses = [
 const placeholderProducts = [
   {
     id: 0,
-    name: 'Cafe de Origen Especial',
+    name: 'Café de Origen Especial',
     price: 35000,
     contribution_amount: 5000,
-    store_name: 'Cafe Origen',
+    store_name: 'Café Origen',
     store_location: 'Manizales',
   },
   {
@@ -141,12 +141,12 @@ const placeholderProducts = [
     name: 'Chocolate Chocoano 70%',
     price: 28000,
     contribution_amount: 4000,
-    store_name: 'Cacao del Pacifico',
-    store_location: 'Quibdo',
+    store_name: 'Cacao del Pacífico',
+    store_location: 'Quibdó',
   },
   {
     id: 0,
-    name: 'Mermelada de Borojo',
+    name: 'Mermelada de Borojó',
     price: 18000,
     contribution_amount: 3000,
     store_name: 'Frutas Nativas',
@@ -169,11 +169,45 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
 
     <div class="relative z-10 w-full max-w-2xl mx-auto text-center">
       <!-- Brand -->
-      <h1 class="text-4xl md:text-6xl font-bold tracking-tighter mb-2">
-        <span class="text-white">co</span><span class="text-comoon-purple">moon</span>
+      <h1 class="group inline-flex items-center gap-2 mb-2 cursor-default">
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 375 375"
+          preserveAspectRatio="xMidYMid meet"
+          class="transition-transform duration-700 group-hover:rotate-[360deg]"
+        >
+          <defs>
+            <clipPath id="hero-moon-outer"
+              ><path
+                d="M 59.0625 37.5 L 316.3125 37.5 L 316.3125 337.5 L 59.0625 337.5 Z"
+                clip-rule="nonzero"></path></clipPath
+            >
+            <clipPath id="hero-moon-inner"
+              ><path
+                d="M 153.1875 92.722656 L 315.9375 92.722656 L 315.9375 282.472656 L 153.1875 282.472656 Z"
+                clip-rule="nonzero"></path></clipPath
+            >
+          </defs>
+          <g clip-path="url(#hero-moon-outer)"
+            ><path
+              fill="#9986bf"
+              d="M 232.242188 321.746094 C 263.921875 321.746094 293.058594 310.769531 316.019531 292.398438 C 288.84375 320.152344 250.902344 337.367188 208.972656 337.367188 C 126.183594 337.367188 59.0625 270.246094 59.0625 187.457031 C 59.0625 104.671875 126.183594 37.570312 208.972656 37.570312 C 250.902344 37.570312 288.824219 54.785156 316.019531 82.539062 C 293.058594 64.167969 263.921875 53.195312 232.242188 53.195312 C 158.09375 53.195312 97.976562 113.308594 97.976562 187.457031 C 97.976562 261.628906 158.09375 321.722656 232.242188 321.722656 Z"
+            ></path></g
+          >
+          <g clip-path="url(#hero-moon-inner)"
+            ><path
+              fill="#fdfdfd"
+              d="M 206.285156 102.5 C 186.226562 102.5 167.777344 109.449219 153.242188 121.082031 C 170.445312 103.507812 194.46875 92.609375 221.019531 92.609375 C 273.4375 92.609375 315.9375 135.109375 315.9375 187.527344 C 315.9375 239.945312 273.4375 282.429688 221.019531 282.429688 C 194.46875 282.429688 170.460938 271.53125 153.242188 253.957031 C 167.777344 265.589844 186.226562 272.539062 206.285156 272.539062 C 253.234375 272.539062 291.296875 234.472656 291.296875 187.527344 C 291.296875 140.5625 253.234375 102.511719 206.285156 102.511719 Z"
+            ></path></g
+          >
+        </svg>
+        <span class="text-4xl md:text-6xl font-bold tracking-tighter">
+          <span class="text-white">co</span><span class="text-comoon-purple">moon</span>
+        </span>
       </h1>
       <p class="text-dracula-comment-accessible text-sm mb-6">
-        Descubre y apoya causas reales a traves del comercio consciente
+        Descubre y apoya causas reales a través del comercio consciente
       </p>
 
       <div class="max-w-lg mx-auto">
@@ -185,7 +219,7 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
           <input
             type="text"
             name="q"
-            placeholder="Buscar productos, causas, lideres..."
+            placeholder="Buscar productos, causas, líderes..."
             class="w-full rounded-full border border-white/10 bg-dracula-current/30 backdrop-blur-sm pl-11 pr-5 py-3 text-sm text-white placeholder-dracula-comment outline-none transition-all focus:border-comoon-purple/40 focus:bg-dracula-current/50"
           />
         </form>
@@ -199,10 +233,16 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
             <Rows size={13} weight="duotone" /> Feed
           </a>
           <a
+            href="/causes"
+            class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-leader/15 bg-leader/5 text-xs font-medium text-leader/80 hover:text-leader hover:border-leader/30 transition-all"
+          >
+            <Heart size={13} weight="duotone" /> Causas
+          </a>
+          <a
             href="/leaders"
             class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-leader/15 bg-leader/5 text-xs font-medium text-leader/80 hover:text-leader hover:border-leader/30 transition-all"
           >
-            <UsersThree size={13} weight="duotone" /> Lideres
+            <UsersThree size={13} weight="duotone" /> Líderes
           </a>
           <a
             href="/store"
@@ -235,7 +275,7 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
                   'text-dracula-pink/60 hover:text-dracula-pink border-dracula-pink/10 hover:border-dracula-pink/25',
               },
               {
-                tag: 'Educacion',
+                tag: 'Educación',
                 icon: 'book',
                 color:
                   'text-dracula-cyan/60 hover:text-dracula-cyan border-dracula-cyan/10 hover:border-dracula-cyan/25',
@@ -259,7 +299,7 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
                   'text-dracula-yellow/60 hover:text-dracula-yellow border-dracula-yellow/10 hover:border-dracula-yellow/25',
               },
               {
-                tag: 'Alimentacion',
+                tag: 'Alimentación',
                 icon: 'bowl',
                 color:
                   'text-community/60 hover:text-community border-community/10 hover:border-community/25',
@@ -290,7 +330,7 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-lg font-semibold text-white">Causas destacadas</h2>
         <a
-          href="/leaders"
+          href="/causes"
           class="text-sm text-dracula-comment-accessible hover:text-white transition-colors flex items-center gap-1 group"
         >
           Ver todas <ArrowRight
@@ -363,7 +403,7 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
   <section class="px-6 pb-20">
     <div class="max-w-7xl mx-auto">
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-lg font-semibold text-white">Productos con proposito</h2>
+        <h2 class="text-lg font-semibold text-white">Productos con propósito</h2>
         <a
           href="/store"
           class="text-sm text-dracula-comment-accessible hover:text-white transition-colors flex items-center gap-1 group"

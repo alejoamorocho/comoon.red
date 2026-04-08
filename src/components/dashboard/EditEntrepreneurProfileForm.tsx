@@ -98,12 +98,12 @@ export default function EditEntrepreneurProfileForm({
   const [whatMakesSpecial, setWhatMakesSpecial] = useState(initialData.what_makes_special || '');
   const [socialConnection, setSocialConnection] = useState(initialData.social_connection || '');
 
-  // Section 3: Ubicacion
+  // Section 3: Ubicación
   const [department, setDepartment] = useState(initialData.department || '');
   const [city, setCity] = useState(initialData.city || '');
   const [citiesList, setCitiesList] = useState<string[]>([]);
 
-  // Section 4: Informacion de tu Tienda
+  // Section 4: Información de tu Tienda
   const [yearsInBusiness, setYearsInBusiness] = useState<number | null>(
     initialData.years_in_business,
   );
@@ -190,7 +190,7 @@ export default function EditEntrepreneurProfileForm({
         setError(data.error || 'Error al guardar');
       }
     } catch {
-      setError('Error de conexion');
+      setError('Error de conexión');
     } finally {
       setLoading(false);
     }
@@ -293,13 +293,13 @@ export default function EditEntrepreneurProfileForm({
             className={textareaClass}
           />
           <p className={helperClass}>
-            Cuenta como nacio tu emprendimiento. La gente conecta con historias reales.
+            Cuenta cómo nació tu emprendimiento. La gente conecta con historias reales.
           </p>
         </div>
 
         <div>
           <label className="mb-2 block text-sm font-bold text-dracula-fg">
-            Que Hace Especiales tus Productos
+            Qué Hace Especiales tus Productos
           </label>
           <textarea
             rows={3}
@@ -307,11 +307,11 @@ export default function EditEntrepreneurProfileForm({
             onChange={(e) => setWhatMakesSpecial(e.target.value)}
             className={textareaClass}
           />
-          <p className={helperClass}>Que hace unicos tus productos? Que los diferencia?</p>
+          <p className={helperClass}>¿Qué hace únicos tus productos? ¿Qué los diferencia?</p>
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Conexion Social</label>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Conexión Social</label>
           <textarea
             rows={3}
             value={socialConnection}
@@ -319,15 +319,15 @@ export default function EditEntrepreneurProfileForm({
             className={textareaClass}
           />
           <p className={helperClass}>
-            Como conecta tu negocio con las causas sociales? Esto inspira a tus clientes.
+            ¿Cómo conecta tu negocio con las causas sociales? Esto inspira a tus clientes.
           </p>
         </div>
       </Section>
 
-      {/* Section 3: Ubicacion */}
+      {/* Section 3: Ubicación */}
       <Section
         icon={<MapPin size={20} className="text-entrepreneur" />}
-        title="Ubicacion"
+        title="Ubicación"
         defaultOpen
       >
         <div className="grid gap-4 md:grid-cols-2">
@@ -365,13 +365,13 @@ export default function EditEntrepreneurProfileForm({
         </div>
       </Section>
 
-      {/* Section 4: Informacion de tu Tienda */}
+      {/* Section 4: Información de tu Tienda */}
       <Section
         icon={<Info size={20} className="text-entrepreneur" />}
-        title="Informacion de tu Tienda"
+        title="Información de tu Tienda"
       >
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Anos en el Negocio</label>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Años en el Negocio</label>
           <input
             type="number"
             min={0}
@@ -385,7 +385,7 @@ export default function EditEntrepreneurProfileForm({
 
         <div>
           <label className="mb-2 block text-sm font-bold text-dracula-fg">
-            Politicas de la Tienda
+            Políticas de la Tienda
           </label>
           <textarea
             rows={3}
@@ -393,12 +393,12 @@ export default function EditEntrepreneurProfileForm({
             onChange={(e) => setStorePolicies(e.target.value)}
             className={textareaClass}
           />
-          <p className={helperClass}>Politicas de cambio, devolucion, garantia...</p>
+          <p className={helperClass}>Políticas de cambio, devolución, garantía...</p>
         </div>
 
         <div>
           <label className="mb-2 block text-sm font-bold text-dracula-fg">
-            Informacion de Envio
+            Información de Envío
           </label>
           <textarea
             rows={3}
@@ -406,7 +406,7 @@ export default function EditEntrepreneurProfileForm({
             onChange={(e) => setShippingInfo(e.target.value)}
             className={textareaClass}
           />
-          <p className={helperClass}>Haces envios? Cuales son tus tiempos y costos?</p>
+          <p className={helperClass}>¿Haces envíos? ¿Cuáles son tus tiempos y costos?</p>
         </div>
       </Section>
 
@@ -508,7 +508,7 @@ export default function EditEntrepreneurProfileForm({
 
         <div>
           <label className="mb-2 block text-sm font-bold text-dracula-fg">
-            Metodo de Contacto Preferido
+            Método de Contacto Preferido
           </label>
           <select
             value={preferredContact}
@@ -527,7 +527,7 @@ export default function EditEntrepreneurProfileForm({
 
       {/* Public profile link */}
       <div className="rounded-lg border border-dracula-current/50 bg-dracula-bg/50 p-4">
-        <p className="mb-1 text-xs text-dracula-comment">Tu tienda publica:</p>
+        <p className="mb-1 text-xs text-dracula-comment">Tu tienda pública:</p>
         <a
           href={`/entrepreneurs/${profileId}`}
           className="text-sm text-entrepreneur hover:underline"

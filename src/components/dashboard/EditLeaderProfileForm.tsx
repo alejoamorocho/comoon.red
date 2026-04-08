@@ -293,7 +293,7 @@ export default function EditLeaderProfileForm({
         setError(data.error || 'Error al guardar');
       }
     } catch {
-      setError('Error de conexion');
+      setError('Error de conexión');
     } finally {
       setLoading(false);
     }
@@ -417,9 +417,9 @@ export default function EditLeaderProfileForm({
         </div>
       </CollapsibleSection>
 
-      {/* Section 3: Ubicacion y Alcance */}
+      {/* Section 3: Ubicación y Alcance */}
       <CollapsibleSection
-        title="Ubicacion y Alcance"
+        title="Ubicación y Alcance"
         icon={<MapPin size={22} className="text-leader" />}
         isOpen={openSections.location}
         onToggle={() => toggleSection('location')}
@@ -484,7 +484,7 @@ export default function EditLeaderProfileForm({
             </select>
           </div>
           <div>
-            <label className="mb-2 block text-sm font-bold text-dracula-fg">Anos activos</label>
+            <label className="mb-2 block text-sm font-bold text-dracula-fg">Años activos</label>
             <input
               type="number"
               min={0}
@@ -532,7 +532,7 @@ export default function EditLeaderProfileForm({
                     type="text"
                     value={ach.title}
                     onChange={(e) => updateAchievement(i, 'title', e.target.value)}
-                    placeholder="Titulo del logro"
+                    placeholder="Título del logro"
                     className={inputClass}
                   />
                   <input
@@ -553,7 +553,7 @@ export default function EditLeaderProfileForm({
                   rows={2}
                   value={ach.description}
                   onChange={(e) => updateAchievement(i, 'description', e.target.value)}
-                  placeholder="Descripcion del logro"
+                  placeholder="Descripción del logro"
                   className={inputClass}
                 />
                 <button
@@ -589,7 +589,7 @@ export default function EditLeaderProfileForm({
                     type="text"
                     value={aw.title}
                     onChange={(e) => updateAward(i, 'title', e.target.value)}
-                    placeholder="Titulo"
+                    placeholder="Título"
                     className={inputClass}
                   />
                   <input

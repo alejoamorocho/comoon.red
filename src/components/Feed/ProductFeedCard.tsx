@@ -15,7 +15,7 @@ export default function ProductFeedCard({ product }: ProductFeedCardProps) {
   );
 
   return (
-    <div className="glass group overflow-hidden rounded-2xl border border-white/5 transition-all duration-300 hover:shadow-xl hover:shadow-entrepreneur/10">
+    <div className="glass group flex h-full flex-col overflow-hidden rounded-2xl border border-white/5 transition-all duration-300 hover:shadow-xl hover:shadow-entrepreneur/10">
       {/* Product Image */}
       <div className="relative h-48 overflow-hidden bg-dracula-current/20">
         <a href={`/store/${product.id}`}>
@@ -45,7 +45,7 @@ export default function ProductFeedCard({ product }: ProductFeedCardProps) {
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="flex flex-1 flex-col p-4">
         {/* Product Info */}
         <a
           href={`/store/${product.id}`}
@@ -126,7 +126,7 @@ export default function ProductFeedCard({ product }: ProductFeedCardProps) {
         {/* CTA Button */}
         <a
           href={`/store/${product.id}`}
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-entrepreneur/30 bg-entrepreneur/20 py-2.5 text-sm font-medium text-entrepreneur transition-colors hover:bg-entrepreneur/30"
+          className="mt-auto flex w-full items-center justify-center gap-2 rounded-full border border-entrepreneur/30 bg-entrepreneur/20 py-2.5 text-sm font-medium text-entrepreneur transition-colors hover:bg-entrepreneur/30"
         >
           Ver producto
         </a>

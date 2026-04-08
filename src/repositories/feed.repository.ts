@@ -40,20 +40,6 @@ export interface FeedProductRow {
   leader_name: string;
 }
 
-export interface FeedPostRow {
-  id: number;
-  type: string;
-  created_at: string;
-  content: string;
-  photo_url: string | null;
-  user_id: number;
-  author_name: string;
-  author_photo: string | null;
-  author_role: string;
-  author_city: string | null;
-  author_department: string | null;
-}
-
 export interface FeedCauseRow {
   id: number;
   type: string;
@@ -143,67 +129,6 @@ export class FeedRepository {
       .prepare(query)
       .bind(...params)
       .all<FeedProductRow>();
-    return results || [];
-  }
-
-  async fetchPosts(options: FeedQueryOptions): Promise<FeedPostRow[]> {
-    const cursorCondition = options.cursor
-      ? `AND (p.created_at < ? OR (p.created_at = ? AND p.id < ?))`
-      : '';
-    const cursorParams = options.cursor
-      ? [options.cursor.timestamp, options.cursor.timestamp, options.cursor.id]
-      : [];
-
-    let query = `
-      SELECT
-        p.id, 'post' as type, p.created_at,
-        p.content, p.photo_url,
-        p.user_id,
-        u.role as author_role,
-        CASE
-          WHEN u.role = 'leader' THEN l.name
-          WHEN u.role = 'entrepreneur' THEN e.store_name
-          ELSE u.email
-        END as author_name,
-        CASE
-          WHEN u.role = 'leader' THEN l.photo_url
-          WHEN u.role = 'entrepreneur' THEN e.photo_url
-          ELSE NULL
-        END as author_photo,
-        CASE
-          WHEN u.role = 'leader' THEN l.city
-          WHEN u.role = 'entrepreneur' THEN e.city
-          ELSE NULL
-        END as author_city,
-        CASE
-          WHEN u.role = 'leader' THEN l.department
-          WHEN u.role = 'entrepreneur' THEN e.department
-          ELSE NULL
-        END as author_department
-      FROM posts p
-      JOIN users u ON p.user_id = u.id
-      LEFT JOIN leaders l ON u.role = 'leader' AND u.profile_id = l.id
-      LEFT JOIN entrepreneurs e ON u.role = 'entrepreneur' AND u.profile_id = e.id
-      WHERE 1=1 ${cursorCondition}
-    `;
-    const params: (string | number)[] = [...cursorParams];
-
-    if (options.department) {
-      query += ` AND COALESCE(CASE WHEN u.role = 'leader' THEN l.department ELSE e.department END, '') = ?`;
-      params.push(options.department);
-    }
-    if (options.city) {
-      query += ` AND COALESCE(CASE WHEN u.role = 'leader' THEN l.city ELSE e.city END, '') = ?`;
-      params.push(options.city);
-    }
-
-    query += ` ORDER BY p.created_at DESC, p.id DESC LIMIT ?`;
-    params.push(options.limit);
-
-    const { results } = await this.db
-      .prepare(query)
-      .bind(...params)
-      .all<FeedPostRow>();
     return results || [];
   }
 

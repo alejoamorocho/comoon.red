@@ -116,7 +116,7 @@ export default function CreateProductForm({ userRole = 'entrepreneur' }: CreateP
         setError(data.error || 'Error al crear el producto');
       }
     } catch {
-      setError('Error de conexion');
+      setError('Error de conexión');
     } finally {
       setLoading(false);
     }
@@ -171,7 +171,7 @@ export default function CreateProductForm({ userRole = 'entrepreneur' }: CreateP
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-bold text-dracula-fg">Descripcion</label>
+        <label className="mb-2 block text-sm font-bold text-dracula-fg">Descripción</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -219,7 +219,7 @@ export default function CreateProductForm({ userRole = 'entrepreneur' }: CreateP
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-2 block text-xs font-bold text-dracula-fg">
-              Tipo de Contribucion
+              Tipo de Contribución
             </label>
             <select
               value={contributionType}
@@ -256,7 +256,7 @@ export default function CreateProductForm({ userRole = 'entrepreneur' }: CreateP
 
         <div className="mt-3">
           <label className="mb-2 block text-xs font-bold text-dracula-fg">
-            Mensaje de Contribucion (opcional)
+            Mensaje de Contribución (opcional)
           </label>
           <input
             type="text"
@@ -312,7 +312,7 @@ export default function CreateProductForm({ userRole = 'entrepreneur' }: CreateP
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-sm font-bold text-dracula-fg">Categoria</label>
+                <label className="mb-2 block text-sm font-bold text-dracula-fg">Categoría</label>
                 <input
                   type="text"
                   value={productCategory}

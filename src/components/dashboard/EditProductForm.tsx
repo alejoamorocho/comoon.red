@@ -167,7 +167,7 @@ export default function EditProductForm({ productId, initialData }: EditProductF
         setError(data.error || 'Error al guardar');
       }
     } catch {
-      setError('Error de conexion');
+      setError('Error de conexión');
     } finally {
       setLoading(false);
     }
@@ -191,9 +191,9 @@ export default function EditProductForm({ productId, initialData }: EditProductF
         </div>
       )}
 
-      {/* Section 1: Informacion del Producto */}
+      {/* Section 1: Información del Producto */}
       <CollapsibleSection
-        title="Informacion del Producto"
+        title="Información del Producto"
         icon={<ShoppingCart size={22} className="text-entrepreneur" />}
         isOpen={openSections.product}
         onToggle={() => toggleSection('product')}
@@ -211,7 +211,7 @@ export default function EditProductForm({ productId, initialData }: EditProductF
           />
         </div>
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Descripcion</label>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Descripción</label>
           <textarea
             rows={3}
             value={description}
@@ -300,9 +300,9 @@ export default function EditProductForm({ productId, initialData }: EditProductF
         </p>
       </CollapsibleSection>
 
-      {/* Section 4: Contribucion Social */}
+      {/* Section 4: Contribución Social */}
       <CollapsibleSection
-        title="Contribucion Social"
+        title="Contribución Social"
         icon={<Package size={22} className="text-entrepreneur" />}
         isOpen={openSections.contribution}
         onToggle={() => toggleSection('contribution')}
@@ -358,7 +358,7 @@ export default function EditProductForm({ productId, initialData }: EditProductF
         onToggle={() => toggleSection('details')}
       >
         <div>
-          <label className="mb-2 block text-sm font-bold text-dracula-fg">Categoria</label>
+          <label className="mb-2 block text-sm font-bold text-dracula-fg">Categoría</label>
           <input
             type="text"
             value={category}

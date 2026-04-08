@@ -76,6 +76,7 @@ const userName = Astro.locals.user?.name;
       userRole={userRole}
       onboardingComplete={onboardingComplete}
       userName={userName}
+      currentPath={Astro.url.pathname}
     />
     <main
       id="main-content"
@@ -87,13 +88,45 @@ const userName = Astro.locals.user?.name;
       <div class="max-w-7xl mx-auto px-6 py-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           <div>
-            <a href="/" class="flex items-center gap-2 mb-4">
+            <a href="/" class="group flex items-center gap-2 mb-4">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 375 375"
+                preserveAspectRatio="xMidYMid meet"
+                class="transition-transform duration-700 group-hover:rotate-[360deg]"
+              >
+                <defs>
+                  <clipPath id="footer-moon-outer"
+                    ><path
+                      d="M 59.0625 37.5 L 316.3125 37.5 L 316.3125 337.5 L 59.0625 337.5 Z"
+                      clip-rule="nonzero"></path></clipPath
+                  >
+                  <clipPath id="footer-moon-inner"
+                    ><path
+                      d="M 153.1875 92.722656 L 315.9375 92.722656 L 315.9375 282.472656 L 153.1875 282.472656 Z"
+                      clip-rule="nonzero"></path></clipPath
+                  >
+                </defs>
+                <g clip-path="url(#footer-moon-outer)"
+                  ><path
+                    fill="#9986bf"
+                    d="M 232.242188 321.746094 C 263.921875 321.746094 293.058594 310.769531 316.019531 292.398438 C 288.84375 320.152344 250.902344 337.367188 208.972656 337.367188 C 126.183594 337.367188 59.0625 270.246094 59.0625 187.457031 C 59.0625 104.671875 126.183594 37.570312 208.972656 37.570312 C 250.902344 37.570312 288.824219 54.785156 316.019531 82.539062 C 293.058594 64.167969 263.921875 53.195312 232.242188 53.195312 C 158.09375 53.195312 97.976562 113.308594 97.976562 187.457031 C 97.976562 261.628906 158.09375 321.722656 232.242188 321.722656 Z"
+                  ></path></g
+                >
+                <g clip-path="url(#footer-moon-inner)"
+                  ><path
+                    fill="#fdfdfd"
+                    d="M 206.285156 102.5 C 186.226562 102.5 167.777344 109.449219 153.242188 121.082031 C 170.445312 103.507812 194.46875 92.609375 221.019531 92.609375 C 273.4375 92.609375 315.9375 135.109375 315.9375 187.527344 C 315.9375 239.945312 273.4375 282.429688 221.019531 282.429688 C 194.46875 282.429688 170.460938 271.53125 153.242188 253.957031 C 167.777344 265.589844 186.226562 272.539062 206.285156 272.539062 C 253.234375 272.539062 291.296875 234.472656 291.296875 187.527344 C 291.296875 140.5625 253.234375 102.511719 206.285156 102.511719 Z"
+                  ></path></g
+                >
+              </svg>
               <span class="text-xl font-bold lowercase tracking-tight">
                 <span class="text-white">co</span><span class="text-comoon-purple">moon</span>
               </span>
             </a>
             <p class="text-sm text-dracula-comment-accessible leading-relaxed">
-              Economia solidaria con proposito. Cada compra ilumina una causa real.
+              Economía solidaria con propósito. Cada compra ilumina una causa real.
             </p>
           </div>
           <div>
@@ -104,45 +137,50 @@ const userName = Astro.locals.user?.name;
               <li>
                 <a
                   href="/feed"
-                  class="text-dracula-comment-accessible hover:text-white transition-colors"
-                  >Feed</a>
+                  class="text-dracula-comment-accessible hover:text-white transition-colors">Feed</a
+                >
               </li>
               <li>
                 <a
                   href="/store"
                   class="text-dracula-comment-accessible hover:text-white transition-colors"
-                  >Tienda</a>
+                  >Tienda</a
+                >
               </li>
               <li>
                 <a
                   href="/leaders"
                   class="text-dracula-comment-accessible hover:text-white transition-colors"
-                  >Lideres</a>
+                  >Líderes</a
+                >
               </li>
               <li>
                 <a
                   href="/entrepreneurs"
                   class="text-dracula-comment-accessible hover:text-white transition-colors"
-                  >Emprendedores</a>
+                  >Emprendedores</a
+                >
               </li>
             </ul>
           </div>
           <div>
             <h4 class="text-xs font-bold uppercase tracking-widest text-dracula-fg/50 mb-4">
-              Unete
+              Únete
             </h4>
             <ul class="space-y-2 text-sm">
               <li>
                 <a
                   href="/register"
                   class="text-dracula-comment-accessible hover:text-white transition-colors"
-                  >Registrarse</a>
+                  >Registrarse</a
+                >
               </li>
               <li>
                 <a
                   href="/login"
                   class="text-dracula-comment-accessible hover:text-white transition-colors"
-                  >Iniciar Sesion</a>
+                  >Iniciar Sesión</a
+                >
               </li>
             </ul>
           </div>
@@ -155,13 +193,15 @@ const userName = Astro.locals.user?.name;
                 <a
                   href="#"
                   class="text-dracula-comment-accessible hover:text-white transition-colors"
-                  >Terminos</a>
+                  >Términos</a
+                >
               </li>
               <li>
                 <a
                   href="#"
                   class="text-dracula-comment-accessible hover:text-white transition-colors"
-                  >Privacidad</a>
+                  >Privacidad</a
+                >
               </li>
             </ul>
           </div>

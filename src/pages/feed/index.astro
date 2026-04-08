@@ -1,40 +1,17 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { FeedContainer } from '../../components/Feed';
-import CreatePostForm from '../../components/Feed/CreatePostForm';
 
 const isAuthenticated = Astro.locals.isAuthenticated || false;
-const user = Astro.locals.user;
-const userRole = user?.role;
-const userName = user?.name;
-
-// Get user photo from DB if authenticated
-let userPhoto: string | undefined;
-if (isAuthenticated && user?.profileId) {
-  const db = Astro.locals.runtime?.env?.DB;
-  if (db) {
-    if (userRole === 'leader') {
-      const leader = await db
-        .prepare('SELECT photo_url FROM leaders WHERE id = ?')
-        .bind(user.profileId)
-        .first<{ photo_url: string | null }>();
-      userPhoto = leader?.photo_url || undefined;
-    } else if (userRole === 'entrepreneur') {
-      const ent = await db
-        .prepare('SELECT photo_url FROM entrepreneurs WHERE id = ?')
-        .bind(user.profileId)
-        .first<{ photo_url: string | null }>();
-      userPhoto = ent?.photo_url || undefined;
-    }
-  }
-}
 ---
 
 <Layout title="Feed - Comoon" fullWidth>
   <!-- Header -->
-  <section class="relative py-20 px-6 overflow-hidden">
+  <section
+    class="relative py-20 px-6 overflow-hidden bg-gradient-to-b from-comoon-purple/[0.07] to-transparent"
+  >
     <div
-      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-comoon-purple/8 rounded-full blur-[140px] pointer-events-none"
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-comoon-purple/15 rounded-full blur-[140px] pointer-events-none"
     >
     </div>
 
@@ -50,25 +27,11 @@ if (isAuthenticated && user?.profileId) {
   <!-- Content -->
   <section class="py-12 px-6">
     <div class="max-w-2xl mx-auto">
-      <!-- Create Post Form (only for authenticated users) -->
-      {
-        isAuthenticated && (userRole === 'leader' || userRole === 'entrepreneur') && (
-          <div class="mb-8">
-            <CreatePostForm
-              client:load
-              userRole={userRole}
-              userName={userName}
-              userPhoto={userPhoto}
-            />
-          </div>
-        )
-      }
-
       {
         !isAuthenticated && (
           <div class="glass rounded-2xl p-8 border border-white/10 mb-10 text-center">
             <p class="text-dracula-comment mb-5">
-              Quieres publicar? Crea tu cuenta como lider o emprendedor.
+              ¿Quieres publicar? Crea tu cuenta como líder o emprendedor.
             </p>
             <div class="flex gap-4 justify-center">
               <a
@@ -81,7 +44,7 @@ if (isAuthenticated && user?.profileId) {
                 href="/register"
                 class="px-6 py-2.5 rounded-full bg-comoon-purple text-white text-sm font-bold hover:shadow-[0_0_30px_rgba(153,134,191,0.3)] transition-all"
               >
-                Unete
+                Únete
               </a>
             </div>
           </div>

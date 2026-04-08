@@ -4,7 +4,6 @@ import type {
   FeedProductRow,
   FeedCauseRow,
   FeedCauseUpdateRow,
-  FeedPostRow,
 } from '../repositories/feed.repository';
 import { safeJsonParse } from '../lib/utils';
 
@@ -77,24 +76,6 @@ function mapProduct(p: FeedProductRow): FeedItem {
   };
 }
 
-function mapPost(p: FeedPostRow): FeedItem {
-  return {
-    id: p.id,
-    type: 'post',
-    created_at: p.created_at,
-    content: p.content,
-    photo_url: p.photo_url,
-    author: {
-      user_id: p.user_id,
-      name: p.author_name,
-      photo_url: p.author_photo,
-      role: p.author_role,
-      city: p.author_city,
-      department: p.author_department,
-    },
-  };
-}
-
 function mapCause(c: FeedCauseRow): FeedItem {
   return {
     id: c.id,
@@ -148,12 +129,7 @@ export class FeedService {
 
   async getFeed(params: FeedParams): Promise<FeedResult> {
     const limit = Math.min(parseInt(params.limit || '20', 10), 50);
-    const types = params.types?.split(',').filter(Boolean) || [
-      'product',
-      'cause',
-      'cause_update',
-      'post',
-    ];
+    const types = params.types?.split(',').filter(Boolean) || ['product', 'cause', 'cause_update'];
     const categories = params.categories?.split(',').filter(Boolean);
     const parsedCursor = parseCursor(params.cursor);
 
@@ -181,11 +157,6 @@ export class FeedService {
     if (types.includes('cause_update')) {
       const updates = await this.feedRepo.fetchCauseUpdates(queryOptions);
       items.push(...updates.map(mapCauseUpdate));
-    }
-
-    if (types.includes('post')) {
-      const posts = await this.feedRepo.fetchPosts(queryOptions);
-      items.push(...posts.map(mapPost));
     }
 
     // Sort all items by created_at DESC, then by id DESC

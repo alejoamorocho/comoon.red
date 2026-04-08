@@ -124,7 +124,7 @@ const sellerColor = sellerType === 'leader' ? 'leader' : 'entrepreneur';
 
 <Layout
   title={product.name}
-  description={`${product.name} - ${contributionDisplay} a "${product.cause_title}". Compra con proposito en Comoon.`}
+  description={`${product.name} - ${contributionDisplay} a "${product.cause_title}". Compra con propósito en Comoon.`}
   ogImage={product.photo_url}
   ogType="product"
   fullWidth
@@ -181,7 +181,7 @@ const sellerColor = sellerType === 'leader' ? 'leader' : 'entrepreneur';
               <div>
                 <p class="text-xs text-dracula-comment-accessible mb-3 flex items-center gap-1.5 uppercase tracking-wider font-bold">
                   <Images size={14} weight="duotone" />
-                  Galeria ({galleryPhotos.length + (product.photo_url ? 1 : 0)} fotos)
+                  Galería ({galleryPhotos.length + (product.photo_url ? 1 : 0)} fotos)
                 </p>
                 <div class="flex gap-2 overflow-x-auto pb-2">
                   {product.photo_url && (
@@ -235,7 +235,7 @@ const sellerColor = sellerType === 'leader' ? 'leader' : 'entrepreneur';
                   <Tag size={14} weight="duotone" />
                 )
               }
-              {sellerType === 'leader' ? 'Producto de Lider' : 'Producto'}
+              {sellerType === 'leader' ? 'Producto de Líder' : 'Producto'}
             </span>
             {
               product.category && (
@@ -371,7 +371,7 @@ const sellerColor = sellerType === 'leader' ? 'leader' : 'entrepreneur';
                 class="text-xs text-dracula-comment-accessible flex items-center gap-2 uppercase tracking-wider font-bold"
               >
                 <Moon size={14} weight="duotone" className="text-comoon-purple" />
-                Difusion Lunar
+                Difusión Lunar
               </span>
               <ShareButtons
                 client:visible
@@ -388,9 +388,9 @@ const sellerColor = sellerType === 'leader' ? 'leader' : 'entrepreneur';
   <!-- ===== RELATED PRODUCTS ===== -->
   <section class="border-t border-white/5 px-6 py-24">
     <div class="max-w-7xl mx-auto text-center">
-      <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-4">Descubre mas</p>
+      <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-4">Descubre más</p>
       <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-10">
-        Mas productos que apoyan esta causa
+        Más productos que apoyan esta causa
       </h2>
       <a
         href={`/store?causa=${product.cause_id}`}
@@ -399,7 +399,7 @@ const sellerColor = sellerType === 'leader' ? 'leader' : 'entrepreneur';
         <Heart size={36} weight="duotone" className="text-leader shrink-0" />
         <div class="text-left">
           <p class="font-bold text-white mb-1 group-hover:text-leader transition-colors">
-            Ver mas productos
+            Ver más productos
           </p>
           <p class="text-sm text-dracula-comment-accessible">
             que apoyan &ldquo;{product.cause_title}&rdquo;

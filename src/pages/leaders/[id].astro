@@ -148,8 +148,8 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
 ---
 
 <Layout
-  title={`${leader.name} - Lider`}
-  description={leader.bio || `Conoce a ${leader.name}, lider social en Comoon.`}
+  title={`${leader.name} - Líder`}
+  description={leader.bio || `Conoce a ${leader.name}, líder social en Comoon.`}
   ogImage={leader.photo_url}
   ogType="profile"
   fullWidth
@@ -191,7 +191,7 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
           className="group-hover:-translate-x-1 transition-transform"
           weight="duotone"
         />
-        Volver a Lideres
+        Volver a Líderes
       </a>
 
       <!-- Profile card -->
@@ -287,12 +287,12 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
             <div class="flex items-center gap-3">
               <span class="text-dracula-comment text-sm flex items-center gap-1.5">
                 <Moon size={14} weight="duotone" className="text-comoon-purple" />
-                Difusion Lunar
+                Difusión Lunar
               </span>
               <ShareButtons
                 client:visible
                 title={leader.name}
-                text={`Conoce a ${leader.name}, lider social en ${location}. Apoya su causa en comoon`}
+                text={`Conoce a ${leader.name}, líder social en ${location}. Apoya su causa en comoon`}
               />
             </div>
             {
@@ -321,7 +321,7 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
             Impacto
           </p>
           <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white text-center mb-12">
-            Numeros que hablan
+            Números que hablan
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
             {leader.people_impacted && (
@@ -337,7 +337,7 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
               <div class="glass rounded-2xl p-8 text-center border border-white/10 hover:border-leader/20 transition-colors">
                 <CalendarBlank size={28} className="text-leader mx-auto mb-3" weight="duotone" />
                 <p class="text-3xl font-bold text-white mb-1">{leader.years_active}</p>
-                <p class="text-sm text-dracula-comment">Anos activo(a)</p>
+                <p class="text-sm text-dracula-comment">Años activo(a)</p>
               </div>
             )}
             {activeCausesCount > 0 && (
@@ -362,7 +362,7 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
             Nuestra Historia
           </p>
           <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8">
-            Quienes Somos
+            Quiénes Somos
           </h2>
           <div class="glass rounded-2xl p-8 md:p-10 border border-white/10 hover:border-dracula-pink/20 transition-colors">
             <p class="text-lg text-dracula-fg/85 leading-relaxed whitespace-pre-line">
@@ -380,10 +380,10 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
       <section class="border-t border-white/5 py-20 px-6">
         <div class="max-w-5xl mx-auto">
           <p class="text-dracula-yellow text-xs font-bold uppercase tracking-[0.2em] mb-3">
-            Nuestro Proposito
+            Nuestro Propósito
           </p>
           <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8">
-            Por que hacemos lo que hacemos
+            Por qué hacemos lo que hacemos
           </h2>
           <div class="glass rounded-2xl p-8 md:p-10 border border-white/10 hover:border-dracula-yellow/20 transition-colors relative overflow-hidden">
             <div class="absolute top-6 right-6 text-dracula-yellow/10">
@@ -407,7 +407,7 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
             Colabora
           </p>
           <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8">
-            Como nos puedes ayudar
+            ¿Cómo nos puedes ayudar?
           </h2>
           <div class="glass rounded-2xl p-8 md:p-10 border border-white/10 hover:border-dracula-green/20 transition-colors relative overflow-hidden">
             <div class="absolute -right-4 -bottom-4 text-dracula-green/8">
@@ -533,7 +533,7 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
           <p class="text-dracula-purple text-xs font-bold uppercase tracking-[0.2em] mb-3">
             Momentos
           </p>
-          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">Galeria</h2>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">Galería</h2>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
             {mediaGallery.map((photo: string, i: number) => (
               <div class="rounded-2xl overflow-hidden border border-white/10 hover:border-leader/30 transition-all duration-300 group">
@@ -646,7 +646,7 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
             Tienda Social
           </p>
           <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-3">
-            Tienda del Lider
+            Tienda del Líder
           </h2>
           <p class="text-dracula-comment-accessible mb-10 text-lg">
             Productos propios y de emprendedores aliados. Cada compra genera impacto directo.

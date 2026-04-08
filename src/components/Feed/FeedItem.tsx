@@ -2,7 +2,6 @@ import type { FeedItem } from '../../types/feed';
 import ProductFeedCard from './ProductFeedCard';
 import CauseFeedCard from './CauseFeedCard';
 import CauseUpdateFeedCard from './CauseUpdateFeedCard';
-import PostFeedCard from './PostFeedCard';
 
 interface FeedItemProps {
   item: FeedItem;
@@ -16,8 +15,6 @@ export default function FeedItemComponent({ item }: FeedItemProps) {
       return <CauseFeedCard cause={item} />;
     case 'cause_update':
       return <CauseUpdateFeedCard update={item} />;
-    case 'post':
-      return <PostFeedCard post={item} />;
     default:
       return null;
   }

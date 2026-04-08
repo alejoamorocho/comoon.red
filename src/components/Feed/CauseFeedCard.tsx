@@ -14,7 +14,7 @@ export default function CauseFeedCard({ cause }: CauseFeedCardProps) {
     : 0;
 
   return (
-    <div className="glass group overflow-hidden rounded-2xl border border-white/5 transition-all duration-300 hover:shadow-xl hover:shadow-leader/10">
+    <div className="glass group flex h-full flex-col overflow-hidden rounded-2xl border border-white/5 transition-all duration-300 hover:shadow-xl hover:shadow-leader/10">
       {/* Cause Image */}
       <div className="relative h-48 overflow-hidden bg-dracula-current/20">
         <a href={`/causes/${cause.id}`}>
@@ -46,7 +46,7 @@ export default function CauseFeedCard({ cause }: CauseFeedCardProps) {
         )}
       </div>
 
-      <div className="p-4">
+      <div className="flex flex-1 flex-col p-4">
         {/* Cause Title */}
         <a href={`/causes/${cause.id}`} className="mb-2 block transition-colors hover:text-leader">
           <h3 className="line-clamp-2 text-base font-semibold leading-tight text-white">
@@ -131,7 +131,7 @@ export default function CauseFeedCard({ cause }: CauseFeedCardProps) {
         {/* CTA */}
         <a
           href={`/causes/${cause.id}`}
-          className="block w-full rounded-full border border-leader/30 bg-leader/20 py-2.5 text-center text-sm font-medium text-leader transition-colors hover:bg-leader/30"
+          className="mt-auto block w-full rounded-full border border-leader/30 bg-leader/20 py-2.5 text-center text-sm font-medium text-leader transition-colors hover:bg-leader/30"
         >
           Ver causa completa
         </a>

@@ -90,7 +90,7 @@ export default function StoreFilters({
           }`}
         >
           <UsersThree size={18} weight="duotone" />
-          Filtrar por Lider
+          Filtrar por Líder
         </button>
 
         {hasActiveFilter && (
@@ -110,7 +110,7 @@ export default function StoreFilters({
           <div className="mb-3 flex items-center justify-between">
             <h3 className="flex items-center gap-2 text-sm font-bold text-white">
               <Funnel size={16} />
-              {filterType === 'causa' ? 'Selecciona una causa' : 'Selecciona un lider'}
+              {filterType === 'causa' ? 'Selecciona una causa' : 'Selecciona un líder'}
             </h3>
             <button
               onClick={() => {
@@ -125,7 +125,7 @@ export default function StoreFilters({
 
           <div
             role="listbox"
-            aria-label={filterType === 'causa' ? 'Causas disponibles' : 'Lideres disponibles'}
+            aria-label={filterType === 'causa' ? 'Causas disponibles' : 'Líderes disponibles'}
             className="grid grid-cols-1 gap-2 md:grid-cols-2"
           >
             {filterType === 'causa'
@@ -142,7 +142,7 @@ export default function StoreFilters({
                     }`}
                   >
                     <p className="text-sm font-bold text-white">{cause.title}</p>
-                    <p className="text-xs text-dracula-comment">Lider: {cause.leaderName}</p>
+                    <p className="text-xs text-dracula-comment">Líder: {cause.leaderName}</p>
                   </button>
                 ))
               : leaders.map((leader) => (

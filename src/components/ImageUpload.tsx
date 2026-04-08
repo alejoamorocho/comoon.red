@@ -59,7 +59,7 @@ export default function ImageUpload({
         setError(data.error || 'Error al subir imagen');
       }
     } catch {
-      setError('Error de conexion');
+      setError('Error de conexión');
     } finally {
       setUploading(false);
     }

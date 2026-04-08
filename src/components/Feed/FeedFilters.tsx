@@ -3,7 +3,6 @@ import {
   ShoppingBag,
   Heart,
   Newspaper,
-  ChatText,
   MapPin,
   Tag,
   X,
@@ -12,7 +11,7 @@ import {
 } from '@phosphor-icons/react';
 import { COLOMBIAN_DEPARTMENTS } from '../../types/feed';
 
-export type FeedType = 'product' | 'cause' | 'cause_update' | 'post';
+export type FeedType = 'product' | 'cause' | 'cause_update';
 
 interface FeedFiltersProps {
   activeTypes: FeedType[];
@@ -36,18 +35,17 @@ const TYPE_CONFIG = {
   product: { label: 'Productos', Icon: ShoppingBag, color: 'entrepreneur' },
   cause: { label: 'Causas', Icon: Heart, color: 'leader' },
   cause_update: { label: 'Actualizaciones', Icon: Newspaper, color: 'dracula-cyan' },
-  post: { label: 'Publicaciones', Icon: ChatText, color: 'dracula-purple' },
 };
 
 const CATEGORIES = [
   { id: 'ambiental', label: 'Ambiental' },
   { id: 'social', label: 'Social' },
   { id: 'animales', label: 'Animales' },
-  { id: 'educacion', label: 'Educacion' },
+  { id: 'educacion', label: 'Educación' },
   { id: 'salud', label: 'Salud' },
   { id: 'cultura', label: 'Cultura' },
   { id: 'comunidad', label: 'Comunidad' },
-  { id: 'alimentacion', label: 'Alimentacion' },
+  { id: 'alimentacion', label: 'Alimentación' },
 ];
 
 export default function FeedFilters({
@@ -64,7 +62,7 @@ export default function FeedFilters({
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
   const hasActiveFilters =
-    activeTypes.length < 4 || activeDepartment || activeCategories.length > 0;
+    activeTypes.length < 3 || activeDepartment || activeCategories.length > 0;
 
   const closeAllDropdowns = useCallback(() => {
     setShowDepartmentDropdown(false);
@@ -205,7 +203,7 @@ export default function FeedFilters({
               }`}
             >
               <Tag size={16} />
-              {activeCategories.length > 0 ? `${activeCategories.length} categorias` : 'Categoria'}
+              {activeCategories.length > 0 ? `${activeCategories.length} categorías` : 'Categoría'}
               <CaretDown
                 size={14}
                 className={`transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`}
@@ -215,7 +213,7 @@ export default function FeedFilters({
             {showCategoryDropdown && (
               <div
                 role="listbox"
-                aria-label="Categorias"
+                aria-label="Categorías"
                 aria-multiselectable="true"
                 className="glass absolute left-0 top-full z-50 mt-2 w-56 rounded-xl border border-white/10 shadow-xl"
               >
