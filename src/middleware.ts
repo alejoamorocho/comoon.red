@@ -89,11 +89,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return redirect(loginUrl, 302);
   }
 
-  // Redirect authenticated+onboarded users from / to /feed
-  if (user && user.onboardingComplete && path === '/') {
-    return redirect('/feed', 302);
-  }
-
   // Redirect authenticated users from login/register
   if (user && (path === '/login' || path === '/register')) {
     if (!user.onboardingComplete) {
