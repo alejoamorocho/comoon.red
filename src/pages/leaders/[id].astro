@@ -138,6 +138,11 @@ try {
   mediaGallery = JSON.parse(leader.media_gallery || '[]');
 } catch {}
 
+let awards: Array<Record<string, any>> = [];
+try {
+  awards = JSON.parse(leader.awards || '[]');
+} catch {}
+
 const activeCausesCount = myCauses.filter((c) => c.status === 'active').length;
 const hasStats = leader.people_impacted || leader.years_active || activeCausesCount > 0;
 ---
@@ -233,10 +238,30 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
 
           {
             location && (
-              <p class="text-dracula-comment-accessible flex items-center gap-2 justify-center md:justify-start mb-4 text-sm">
+              <p class="text-dracula-comment-accessible flex items-center gap-2 justify-center md:justify-start mb-2 text-sm">
                 <MapPin size={16} weight="duotone" className="text-leader" />
                 {location}
               </p>
+            )
+          }
+
+          {
+            leader.community && (
+              <p class="text-dracula-comment-accessible flex items-center gap-2 justify-center md:justify-start mb-2 text-sm">
+                <UsersThree size={16} weight="duotone" className="text-leader" />
+                {leader.community}
+              </p>
+            )
+          }
+
+          {
+            leader.impact_scope && (
+              <div class="flex justify-center md:justify-start mb-4">
+                <span class="bg-leader/15 text-leader px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border border-leader/20">
+                  <Star size={14} weight="duotone" />
+                  Alcance: {leader.impact_scope}
+                </span>
+              </div>
             )
           }
 
@@ -427,6 +452,38 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
     )
   }
 
+  <!-- ===== AWARDS ===== -->
+  {
+    awards.length > 0 && (
+      <section class="border-t border-white/5 py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+          <p class="text-dracula-orange text-xs font-bold uppercase tracking-[0.2em] mb-3">
+            Premios
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">
+            Reconocimientos y Premios
+          </h2>
+          <div class="space-y-4">
+            {awards.map((a: any) => (
+              <div class="glass rounded-2xl p-6 border border-white/10 hover:border-dracula-orange/20 transition-colors flex gap-5 items-start">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-dracula-orange/15 flex items-center justify-center border border-dracula-orange/20">
+                  <Trophy size={20} className="text-dracula-orange" weight="fill" />
+                </div>
+                <div>
+                  {a.title && <h3 class="text-lg font-bold text-white mb-1">{a.title}</h3>}
+                  <div class="flex items-center gap-3 text-sm">
+                    {a.organization && <span class="text-dracula-fg/75">{a.organization}</span>}
+                    {a.year && <span class="text-dracula-comment">{a.year}</span>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   <!-- ===== TESTIMONIALS ===== -->
   {
     testimonials.length > 0 && (
@@ -495,70 +552,85 @@ const hasStats = leader.people_impacted || leader.years_active || activeCausesCo
     )
   }
 
-  <!-- ===== ACTIVE CAUSE ===== -->
+  <!-- ===== CAUSES ===== -->
   {
-    activeCause && (
+    myCauses.length > 0 && (
       <section id="causa" class="border-t border-white/5 py-20 px-6 scroll-mt-24">
         <div class="max-w-5xl mx-auto">
-          <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-3">Apoya Ahora</p>
-          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">
-            Causa Activa
-          </h2>
+          <p class="text-leader text-xs font-bold uppercase tracking-[0.2em] mb-3">
+            Impacto Social
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">Causas</h2>
 
-          <div class="glass rounded-2xl p-8 md:p-10 border border-white/10 hover:border-leader/20 transition-colors relative overflow-hidden">
-            {/* Ambient glow */}
-            <div class="absolute top-0 right-0 w-64 h-64 bg-leader/8 rounded-full blur-[80px] pointer-events-none" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {myCauses.map((cause) => {
+              const causeProgress =
+                cause.goal > 0 ? Math.round((cause.raised / cause.goal) * 100) : 0;
+              const statusColors = {
+                active: 'bg-dracula-green/15 text-dracula-green border-dracula-green/20',
+                completed: 'bg-dracula-purple/15 text-dracula-purple border-dracula-purple/20',
+                pending: 'bg-dracula-yellow/15 text-dracula-yellow border-dracula-yellow/20',
+              };
+              const statusLabels = {
+                active: 'Activa',
+                completed: 'Completada',
+                pending: 'Pendiente',
+              };
+              const statusClass = statusColors[cause.status] || statusColors.pending;
+              const statusLabel = statusLabels[cause.status] || cause.status;
 
-            <h3 class="text-2xl font-bold text-white mb-4">{activeCause.title}</h3>
-            {activeCause.description && (
-              <p class="text-dracula-fg/75 mb-8 text-lg leading-relaxed max-w-3xl">
-                {activeCause.description}
-              </p>
-            )}
-
-            {activeCause.goal > 0 && (
-              <div class="mb-8 max-w-2xl">
-                <div class="flex justify-between text-sm font-semibold mb-3">
-                  <span class="text-dracula-green">
-                    {formatCurrency(activeCause.raised)} recaudados
-                  </span>
-                  <span class="text-dracula-comment">Meta: {formatCurrency(activeCause.goal)}</span>
-                </div>
-                <div
-                  class="w-full bg-white/5 rounded-full h-3 overflow-hidden"
-                  role="progressbar"
-                  aria-valuenow={activeCause.raised}
-                  aria-valuemin={0}
-                  aria-valuemax={activeCause.goal}
-                  aria-label="Progreso de la causa"
+              return (
+                <a
+                  href={`/causes/${cause.id}`}
+                  class="glass rounded-2xl p-6 border border-white/10 hover:border-leader/20 transition-all duration-300 relative overflow-hidden group block"
                 >
-                  <div
-                    class="bg-gradient-to-r from-leader to-dracula-green h-full rounded-full transition-all duration-1000"
-                    style={`width: ${Math.min(progressPercent, 100)}%`}
-                  />
-                </div>
-                <p class="text-center text-dracula-comment text-sm mt-3">
-                  {progressPercent}% de la meta alcanzada
-                </p>
-              </div>
-            )}
+                  {/* Ambient glow */}
+                  <div class="absolute top-0 right-0 w-40 h-40 bg-leader/5 rounded-full blur-[60px] pointer-events-none group-hover:bg-leader/10 transition-colors" />
 
-            <div class="flex flex-col sm:flex-row gap-4 items-center">
-              <a
-                href={`/causes/${activeCause.id}`}
-                class="px-6 py-2.5 border border-leader/30 text-leader font-semibold text-sm rounded-full hover:bg-leader/10 hover:border-leader/50 transition-all duration-300 flex items-center gap-2"
-              >
-                <Star size={16} weight="duotone" />
-                Ver detalles de la causa
-              </a>
-              <a
-                href={`/store?causa=${activeCause.id}`}
-                class="px-6 py-2.5 bg-leader text-dracula-bg font-bold text-sm rounded-full hover:shadow-[0_0_30px_rgba(45,212,191,0.25)] transition-all duration-300 flex items-center gap-2"
-              >
-                <Heart size={16} weight="fill" />
-                Productos que apoyan esta causa
-              </a>
-            </div>
+                  <div class="flex items-start justify-between mb-3 relative z-10">
+                    <h3 class="text-lg font-bold text-white group-hover:text-leader transition-colors line-clamp-2 flex-1 mr-3">
+                      {cause.title}
+                    </h3>
+                    <span
+                      class={`shrink-0 px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusClass}`}
+                    >
+                      {statusLabel}
+                    </span>
+                  </div>
+
+                  {cause.description && (
+                    <p class="text-dracula-fg/65 text-sm leading-relaxed mb-4 line-clamp-2 relative z-10">
+                      {cause.description}
+                    </p>
+                  )}
+
+                  {cause.goal > 0 && (
+                    <div class="relative z-10">
+                      <div class="flex justify-between text-xs font-semibold mb-2">
+                        <span class="text-dracula-green">{formatCurrency(cause.raised)}</span>
+                        <span class="text-dracula-comment">Meta: {formatCurrency(cause.goal)}</span>
+                      </div>
+                      <div
+                        class="w-full bg-white/5 rounded-full h-2 overflow-hidden"
+                        role="progressbar"
+                        aria-valuenow={cause.raised}
+                        aria-valuemin={0}
+                        aria-valuemax={cause.goal}
+                        aria-label={`Progreso de ${cause.title}`}
+                      >
+                        <div
+                          class="bg-gradient-to-r from-leader to-dracula-green h-full rounded-full transition-all duration-1000"
+                          style={`width: ${Math.min(causeProgress, 100)}%`}
+                        />
+                      </div>
+                      <p class="text-center text-dracula-comment text-xs mt-2">
+                        {causeProgress}% de la meta
+                      </p>
+                    </div>
+                  )}
+                </a>
+              );
+            })}
           </div>
         </div>
       </section>

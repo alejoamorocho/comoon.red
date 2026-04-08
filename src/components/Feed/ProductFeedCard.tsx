@@ -17,7 +17,7 @@ export default function ProductFeedCard({ product }: ProductFeedCardProps) {
   return (
     <div className="glass group overflow-hidden rounded-2xl border border-white/5 transition-all duration-300 hover:shadow-xl hover:shadow-entrepreneur/10">
       {/* Product Image */}
-      <div className="relative h-52 overflow-hidden bg-dracula-current/20">
+      <div className="relative h-48 overflow-hidden bg-dracula-current/20">
         <a href={`/store/${product.id}`}>
           {product.photo_url ? (
             <img
@@ -45,13 +45,13 @@ export default function ProductFeedCard({ product }: ProductFeedCardProps) {
         </div>
       </div>
 
-      <div className="p-5">
+      <div className="p-4">
         {/* Product Info */}
         <a
           href={`/store/${product.id}`}
           className="mb-1 block transition-colors hover:text-dracula-cyan"
         >
-          <h3 className="line-clamp-2 text-lg font-bold leading-tight text-white">
+          <h3 className="line-clamp-2 text-base font-semibold leading-tight text-white">
             {product.name}
           </h3>
         </a>

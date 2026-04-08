@@ -21,6 +21,7 @@ import {
   HandHeart,
   ChartBar,
   ListChecks,
+  Target,
 } from '@phosphor-icons/react';
 
 const { id } = Astro.params;
@@ -122,6 +123,18 @@ if (runtime?.env?.DB) {
   }
 }
 
+let causeObjectives: any[] = [];
+if (runtime?.env?.DB) {
+  try {
+    const { results: objResults } = await runtime.env.DB.prepare(
+      'SELECT * FROM cause_objectives WHERE cause_id = ? ORDER BY sort_order ASC, created_at ASC',
+    )
+      .bind(id)
+      .all();
+    causeObjectives = objResults || [];
+  } catch {}
+}
+
 // Redirect if cause not found
 if (!cause) {
   return Astro.redirect('/404');
@@ -161,9 +174,9 @@ import { UPDATE_TYPE_CONFIG } from '../../types/feed';
 
 <Layout title={cause.title} fullWidth>
   <!-- Hero Header -->
-  <section class="relative py-24 px-6 border-b border-white/5">
+  <section class="relative py-20 px-6 overflow-hidden">
     <div
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-leader/5 rounded-full blur-[150px] -z-10"
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-leader/8 rounded-full blur-[140px] pointer-events-none"
     >
     </div>
 
@@ -320,6 +333,78 @@ import { UPDATE_TYPE_CONFIG } from '../../types/feed';
         </div>
       </div>
     </section>
+
+    <!-- Cause Objectives -->
+    {
+      causeObjectives.length > 0 && (
+        <section class="py-12 border-b border-white/5">
+          <p class="text-xs font-bold uppercase tracking-[0.2em] text-dracula-yellow mb-3">
+            Objetivos
+          </p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white mb-8 flex items-center gap-3">
+            <Target size={32} className="text-dracula-yellow" weight="duotone" />
+            Metas de la causa
+          </h2>
+
+          <div class="space-y-4">
+            {causeObjectives.map((obj: any) => {
+              const isObjCompleted = obj.is_completed === 1 || obj.is_completed === true;
+              const hasTarget = obj.target_value && obj.target_value > 0;
+              const objProgress = hasTarget
+                ? Math.min(((obj.current_value || 0) / obj.target_value) * 100, 100)
+                : 0;
+              return (
+                <div
+                  class={`glass rounded-2xl p-6 border transition-all ${isObjCompleted ? 'border-dracula-green/20 bg-dracula-green/[0.03]' : 'border-white/5 hover:border-white/10'}`}
+                >
+                  <div class="flex items-start gap-4">
+                    <div class="mt-1 shrink-0">
+                      {isObjCompleted ? (
+                        <CheckCircle weight="fill" size={24} className="text-dracula-green" />
+                      ) : (
+                        <div class="w-6 h-6 rounded-full border-2 border-white/20" />
+                      )}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h3
+                        class={`text-lg font-bold ${isObjCompleted ? 'text-dracula-green' : 'text-white'}`}
+                      >
+                        {obj.title}
+                      </h3>
+                      {obj.description && (
+                        <p class="text-sm text-dracula-fg/60 mt-1 leading-relaxed">
+                          {obj.description}
+                        </p>
+                      )}
+                      {hasTarget && (
+                        <div class="mt-3">
+                          <div class="flex items-center justify-between text-xs text-dracula-comment mb-1.5">
+                            <span>
+                              {(obj.current_value || 0).toLocaleString('es-CO')} /{' '}
+                              {obj.target_value.toLocaleString('es-CO')}
+                              {obj.unit && <span class="ml-1">{obj.unit}</span>}
+                            </span>
+                            <span class="font-bold text-dracula-yellow">
+                              {objProgress.toFixed(0)}%
+                            </span>
+                          </div>
+                          <div class="w-full bg-dracula-bg h-2 rounded-full overflow-hidden border border-white/5">
+                            <div
+                              class={`h-full rounded-full transition-all duration-700 ${isObjCompleted ? 'bg-dracula-green' : 'bg-gradient-to-r from-dracula-yellow to-dracula-orange'}`}
+                              style={`width: ${objProgress}%`}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )
+    }
 
     <!-- Leader Info Card -->
     <section class="py-12 border-b border-white/5">

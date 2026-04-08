@@ -16,7 +16,7 @@ export default function CauseFeedCard({ cause }: CauseFeedCardProps) {
   return (
     <div className="glass group overflow-hidden rounded-2xl border border-white/5 transition-all duration-300 hover:shadow-xl hover:shadow-leader/10">
       {/* Cause Image */}
-      <div className="relative h-52 overflow-hidden bg-dracula-current/20">
+      <div className="relative h-48 overflow-hidden bg-dracula-current/20">
         <a href={`/causes/${cause.id}`}>
           {cause.photo_url ? (
             <img
@@ -46,10 +46,12 @@ export default function CauseFeedCard({ cause }: CauseFeedCardProps) {
         )}
       </div>
 
-      <div className="p-5">
+      <div className="p-4">
         {/* Cause Title */}
         <a href={`/causes/${cause.id}`} className="mb-2 block transition-colors hover:text-leader">
-          <h3 className="line-clamp-2 text-lg font-bold leading-tight text-white">{cause.title}</h3>
+          <h3 className="line-clamp-2 text-base font-semibold leading-tight text-white">
+            {cause.title}
+          </h3>
         </a>
 
         {/* Leader info */}

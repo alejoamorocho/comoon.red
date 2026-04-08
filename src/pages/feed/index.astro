@@ -32,16 +32,16 @@ if (isAuthenticated && user?.profileId) {
 
 <Layout title="Feed - Comoon" fullWidth>
   <!-- Header -->
-  <section class="relative py-24 px-6 border-b border-white/5">
+  <section class="relative py-20 px-6 overflow-hidden">
     <div
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-comoon-purple/8 rounded-full blur-[120px] -z-10"
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-comoon-purple/8 rounded-full blur-[140px] pointer-events-none"
     >
     </div>
 
-    <div class="max-w-7xl mx-auto text-center">
-      <p class="text-xs font-bold uppercase tracking-[0.2em] text-comoon-purple mb-4">Comunidad</p>
-      <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-white">Feed</h1>
-      <p class="text-dracula-comment max-w-lg mx-auto mt-4">
+    <div class="relative z-10 max-w-3xl mx-auto text-center">
+      <p class="text-comoon-purple text-xs font-bold uppercase tracking-[0.2em] mb-4">Comunidad</p>
+      <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">Feed</h1>
+      <p class="text-lg text-dracula-comment-accessible leading-relaxed max-w-2xl mx-auto">
         Descubre productos, causas y actualizaciones que transforman comunidades.
       </p>
     </div>

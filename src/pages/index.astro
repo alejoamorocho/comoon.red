@@ -160,7 +160,7 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
 
 <Layout title="Inicio" fullWidth>
   <!-- ===== HERO ===== -->
-  <section class="relative flex items-center justify-center px-6 pt-12 pb-14 overflow-hidden">
+  <section class="relative flex items-center justify-center px-6 py-20 overflow-hidden">
     <!-- Ambient -->
     <div
       class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-comoon-purple/8 rounded-full blur-[140px] pointer-events-none"
@@ -300,14 +300,14 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
         </a>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {
           causes.slice(0, 4).map((cause: any, i: number) => (
             <a
               href={cause.id ? `/causes/${cause.id}` : '/leaders'}
-              class="group glass rounded-xl overflow-hidden hover:border-leader/20 transition-all duration-200"
+              class="group glass rounded-2xl overflow-hidden border border-white/5 hover:border-leader/20 transition-all duration-300"
             >
-              <div class="relative h-36 overflow-hidden">
+              <div class="relative h-48 overflow-hidden">
                 <img
                   src={cause.photo_url || causeImages[i % causeImages.length]}
                   alt={cause.title}
@@ -329,7 +329,7 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
                 )}
               </div>
               <div class="p-4">
-                <h3 class="font-semibold text-white text-sm mb-1 group-hover:text-leader transition-colors">
+                <h3 class="text-base font-semibold text-white mb-1 group-hover:text-leader transition-colors">
                   {cause.title}
                 </h3>
                 <p class="text-xs text-dracula-comment-accessible line-clamp-1 mb-3">
@@ -342,14 +342,14 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
                       alt=""
                       width="20"
                       height="20"
-                      class="w-5 h-5 rounded-full object-cover"
+                      class="w-6 h-6 rounded-full object-cover"
                     />
                   ) : (
-                    <div class="w-5 h-5 rounded-full bg-leader/20 flex items-center justify-center text-leader text-[10px] font-bold">
+                    <div class="w-6 h-6 rounded-full bg-leader/20 flex items-center justify-center text-leader text-[10px] font-bold">
                       {(cause.leader_name || 'L')[0]}
                     </div>
                   )}
-                  <span class="text-xs text-dracula-comment">{cause.leader_name}</span>
+                  <span class="text-sm text-dracula-comment">{cause.leader_name}</span>
                 </div>
               </div>
             </a>
@@ -375,14 +375,14 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
         </a>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {
           products.slice(0, 6).map((product: any, i: number) => (
             <a
               href={product.id ? `/store/${product.id}` : '/store'}
-              class="group glass rounded-xl overflow-hidden hover:border-entrepreneur/20 transition-all duration-200"
+              class="group glass rounded-2xl overflow-hidden border border-white/5 hover:border-entrepreneur/20 transition-all duration-300"
             >
-              <div class="relative aspect-square overflow-hidden bg-dracula-current/30">
+              <div class="relative h-48 overflow-hidden bg-dracula-current/20">
                 {product.photo_url ? (
                   <img
                     src={product.photo_url}
@@ -410,11 +410,11 @@ const products = featuredProducts.length > 0 ? featuredProducts : placeholderPro
                   </div>
                 )}
               </div>
-              <div class="p-3">
-                <h3 class="font-medium text-white text-xs mb-0.5 group-hover:text-entrepreneur transition-colors line-clamp-1">
+              <div class="p-4">
+                <h3 class="text-base font-semibold text-white mb-0.5 group-hover:text-entrepreneur transition-colors line-clamp-1">
                   {product.name}
                 </h3>
-                <p class="text-[10px] text-dracula-comment mb-1">{product.store_name}</p>
+                <p class="text-sm text-dracula-comment mb-1">{product.store_name}</p>
                 <p class="text-sm font-bold text-white">{formatCurrency(product.price || 0)}</p>
               </div>
             </a>

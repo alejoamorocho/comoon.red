@@ -9,6 +9,7 @@ import causes from './causes';
 import entrepreneurs from './entrepreneurs';
 import posts from './posts';
 import upload from './upload';
+import causeObjectives from './cause-objectives';
 import { authMiddleware } from '../lib/auth';
 import { errorHandler } from '../lib/middleware/error-handler';
 import { securityHeaders } from '../lib/middleware/security-headers';
@@ -76,5 +77,6 @@ app.route('/causes', causes);
 app.route('/entrepreneurs', entrepreneurs);
 app.route('/posts', posts);
 app.route('/upload', upload);
+app.route('/causes', causeObjectives);
 
 export { app };
